@@ -129,3 +129,13 @@ But the real breakthrough is our commitment: OncoAgent will be 100% Open-Source.
 Why? Because life-saving clinical intelligence shouldn't be locked behind a proprietary API. Hospitals can deploy OncoAgent locally on AMD Instinct MI300X hardware, ensuring absolute patient privacy while allowing the global medical community to audit and contribute to the knowledge base.
 
 #AMDHackathon #OncoAgent #AMDInstinct #OpenSource #HealthTech #AIArchitecture #ROCm
+
+---
+DATE: 2026-05-04 (Session 5)
+
+### POST 1: X/TWITTER (Tone: Quick tip / Professional)
+🛡️ Quick tip for #Hackathon developers: Keep your repo clean!
+
+Just hardened our `.gitignore` to ensure internal instructions and planning docs stay private. Focus on the code, keep the noise out. 🚀
+
+#AMDHackathon #BuildInPublic #GitTips #CleanCode

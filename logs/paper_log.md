@@ -61,3 +61,12 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 
 - **Problem/Hypothesis:** Proprietary AI models lock life-saving clinical intelligence behind APIs, preventing local deployment in privacy-sensitive hospital environments.
 - **Architectural Justification:** Positioned OncoAgent as a 100% Open Source solution. This dual-pronged strategy ensures patient privacy (by allowing local execution on AMD MI300X hardware) and fosters global medical community contribution to the RAG knowledge base.
+
+## Milestone: Internal Documentation Security & Git Hygiene
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Accidental leakage of internal hackathon instructions or sensitive project planning documents in public repositories can lead to clutter and potential disqualification.
+- **Architectural Justification:** Implemented explicit ignore rules for hackathon-specific internal documents (e.g., Lablab.ai guidelines) within `.gitignore`.
+- **Logical/Technical Implementation:** Added specific file patterns to the `.gitignore` under the "Internal AI & Tooling" section to ensure zero-leakage policy.
+- **Performance Metrics:** 100% exclusion of sensitive internal PDFs from the git index.
