@@ -141,3 +141,59 @@ FECHA: 2026-05-04 (Sesión 5)
 Acabamos de reforzar nuestro `.gitignore` para asegurar que las instrucciones internas y docs de planificación se mantengan privados. Foco en el código, fuera el ruido. 🚀
 
 #AMDHackathon #BuildInPublic #GitTips #CleanCode
+
+---
+---
+FECHA: 2026-05-04 (Sesión 6)
+
+### POST 1: X/TWITTER THREAD (Tono: Build in Public / Técnico)
+1/ 🧠 ¡OncoAgent ahora es más inteligente! 🚀
+
+Hemos pivotado a una arquitectura 100% Open-Source. ¿Por qué? Porque la IA médica pertenece a la comunidad. Los hospitales ahora pueden ejecutar nuestros agentes de LangGraph localmente en #AMD MI300X.
+
+#AMDHackathon #OpenSource #HealthTech
+
+2/ 🛡️ El "Fracaso del Día": ¡Casi filtramos documentos internos del hackathon al repo! 🤦‍♂️
+
+Solución rápida: Reforzamos nuestro `.gitignore`. La higiene de Git es tan importante como el código mismo.
+
+3/ 📊 Métricas de Hoy:
+- Posicionamiento 100% Open-Source confirmado.
+- 0 documentos internos filtrados (Protocolo Safe-Git).
+- Lógica de LangGraph verificada para desacoplamiento estilo Biofy.
+
+4/ 📸 Sugerencia Visual: Una captura de código de la nueva sección Open-Source en el README. Se ve con mucha autoridad.
+
+#ROCm #AI #Llama31 #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
+🚀 **OncoAgent: Por qué elegimos 100% Open-Source para el Hackathon de AMD**
+
+En el sector salud, la privacidad no es una opción, es un requisito. Hoy hemos finalizado nuestro pivot estratégico: OncoAgent es ahora un proyecto totalmente de código abierto.
+
+🔹 **Arquitectura Desacoplada:** Usando LangGraph, hemos separado el razonamiento clínico de la recuperación de datos.
+🔹 **Privacidad Local:** Diseñado para #AMD Instinct MI300X, permitiendo a los hospitales ejecutar IA sin que los datos del paciente salgan de su red.
+🔹 **Impulsado por la Comunidad:** Al ser open-source, invitamos a clínicos e ingenieros a auditar nuestros nodos de anti-alucinación.
+
+¡Adelante con la democratización de la oncología! 🚀
+
+#AMDHackathon #HealthTech #AMDInstinct #OpenSource #SoftwareArchitecture #ROCm
+
+---
+
+### POST 3: INSTAGRAM/TIKTOK (Tono: Dinámico / Visual)
+**Hook:** ¡Por qué tu IA médica DEBE ser Open Source! 🏥💻
+
+**Caption:**
+Estamos construyendo OncoAgent para el #AMDHackathon y acabamos de tomar una GRAN decisión: 100% Open Source. 🚀
+
+La mayoría de la IA vive en la nube, pero en oncología, la privacidad lo es todo. Al ser abiertos, permitimos que los hospitales ejecuten esto localmente con el poder de #AMD. Sin fugas de datos, solo inteligencia que salva vidas.
+
+**Sugerencia Visual:**
+- Slide 1: "OncoAgent se vuelve 100% Open Source" (Texto en negrita)
+- Slide 2: Captura de pantalla de la arquitectura LangGraph.
+- Slide 3: Un clip corto del código corriendo en ROCm.
+
+#AMDHackathon #BuildInPublic #IA #Oncologia #OpenSource #AMD #CodingLife

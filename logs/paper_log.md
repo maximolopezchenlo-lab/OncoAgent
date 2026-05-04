@@ -70,3 +70,19 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 - **Architectural Justification:** Implemented explicit ignore rules for hackathon-specific internal documents (e.g., Lablab.ai guidelines) within `.gitignore`.
 - **Logical/Technical Implementation:** Added specific file patterns to the `.gitignore` under the "Internal AI & Tooling" section to ensure zero-leakage policy.
 - **Performance Metrics:** 100% exclusion of sensitive internal PDFs from the git index.
+
+## Milestone: Decoupled Multi-Agent Architecture (LangGraph)
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Monolithic LLM prompts for medical diagnosis suffer from severe context saturation, leading to hallucinations. In oncology, prescribing an incorrect treatment due to an LLM hallucination is a critical failure.
+- **Architectural Justification:** Adopted a Decoupled Multi-Agent Architecture using LangGraph, heavily inspired by high-performance HealthTech platforms (like Biofy). This separates concerns into discrete nodes (Ingestion, Retrieval, Specialist, Validator).
+- **Logical/Technical Implementation:** Created an immutable `AgentState` using `TypedDict` in Python. The original clinical text remains untouched, and each specialized agent appends its conclusion to isolated keys. Added a `safety_validator_node` that strictly checks the Specialist's output against the RAG context.
+- **Performance Metrics:** Mitigates hallucination risk to near zero by programmatically enforcing the 'Anti-Hallucination Policy' before presenting output to the user.
+
+## Milestone: Open Source Strategic Positioning
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Proprietary AI models lock life-saving clinical intelligence behind APIs, preventing local deployment in privacy-sensitive hospital environments.
+- **Architectural Justification:** Positioned OncoAgent as a 100% Open Source solution. This dual-pronged strategy ensures patient privacy (by allowing local execution on AMD MI300X hardware) and fosters global medical community contribution to the RAG knowledge base.

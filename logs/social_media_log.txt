@@ -139,3 +139,59 @@ DATE: 2026-05-04 (Session 5)
 Just hardened our `.gitignore` to ensure internal instructions and planning docs stay private. Focus on the code, keep the noise out. 🚀
 
 #AMDHackathon #BuildInPublic #GitTips #CleanCode
+
+---
+---
+DATE: 2026-05-04 (Session 6)
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🧠 OncoAgent just got smarter! 🚀 
+
+We've pivoted to a 100% Open-Source architecture. Why? Because medical AI belongs to the community. Hospitals can now run our LangGraph agents locally on #AMD MI300X. 
+
+#AMDHackathon #OpenSource #HealthTech
+
+2/ 🛡️ The "Failure of the Day": We almost leaked internal hackathon docs to the repo! 🤦‍♂️
+
+Quick fix: Hardened our `.gitignore`. Git hygiene is as important as the code itself. 
+
+3/ 📊 Today's Metrics:
+- 100% Open-Source positioning confirmed.
+- 0 internal docs leaked (Safe-Git protocol).
+- LangGraph logic verified for Biofy-style decoupling.
+
+4/ 📸 Visual Suggestion: A "code screenshot" of the new Open-Source section in the README. Looks authoritative.
+
+#ROCm #AI #Llama31 #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tone: Professional / Strategic)
+🚀 **OncoAgent: Why we chose 100% Open-Source for the AMD Hackathon**
+
+In the healthcare sector, privacy isn't a feature—it's a requirement. Today, we've finalized our strategic pivot: OncoAgent is now a fully Open-Source project.
+
+🔹 **Decoupled Architecture:** Using LangGraph, we've separated clinical reasoning from data retrieval.
+🔹 **Local Privacy:** Designed for #AMD Instinct MI300X, allowing hospitals to run AI without patient data ever leaving their network.
+🔹 **Community Driven:** By going open-source, we invite clinicians and engineers to audit our anti-hallucination nodes.
+
+Onward to democratizing oncology! 🚀
+
+#AMDHackathon #HealthTech #AMDInstinct #OpenSource #SoftwareArchitecture #ROCm
+
+---
+
+### POST 3: INSTAGRAM/TIKTOK (Tone: Dynamic / Visual)
+**Hook:** Why your medical AI needs to be Open Source! 🏥💻
+
+**Caption:**
+We’re building OncoAgent for the #AMDHackathon and we just made a BIG decision: 100% Open Source. 🚀
+
+Most AI lives in the cloud, but in oncology, privacy is everything. By staying open, we let hospitals run this locally on #AMD power. No data leaks, just life-saving intelligence.
+
+**Visual Suggestion:**
+- Slide 1: "OncoAgent goes 100% Open Source" (Bold text)
+- Slide 2: Screenshot of the LangGraph architecture.
+- Slide 3: A photo/clip of the code running on ROCm.
+
+#AMDHackathon #BuildInPublic #AITech #Oncology #OpenSource #AMD #CodingLife

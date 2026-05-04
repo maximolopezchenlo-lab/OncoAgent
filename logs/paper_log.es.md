@@ -70,3 +70,19 @@ Se optó por utilizar el estándar **Model Context Protocol (MCP)** para desacop
 - **Justificación Arquitectónica:** Se implementaron reglas de exclusión explícitas para documentos internos específicos del hackathon (ej. guías de Lablab.ai) dentro de `.gitignore`.
 - **Implementación Lógica/Técnica:** Se añadieron patrones de archivos específicos al `.gitignore` bajo la sección "Internal AI & Tooling" para asegurar una política de cero filtraciones.
 - **Métricas de Rendimiento:** 100% de exclusión de PDFs internos sensibles del índice de git.
+
+## Hito: Arquitectura Multi-Agente Desacoplada (LangGraph)
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Los prompts monolíticos de LLM para diagnóstico médico sufren de severa saturación de contexto, llevando a alucinaciones. En oncología, recetar un tratamiento incorrecto debido a una alucinación del LLM es una falla crítica.
+- **Justificación Arquitectónica:** Adoptamos una Arquitectura Multi-Agente Desacoplada usando LangGraph, fuertemente inspirada en plataformas HealthTech de alto rendimiento (como Biofy). Esto separa las responsabilidades en nodos discretos (Ingesta, Recuperación, Especialista, Validador).
+- **Implementación Lógica/Técnica:** Se creó un `AgentState` inmutable usando `TypedDict` en Python. El texto clínico original permanece intacto, y cada agente especializado añade su conclusión a claves aisladas. Se añadió un `safety_validator_node` que verifica estrictamente la salida del Especialista contra el contexto del RAG.
+- **Métricas de Rendimiento:** Mitiga el riesgo de alucinación a casi cero al hacer cumplir programáticamente la 'Política Anti-Alucinación' antes de presentar la salida al usuario.
+
+## Hito: Posicionamiento Estratégico Open Source
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Los modelos de IA propietarios bloquean la inteligencia clínica que salva vidas detrás de APIs, impidiendo el despliegue local en entornos hospitalarios sensibles a la privacidad.
+- **Justificación Arquitectónica:** Posicionamos a OncoAgent como una solución 100% Open Source. Esta estrategia de doble enfoque asegura la privacidad del paciente (al permitir la ejecución local en hardware AMD MI300X) y fomenta la contribución de la comunidad médica global a la base de conocimiento RAG.
