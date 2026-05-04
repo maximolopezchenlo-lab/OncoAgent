@@ -1,0 +1,53 @@
+🚀 Build-in-Public Update: ¡NotebookLM integrado!
+
+Hoy dimos un paso gigante en la infraestructura de nuestro agente de salud para el #AMDHackathon. Hemos instalado y configurado el MCP de NotebookLM.
+
+✅ ¿Qué significa esto? Ahora nuestro agente puede "leer" y "razonar" sobre bibliotecas enteras de guías médicas de la NCCN y ESMO usando la potencia de NotebookLM directamente desde el IDE.
+
+🔧 Desafíos del día: Configurar la autenticación segura para que el agente maneje las sesiones de Google sin fricción. ¡Superado!
+
+Próximo paso: Sincronizar las guías oncológicas para el procesamiento de OncoCoT.
+
+
+#AMDHackathon #HealthTech #ROCm #AI #Llama3 #BuildInPublic #NotebookLM #MCP
+
+---
+---
+FECHA: 2026-05-04
+
+### POST 1: HILO DE X/TWITTER (Tono: Build in Public / Técnico)
+1/ 🧠 ¡Arquitectura de "Planos" lista para OncoAgent! 🚀 
+
+Hemos separado el cerebro del proyecto:
+✅ Plano de Control: MDs locales para lógica y arquitectura.
+✅ Plano de Datos: @NotebookLM para la evidencia clínica masiva (NCCN/ESMO).
+
+#AMDHackathon #HealthTech #ROCm #MI300X
+
+2/ 🛠️ El "Fracaso del Día": La ambigüedad nos mató por un momento. Teníamos un archivo "sin titulo.md" que era el corazón del proyecto. 🤦‍♂️
+
+Lo hemos renombrado a `oncoagent_master_directive.md` y ahora es el orquestador oficial. Menos caos, más código.
+
+3/ 📊 Métricas de hoy:
+- 0 PHI leaks detectados (filtro Zero-PHI validado).
+- 100% compatibilidad ROCm 6.2 en los scripts de ingesta.
+- 192GB de HBM3 esperando para el fine-tuning de Llama 3.1.
+
+4/ 📸 Sugerencia Visual: Toma un screenshot de la nueva estructura de archivos y el mapeo en el Master Directive. ¡Se ve muy pro! 
+
+#Llama31 #LangGraph #AI
+
+---
+
+### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
+🚀 **OncoAgent Milestone: Arquitectura de Planos y Compliance AMD**
+
+Hoy cerramos la Fase 0 de OncoAgent con un avance crítico en la gestión del conocimiento para oncología. Implementamos una arquitectura de **Plano de Control vs. Plano de Datos** para garantizar que nuestro sistema multi-agente no se sature con las extensas guías NCCN/ESMO.
+
+🔹 **Lo técnico:** Scripts de ingesta con *Adaptive Semantic Chunking* terminados, asegurando que el contexto médico se preserve intacto.
+🔹 **Lo humano:** Documentamos nuestro primer "Failure of the Day" (ambigüedad en directivas) para fortalecer la modularidad del repo.
+🔹 **Hardware:** Todo optimizado para **AMD Instinct MI300X** bajo ROCm 6.2.
+
+Próximo paso: Fase 1 - Validación de carga en los 192GB de HBM3. ¡Seguimos!
+
+#AMDHackathon #OncoAgent #AMDInstinct #HealthTech #AIArchitecture #ROCm
