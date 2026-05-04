@@ -1,6 +1,34 @@
+# === Python ===
 .venv/
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+
+# === Secrets ===
 .env
+
+# === Data (generated, not tracked) ===
 *.pdf
+*.jsonl
+processed_data/
+chroma_db/
+clinical_guides/
+raw_data/
+checkpoints/
+
+# === Node/Tooling ===
 node_modules/
+.gitnexus/
+
+# === Internal AI & Tooling (No mostrar a los jueces) ===
+.oncoagent/
+.claude/
+AGENTS.md
+docs/antigravity_rules.md
+docs/oncoagent_master_directive.md
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp

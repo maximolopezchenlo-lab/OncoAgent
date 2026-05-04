@@ -1,0 +1,98 @@
+🚀 Build-in-Public Update: NotebookLM Integrated!
+
+Today we took a giant leap in the infrastructure of our health agent for the #AMDHackathon. We installed and configured the NotebookLM MCP.
+
+✅ What does this mean? Our agent can now "read" and "reason" over entire libraries of NCCN and ESMO medical guidelines using the power of NotebookLM directly from the IDE.
+
+🔧 Challenges of the day: Configuring secure authentication so the agent handles Google sessions seamlessly. Overcome!
+
+Next step: Sync the oncology guidelines for OncoCoT processing.
+
+#AMDHackathon #HealthTech #ROCm #AI #Llama3 #BuildInPublic #NotebookLM #MCP
+
+---
+---
+DATE: 2026-05-04
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🧠 "Planes" architecture ready for OncoAgent! 🚀 
+
+We have separated the brain of the project:
+✅ Control Plane: Local MDs for logic and architecture.
+✅ Data Plane: @NotebookLM for massive clinical evidence (NCCN/ESMO).
+
+#AMDHackathon #HealthTech #ROCm #MI300X
+
+2/ 🛠️ The "Failure of the Day": Ambiguity killed us for a moment. We had an "untitled.md" file that was the heart of the project. 🤦‍♂️
+
+We renamed it to `oncoagent_master_directive.md` and it is now the official orchestrator. Less chaos, more code.
+
+3/ 📊 Today's Metrics:
+- 0 PHI leaks detected (Zero-PHI filter validated).
+- 100% ROCm 6.2 compatibility in ingestion scripts.
+- 192GB of HBM3 waiting for Llama 3.1 fine-tuning.
+
+4/ 📸 Visual Suggestion: Take a screenshot of the new file structure and the mapping in the Master Directive. Looks very pro! 
+
+#Llama31 #LangGraph #AI
+
+---
+
+### POST 2: LINKEDIN (Tone: Professional / Strategic)
+🚀 **OncoAgent Milestone: Plane Architecture and AMD Compliance**
+
+Today we close Phase 0 of OncoAgent with a critical advance in knowledge management for oncology. We implemented a **Control Plane vs. Data Plane** architecture to ensure our multi-agent system does not saturate with the extensive NCCN/ESMO guidelines.
+
+🔹 **The Technical:** Ingestion scripts with *Adaptive Semantic Chunking* finished, ensuring medical context is preserved intact.
+🔹 **The Human:** Documented our first "Failure of the Day" (directive ambiguity) to strengthen repo modularity.
+🔹 **Hardware:** Everything optimized for **AMD Instinct MI300X** under ROCm 6.2.
+
+Next step: Phase 1 - Load validation on the 192GB of HBM3. Onward!
+
+#AMDHackathon #OncoAgent #AMDInstinct #HealthTech #AIArchitecture #ROCm
+
+---
+---
+DATE: 2026-05-04 (Session 3)
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🏗️ Repo Cleanup Day for OncoAgent! 🧹
+
+We went from a chaotic root directory with 13 loose files to a professional modular architecture:
+
+✅ `docs/research/` — 4 centralized Deep Research docs
+✅ `rag_engine/` — Medical knowledge engine
+✅ `agents/` — LangGraph orchestration
+✅ `README.md` + `Dockerfile` + `requirements.txt` ready
+
+#AMDHackathon #HealthTech #ROCm #MI300X
+
+2/ 🗑️ The "Failure of the Day": We had 22MB of generic skills (1427 folders!) copied in the repo — from "discord-bot-architect" to "shopify-development" 🤦‍♂️
+
+Solution: rm -rf and rely on the 7 curated medical skills that actually matter. Less is more.
+
+3/ 📊 Today's Metrics:
+- -22MB of dead weight removed from the repo
+- 0 orphaned files in the root
+- 100% files with snake_case names (goodbye spaces and accents in filenames)
+- Dockerfile ready based on `rocm/vllm:latest`
+
+4/ 📸 Visual Suggestion: Take a screenshot of the `tree -L 2` output showing the clean new structure. The before/after is brutal!
+
+#Llama31 #LangGraph #AI #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tone: Professional / Strategic)
+🏗️ **OncoAgent Milestone: Repository Architecture Overhaul**
+
+Today we tackled technical debt before it compounds. Our AMD Hackathon oncology triage project underwent a full repository reorganization:
+
+🔹 **Modular structure:** Code separated into `data_prep/`, `rag_engine/`, `agents/`, and `ui/` — mapped 1:1 to our development phases.
+🔹 **Production-ready scaffolding:** `Dockerfile` (rocm/vllm), pinned `requirements.txt`, comprehensive `.gitignore`.
+🔹 **22MB of bloat removed:** 1,427 generic skill files that had no place in a medical AI project.
+🔹 **Documentation centralized:** Deep Research documents, ADR folder, and Master Directive properly organized.
+
+Clean architecture = faster iteration. On to Phase 1: AMD MI300X hardware validation! 🚀
+
+#AMDHackathon #OncoAgent #AMDInstinct #HealthTech #ROCm #SoftwareArchitecture

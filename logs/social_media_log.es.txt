@@ -51,3 +51,50 @@ Hoy cerramos la Fase 0 de OncoAgent con un avance crítico en la gestión del co
 Próximo paso: Fase 1 - Validación de carga en los 192GB de HBM3. ¡Seguimos!
 
 #AMDHackathon #OncoAgent #AMDInstinct #HealthTech #AIArchitecture #ROCm
+
+---
+---
+FECHA: 2026-05-04 (Sesión 3)
+
+### POST 1: HILO DE X/TWITTER (Tono: Build in Public / Técnico)
+1/ 🏗️ ¡Repo Cleanup Day para OncoAgent! 🧹
+
+Pasamos de un directorio raíz caótico con 13 archivos sueltos a una arquitectura modular profesional:
+
+✅ `docs/research/` — 4 Deep Research centralizados
+✅ `rag_engine/` — Motor de conocimiento médico
+✅ `agents/` — Orquestación LangGraph
+✅ `README.md` + `Dockerfile` + `requirements.txt` listos
+
+#AMDHackathon #HealthTech #ROCm #MI300X
+
+2/ 🗑️ El "Fracaso del Día": ¡Teníamos 22MB de skills genéricos (1427 carpetas!) copiados en el repo — desde "discord-bot-architect" hasta "shopify-development" 🤦‍♂️
+
+Solución: rm -rf y confiar en los 7 skills médicos curados que realmente importan. Menos es más.
+
+3/ 📊 Métricas de hoy:
+- -22MB de peso muerto eliminados del repo
+- 0 archivos huérfanos en la raíz
+- 100% de archivos con nombres snake_case (adiós espacios y tildes en filenames)
+- Dockerfile listo basado en `rocm/vllm:latest`
+
+4/ 📸 Sugerencia Visual: Toma un screenshot del output de `tree -L 2` mostrando la nueva estructura limpia. ¡El antes/después es brutal!
+
+#Llama31 #LangGraph #AI #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
+🏗️ **OncoAgent Milestone: Repository Architecture Overhaul**
+
+Today we tackled technical debt before it compounds. Our AMD Hackathon oncology triage project underwent a full repository reorganization:
+
+🔹 **Modular structure:** Code separated into `data_prep/`, `rag_engine/`, `agents/`, and `ui/` — mapped 1:1 to our development phases.
+🔹 **Production-ready scaffolding:** `Dockerfile` (rocm/vllm), pinned `requirements.txt`, comprehensive `.gitignore`.
+🔹 **22MB of bloat removed:** 1,427 generic skill files that had no place in a medical AI project.
+🔹 **Documentation centralized:** Deep Research documents, ADR folder, and Master Directive properly organized.
+
+Clean architecture = faster iteration. On to Fase 1: AMD MI300X hardware validation! 🚀
+
+#AMDHackathon #OncoAgent #AMDInstinct #HealthTech #ROCm #SoftwareArchitecture
+
