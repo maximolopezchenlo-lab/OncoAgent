@@ -46,6 +46,8 @@ DATE: 2026-05-04 (Session 6)
 
 We've pivoted to a 100% Open-Source architecture. Why? Because medical AI belongs to the community. Hospitals can now run our LangGraph agents locally on #AMD MI300X. 
 
+cc: @lablabai @AIatAMD @huggingface
+
 #AMDHackathon #OpenSource #HealthTech
 
 2/ 🛡️ The "Failure of the Day": We almost leaked internal hackathon docs to the repo! 🤦‍♂️
@@ -74,6 +76,8 @@ In the healthcare sector, privacy isn't a feature—it's a requirement. Today, w
 
 Onward to democratizing oncology! 🚀
 
+Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
+
 #AMDHackathon #HealthTech #AMDInstinct #OpenSource #SoftwareArchitecture #ROCm
 
 ---
@@ -86,10 +90,7 @@ We’re building OncoAgent for the #AMDHackathon and we just made a BIG decision
 
 Most AI lives in the cloud, but in oncology, privacy is everything. By staying open, we let hospitals run this locally on #AMD power. No data leaks, just life-saving intelligence.
 
-**Visual Suggestion:**
-- Slide 1: "OncoAgent goes 100% Open Source" (Bold text)
-- Slide 2: Screenshot of the LangGraph architecture.
-- Slide 3: A photo/clip of the code running on ROCm.
+Tagging the squad: @lablab.ai @amd @huggingface
 
 #AMDHackathon #BuildInPublic #AITech #Oncology #OpenSource #AMD #CodingLife
 """
@@ -103,6 +104,8 @@ FECHA: 2026-05-04 (Sesión 6)
 1/ 🧠 ¡OncoAgent ahora es más inteligente! 🚀
 
 Hemos pivotado a una arquitectura 100% Open-Source. ¿Por qué? Porque la IA médica pertenece a la comunidad. Los hospitales ahora pueden ejecutar nuestros agentes de LangGraph localmente en #AMD MI300X.
+
+cc: @lablabai @AIatAMD @huggingface
 
 #AMDHackathon #OpenSource #HealthTech
 
@@ -132,6 +135,8 @@ En el sector salud, la privacidad no es una opción, es un requisito. Hoy hemos 
 
 ¡Adelante con la democratización de la oncología! 🚀
 
+Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
+
 #AMDHackathon #HealthTech #AMDInstinct #OpenSource #SoftwareArchitecture #ROCm
 
 ---
@@ -144,10 +149,7 @@ Estamos construyendo OncoAgent para el #AMDHackathon y acabamos de tomar una GRA
 
 La mayoría de la IA vive en la nube, pero en oncología, la privacidad lo es todo. Al ser abiertos, permitimos que los hospitales ejecuten esto localmente con el poder de #AMD. Sin fugas de datos, solo inteligencia que salva vidas.
 
-**Sugerencia Visual:**
-- Slide 1: "OncoAgent se vuelve 100% Open Source" (Texto en negrita)
-- Slide 2: Captura de pantalla de la arquitectura LangGraph.
-- Slide 3: Un clip corto del código corriendo en ROCm.
+Mencionando al equipo: @lablab.ai @amd @huggingface
 
 #AMDHackathon #BuildInPublic #IA #Oncologia #OpenSource #AMD #CodingLife
 """
