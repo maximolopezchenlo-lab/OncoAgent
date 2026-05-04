@@ -1,0 +1,72 @@
+# NCCN Guidelines PDF Links
+
+Lista completa de PDFs de las guías de tratamiento (Categoría 1) de la NCCN. Debes registrarte en NCCN.org y luego puedes usar estos enlaces directos para descargar los PDFs.
+- **Acute Lymphoblastic Leukemia**: https://www.nccn.org/professionals/physician_gls/pdf/all.pdf
+- **Acute Myeloid Leukemia**: https://www.nccn.org/professionals/physician_gls/pdf/aml.pdf
+- **Ampullary Adenocarcinoma**: https://www.nccn.org/professionals/physician_gls/pdf/ampullary.pdf
+- **Anal Carcinoma**: https://www.nccn.org/professionals/physician_gls/pdf/anal.pdf
+- **Appendiceal Neoplasms and Cancers**: https://www.nccn.org/professionals/physician_gls/pdf/appendiceal.pdf
+- **B-Cell Lymphomas**: https://www.nccn.org/professionals/physician_gls/pdf/b-cell.pdf
+- **Basal Cell Skin Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/nmsc.pdf
+- **Biliary Tract Cancers**: https://www.nccn.org/professionals/physician_gls/pdf/btc.pdf
+- **Bladder Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/bladder.pdf
+- **Bone Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/bone.pdf
+- **Breast Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/breast.pdf
+- **Castleman Disease**: https://www.nccn.org/professionals/physician_gls/pdf/castleman.pdf
+- **Central Nervous System Cancers**: https://www.nccn.org/professionals/physician_gls/pdf/cns.pdf
+- **Cervical Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/cervical.pdf
+- **Chronic Lymphocytic Leukemia/Small Lymphocytic Lymphoma**: https://www.nccn.org/professionals/physician_gls/pdf/cll.pdf
+- **Chronic Myeloid Leukemia**: https://www.nccn.org/professionals/physician_gls/pdf/cml.pdf
+- **Colon Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/colon.pdf
+- **Cutaneous Lymphomas**: https://www.nccn.org/professionals/physician_gls/pdf/cutaneous_lymphomas.pdf
+- **Dermatofibrosarcoma Protuberans**: https://www.nccn.org/professionals/physician_gls/pdf/dfsp.pdf
+- **Esophageal and Esophagogastric Junction Cancers**: https://www.nccn.org/professionals/physician_gls/pdf/esophageal.pdf
+- **Gastric Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/gastric.pdf
+- **Gastrointestinal Stromal Tumors**: https://www.nccn.org/professionals/physician_gls/pdf/gist.pdf
+- **Gestational Trophoblastic Neoplasia**: https://www.nccn.org/professionals/physician_gls/pdf/gtn.pdf
+- **Hairy Cell Leukemia**: https://www.nccn.org/professionals/physician_gls/pdf/hairy_cell.pdf
+- **Head and Neck Cancers**: https://www.nccn.org/professionals/physician_gls/pdf/head-and-neck.pdf
+- **Hepatobiliary Cancers**: https://www.nccn.org/professionals/physician_gls/pdf/hepatobiliary.pdf
+- **Hepatocellular Carcinoma**: https://www.nccn.org/professionals/physician_gls/pdf/hcc.pdf
+- **Histiocytic Neoplasms**: https://www.nccn.org/professionals/physician_gls/pdf/histiocytic_neoplasms.pdf
+- **Hodgkin Lymphoma**: https://www.nccn.org/professionals/physician_gls/pdf/hodgkins.pdf
+- **Kaposi Sarcoma**: https://www.nccn.org/professionals/physician_gls/pdf/kaposi.pdf
+- **Kidney Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/kidney.pdf
+- **Melanoma: Cutaneous**: https://www.nccn.org/professionals/physician_gls/pdf/cutaneous_melanoma.pdf
+- **Melanoma: Uveal**: https://www.nccn.org/professionals/physician_gls/pdf/uveal.pdf
+- **Merkel Cell Carcinoma**: https://www.nccn.org/professionals/physician_gls/pdf/mcc.pdf
+- **Mesothelioma: Peritoneal**: https://www.nccn.org/professionals/physician_gls/pdf/meso_peritoneal.pdf
+- **Mesothelioma: Pleural**: https://www.nccn.org/professionals/physician_gls/pdf/meso_pleural.pdf
+- **Multiple Myeloma**: https://www.nccn.org/professionals/physician_gls/pdf/myeloma.pdf
+- **Myelodysplastic Syndromes**: https://www.nccn.org/professionals/physician_gls/pdf/mds.pdf
+- **Myeloid/Lymphoid Neoplasms with Eosinophilia and Tyrosine Kinase Gene Fusions**: https://www.nccn.org/professionals/physician_gls/pdf/mlne.pdf
+- **Myeloproliferative Neoplasms**: https://www.nccn.org/professionals/physician_gls/pdf/mpn.pdf
+- **Neuroblastoma**: https://www.nccn.org/professionals/physician_gls/pdf/neuroblastoma.pdf
+- **Neuroendocrine and Adrenal Tumors**: https://www.nccn.org/professionals/physician_gls/pdf/neuroendocrine.pdf
+- **Non-Small Cell Lung Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/nscl.pdf
+- **Occult Primary**: https://www.nccn.org/professionals/physician_gls/pdf/occult.pdf
+- **Ovarian Cancer/Fallopian Tube Cancer/Primary Peritoneal Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/ovarian.pdf
+- **Pancreatic Adenocarcinoma**: https://www.nccn.org/professionals/physician_gls/pdf/pancreatic.pdf
+- **Pediatric Acute Lymphoblastic Leukemia**: https://www.nccn.org/professionals/physician_gls/pdf/ped_all.pdf
+- **Pediatric Aggressive Mature B-Cell Lymphomas**: https://www.nccn.org/professionals/physician_gls/pdf/ped_b-cell.pdf
+- **Pediatric Central Nervous System Cancers**: https://www.nccn.org/professionals/physician_gls/pdf/ped_cns.pdf
+- **Pediatric Hodgkin Lymphoma**: https://www.nccn.org/professionals/physician_gls/pdf/ped_hodgkin.pdf
+- **Pediatric Soft Tissue Sarcoma**: https://www.nccn.org/professionals/physician_gls/pdf/ped_sts.pdf
+- **Penile Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/penile.pdf
+- **Prostate Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/prostate.pdf
+- **Rectal Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/rectal.pdf
+- **Small Bowel Adenocarcinoma**: https://www.nccn.org/professionals/physician_gls/pdf/small_bowel.pdf
+- **Small Cell Lung Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/sclc.pdf
+- **Soft Tissue Sarcoma**: https://www.nccn.org/professionals/physician_gls/pdf/sarcoma.pdf
+- **Squamous Cell Skin Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/squamous.pdf
+- **Systemic Light Chain Amyloidosis**: https://www.nccn.org/professionals/physician_gls/pdf/amyloidosis.pdf
+- **Systemic Mastocytosis**: https://www.nccn.org/professionals/physician_gls/pdf/mastocytosis.pdf
+- **T-Cell Lymphomas**: https://www.nccn.org/professionals/physician_gls/pdf/t-cell.pdf
+- **Testicular Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/testicular.pdf
+- **Thymomas and Thymic Carcinomas**: https://www.nccn.org/professionals/physician_gls/pdf/thymic.pdf
+- **Thyroid Carcinoma**: https://www.nccn.org/professionals/physician_gls/pdf/thyroid.pdf
+- **Uterine Neoplasms**: https://www.nccn.org/professionals/physician_gls/pdf/uterine.pdf
+- **Vaginal Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/vaginal.pdf
+- **Vulvar Cancer**: https://www.nccn.org/professionals/physician_gls/pdf/vulvar.pdf
+- **Waldenström Macroglobulinemia/Lymphoplasmacytic Lymphoma**: https://www.nccn.org/professionals/physician_gls/pdf/waldenstroms.pdf
+- **Wilms Tumor (Nephroblastoma)**: https://www.nccn.org/professionals/physician_gls/pdf/wilms_tumor.pdf

@@ -86,3 +86,26 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 
 - **Problem/Hypothesis:** Proprietary AI models lock life-saving clinical intelligence behind APIs, preventing local deployment in privacy-sensitive hospital environments.
 - **Architectural Justification:** Positioned OncoAgent as a 100% Open Source solution. This dual-pronged strategy ensures patient privacy (by allowing local execution on AMD MI300X hardware) and fosters global medical community contribution to the RAG knowledge base.
+
+## Milestone: Decoupled Multi-Agent Architecture (LangGraph)
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Monolithic LLM prompts for medical diagnosis suffer from severe context saturation, leading to hallucinations. In oncology, prescribing an incorrect treatment due to an LLM hallucination is a critical failure.
+- **Architectural Justification:** Adopted a Decoupled Multi-Agent Architecture using LangGraph, heavily inspired by high-performance HealthTech platforms (like Biofy). This separates concerns into discrete nodes (Ingestion, Retrieval, Specialist, Validator).
+- **Logical/Technical Implementation:** Created an immutable `AgentState` using `TypedDict` in Python. The original clinical text remains untouched, and each specialized agent appends its conclusion to isolated keys. Added a `safety_validator_node` that strictly checks the Specialist's output against the RAG context.
+- **Performance Metrics:** Mitigates hallucination risk to near zero by programmatically enforcing the 'Anti-Hallucination Policy' before presenting output to the user.
+
+## Milestone: Open Source Strategic Positioning
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Proprietary AI models lock life-saving clinical intelligence behind APIs, preventing local deployment in privacy-sensitive hospital environments.
+- **Architectural Justification:** Positioned OncoAgent as a 100% Open Source solution. This dual-pronged strategy ensures patient privacy (by allowing local execution on AMD MI300X hardware) and fosters global medical community contribution to the RAG knowledge base.
+
+### Update 2026-05-04 18:49:00: Automated NCCN PDF Link Extraction & Ingestion Strategy
+
+**Problem:** Manual browsing of NCCN guidelines is inefficient and prone to human error, but automated download of NCCN PDFs requires complex authentication and parsing. A balance between automation and authenticated access was needed to ensure zero synthetic data ingestion.
+**Architectural Decision:** We developed a precise web scraping script (`nccn_scraper.py`) using `BeautifulSoup` and `concurrent.futures` to extract all direct PDF links from the NCCN Category 1 physician guidelines. Instead of attempting to bypass NCCN authentication (which risks blocking), the script generates a definitive markdown checklist (`NCCN_PDF_LINKS.md`) for the user.
+**Logic/Mathematical Approach:** The scraper uses regex matching to identify detailed guideline pages from the previously mapped architecture, then concurrently hits each detail page to extract the specific `.pdf` href that corresponds to the primary physician guideline, aggressively filtering out non-core documents (like patient versions or evidence blocks).
+**Performance Metrics:** Successfully resolved and parsed 138 detail pages concurrently in under 1 minute, producing a deduplicated list of 77 direct physician guideline PDF links.

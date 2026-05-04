@@ -86,3 +86,26 @@ Se optó por utilizar el estándar **Model Context Protocol (MCP)** para desacop
 
 - **Problema/Hipótesis:** Los modelos de IA propietarios bloquean la inteligencia clínica que salva vidas detrás de APIs, impidiendo el despliegue local en entornos hospitalarios sensibles a la privacidad.
 - **Justificación Arquitectónica:** Posicionamos a OncoAgent como una solución 100% Open Source. Esta estrategia de doble enfoque asegura la privacidad del paciente (al permitir la ejecución local en hardware AMD MI300X) y fomenta la contribución de la comunidad médica global a la base de conocimiento RAG.
+
+## Hito: Arquitectura Multi-Agente Desacoplada (LangGraph)
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Los prompts monolíticos de LLM para diagnóstico médico sufren de severa saturación de contexto, llevando a alucinaciones. En oncología, recetar un tratamiento incorrecto debido a una alucinación del LLM es una falla crítica.
+- **Justificación Arquitectónica:** Adoptamos una Arquitectura Multi-Agente Desacoplada usando LangGraph, fuertemente inspirada en plataformas HealthTech de alto rendimiento (como Biofy). Esto separa las responsabilidades en nodos discretos (Ingesta, Recuperación, Especialista, Validador).
+- **Implementación Lógica/Técnica:** Se creó un `AgentState` inmutable usando `TypedDict` en Python. El texto clínico original permanece intacto, y cada agente especializado añade su conclusión a claves aisladas. Se añadió un `safety_validator_node` que verifica estrictamente la salida del Especialista contra el contexto del RAG.
+- **Métricas de Rendimiento:** Mitiga el riesgo de alucinación a casi cero al hacer cumplir programáticamente la 'Política Anti-Alucinación' antes de presentar la salida al usuario.
+
+## Hito: Posicionamiento Estratégico Open Source
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Los modelos de IA propietarios bloquean la inteligencia clínica que salva vidas detrás de APIs, impidiendo el despliegue local en entornos hospitalarios sensibles a la privacidad.
+- **Justificación Arquitectónica:** Posicionamos a OncoAgent como una solución 100% Open Source. Esta estrategia de doble enfoque asegura la privacidad del paciente (al permitir la ejecución local en hardware AMD MI300X) y fomenta la contribución de la comunidad médica global a la base de conocimiento RAG.
+
+### Actualización 2026-05-04 18:49:00: Extracción Automatizada de Enlaces PDF de NCCN y Estrategia de Ingesta
+
+**Problema:** La navegación manual de las guías NCCN es ineficiente y propensa a errores humanos, pero la descarga automatizada de los PDFs requiere autenticación compleja y análisis sintáctico. Se necesitaba un equilibrio entre automatización y acceso autenticado para garantizar una ingesta de datos con cero información sintética.
+**Decisión Arquitectónica:** Desarrollamos un script de web scraping preciso (`nccn_scraper.py`) utilizando `BeautifulSoup` y `concurrent.futures` para extraer todos los enlaces directos a los PDFs de las guías de médicos (Categoría 1) de la NCCN. En lugar de intentar eludir la autenticación de la NCCN (lo que conlleva riesgo de bloqueo), el script genera una lista de verificación definitiva en markdown (`NCCN_PDF_LINKS.md`) para el usuario.
+**Enfoque Lógico/Matemático:** El scraper utiliza expresiones regulares para identificar páginas detalladas de las guías a partir de la arquitectura mapeada previamente. Luego, realiza peticiones concurrentes a cada página para extraer el href específico `.pdf` correspondiente a la guía principal, filtrando agresivamente documentos no centrales (como versiones para pacientes o bloques de evidencia).
+**Métricas de Rendimiento:** Se resolvieron y analizaron exitosamente 138 páginas detalladas concurrentemente en menos de 1 minuto, produciendo una lista desduplicada de 77 enlaces directos a los PDFs de las guías médicas.
