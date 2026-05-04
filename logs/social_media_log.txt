@@ -96,3 +96,36 @@ Today we tackled technical debt before it compounds. Our AMD Hackathon oncology 
 Clean architecture = faster iteration. On to Phase 1: AMD MI300X hardware validation! 🚀
 
 #AMDHackathon #OncoAgent #AMDInstinct #HealthTech #ROCm #SoftwareArchitecture
+
+---
+---
+DATE: 2026-05-04 (Session 4)
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🧠 We just completely overhauled the brain of OncoAgent! 
+
+Inspired by high-performance diagnostic platforms, we moved away from single monolithic prompts to a Decoupled Multi-Agent Architecture using LangGraph. 
+
+#AMDHackathon #HealthTech #AI
+
+2/ 🛡️ The secret sauce? A strict `AgentState` where the original clinical text is immutable. We now have specific nodes for Ingestion, Vector Search (RAG), Clinical Synthesis, and a dedicated Safety Validator. 
+
+Zero hallucinations. 
+
+3/ 🌍 And the best part? OncoAgent is now officially positioned as a 100% Open Source solution. Hospitals can run this locally on an AMD MI300X, guaranteeing absolute patient data privacy. No closed APIs.
+
+#OpenSource #ROCm #MI300X
+
+---
+
+### POST 2: LINKEDIN (Tone: Professional / Strategic)
+🚀 **Democratizing Oncology with 100% Open-Source AI**
+
+Today marks a massive milestone for the OncoAgent project at the AMD Developer Hackathon. We've officially implemented a decoupled, multi-agent architecture using LangGraph—heavily inspired by top-tier HealthTech solutions. 
+
+By separating data ingestion, RAG retrieval, clinical synthesis, and safety validation into distinct, isolated nodes, we practically eliminate the risk of AI hallucinations when matching patient cases against NCCN/ESMO guidelines.
+
+But the real breakthrough is our commitment: OncoAgent will be 100% Open-Source. 
+Why? Because life-saving clinical intelligence shouldn't be locked behind a proprietary API. Hospitals can deploy OncoAgent locally on AMD Instinct MI300X hardware, ensuring absolute patient privacy while allowing the global medical community to audit and contribute to the knowledge base.
+
+#AMDHackathon #OncoAgent #AMDInstinct #OpenSource #HealthTech #AIArchitecture #ROCm

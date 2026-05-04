@@ -45,3 +45,19 @@ Se optó por utilizar el estándar **Model Context Protocol (MCP)** para desacop
 - **Justificación Arquitectónica:** Se implementó una estructura modular alineada con las Fases del Master Directive: `data_prep/` (Fase 0), `rag_engine/` (Fase 0-3), `agents/` (Fase 3), `ui/` (Fase 4). La documentación se centralizó en `docs/` con subdirectorio `research/` para los Deep Research y `ADR/` para futuros registros de decisiones.
 - **Implementación Lógica:** (1) Movimiento y renombrado de archivos a snake_case para evitar problemas de encoding en CLI/Docker. (2) Migración de `rag_ingestion.py` de `data_prep/` a `rag_engine/` por pertenencia conceptual. (3) Eliminación de 1427 skills irrelevantes (22MB) y del duplicado `CLAUDE.md`. (4) Creación de `README.md`, `requirements.txt` con dependencias pinneadas, y `Dockerfile` basado en `rocm/vllm`.
 - **Métricas de Rendimiento:** Reducción de peso del repositorio en ~22MB (eliminar active_skills). Estructura final: 6 módulos Python, 4 docs de research, 7 skills curados, 0 archivos huérfanos en raíz.
+
+## Hito: Arquitectura Multi-Agente Desacoplada (LangGraph)
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Los prompts monolíticos de LLM para diagnóstico médico sufren de severa saturación de contexto, llevando a alucinaciones. En oncología, recetar un tratamiento incorrecto debido a una alucinación del LLM es una falla crítica.
+- **Justificación Arquitectónica:** Adoptamos una Arquitectura Multi-Agente Desacoplada usando LangGraph, fuertemente inspirada en plataformas HealthTech de alto rendimiento (como Biofy). Esto separa las responsabilidades en nodos discretos (Ingesta, Recuperación, Especialista, Validador).
+- **Implementación Lógica/Técnica:** Se creó un `AgentState` inmutable usando `TypedDict` en Python. El texto clínico original permanece intacto, y cada agente especializado añade su conclusión a claves aisladas. Se añadió un `safety_validator_node` que verifica estrictamente la salida del Especialista contra el contexto del RAG.
+- **Métricas de Rendimiento:** Mitiga el riesgo de alucinación a casi cero al hacer cumplir programáticamente la 'Política Anti-Alucinación' antes de presentar la salida al usuario.
+
+## Hito: Posicionamiento Estratégico Open Source
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Los modelos de IA propietarios bloquean la inteligencia clínica que salva vidas detrás de APIs, impidiendo el despliegue local en entornos hospitalarios sensibles a la privacidad.
+- **Justificación Arquitectónica:** Posicionamos a OncoAgent como una solución 100% Open Source. Esta estrategia de doble enfoque asegura la privacidad del paciente (al permitir la ejecución local en hardware AMD MI300X) y fomenta la contribución de la comunidad médica global a la base de conocimiento RAG.

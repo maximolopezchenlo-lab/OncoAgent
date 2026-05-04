@@ -2,6 +2,11 @@
 
 > **AMD Developer Hackathon 2026** · Powered by AMD Instinct™ MI300X · ROCm 6.2
 
+## 🌍 100% Open-Source: Democratizing Oncology
+OncoAgent is proudly 100% open-source. We believe that life-saving clinical intelligence should not be locked behind proprietary APIs. Our solution is designed to:
+- **Guarantee Patient Privacy:** Run locally on AMD MI300X hardware or private clouds, ensuring zero patient data leaves the hospital.
+- **Foster Global Contribution:** Allow medical communities worldwide to easily audit, modify, and contribute to the RAG knowledge base.
+
 OncoAgent is a multi-agent clinical triage system designed to combat **unstructured data blindness** in primary care oncology. It leverages a fine-tuned Llama 3.1 8B model orchestrated via LangGraph to provide evidence-based oncological reasoning grounded in NCCN/ESMO clinical guidelines.
 
 ---

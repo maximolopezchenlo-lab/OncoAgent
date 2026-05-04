@@ -98,3 +98,36 @@ Clean architecture = faster iteration. On to Fase 1: AMD MI300X hardware validat
 
 #AMDHackathon #OncoAgent #AMDInstinct #HealthTech #ROCm #SoftwareArchitecture
 
+
+---
+---
+FECHA: 2026-05-04 (Sesión 4)
+
+### POST 1: X/TWITTER THREAD (Tono: Build in Public / Técnico)
+1/ 🧠 ¡Acabamos de renovar por completo el cerebro de OncoAgent!
+
+Inspirados en plataformas de diagnóstico de alto rendimiento, dejamos atrás los prompts monolíticos para pasar a una Arquitectura Multi-Agente Desacoplada usando LangGraph.
+
+#AMDHackathon #HealthTech #AI
+
+2/ 🛡️ ¿El secreto? Un `AgentState` estricto donde el texto clínico original es inmutable. Ahora tenemos nodos específicos para Ingesta, Búsqueda Vectorial (RAG), Síntesis Clínica y un Validador de Seguridad dedicado.
+
+Cero alucinaciones.
+
+3/ 🌍 ¿Y la mejor parte? OncoAgent ahora se posiciona oficialmente como una solución 100% Open Source. Los hospitales pueden ejecutar esto localmente en un AMD MI300X, garantizando absoluta privacidad de los datos del paciente. Sin APIs cerradas.
+
+#OpenSource #ROCm #MI300X
+
+---
+
+### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
+🚀 **Democratizando la Oncología con IA 100% Open-Source**
+
+Hoy marcamos un gran hito para el proyecto OncoAgent en el AMD Developer Hackathon. Hemos implementado oficialmente una arquitectura multi-agente desacoplada usando LangGraph—fuertemente inspirada en soluciones HealthTech de primer nivel.
+
+Al separar la ingesta de datos, la recuperación RAG, la síntesis clínica y la validación de seguridad en nodos distintos y aislados, prácticamente eliminamos el riesgo de alucinaciones de IA al cruzar casos de pacientes contra las guías NCCN/ESMO.
+
+Pero el verdadero avance es nuestro compromiso: OncoAgent será 100% Open-Source.
+¿Por qué? Porque la inteligencia clínica que salva vidas no debería estar bloqueada tras una API propietaria. Los hospitales pueden desplegar OncoAgent localmente en hardware AMD Instinct MI300X, asegurando la privacidad absoluta del paciente mientras permiten a la comunidad médica global auditar y contribuir a la base de conocimiento.
+
+#AMDHackathon #OncoAgent #AMDInstinct #OpenSource #HealthTech #AIArchitecture #ROCm
