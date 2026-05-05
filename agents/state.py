@@ -2,12 +2,12 @@ from typing import TypedDict, Annotated, List, Dict, Any
 import operator
 
 class AgentState(TypedDict):
-    \"\"\"
+    """
     Represents the state of the LangGraph execution for OncoAgent.
     Inspired by high-performance decoupled architectures (e.g., Biofy).
     Ensures the original clinical text remains immutable while adding
     specialized outputs in isolated keys to prevent hallucinations and data pollution.
-    \"\"\"
+    """
     
     # 1. Input (Immutable)
     clinical_text: str
