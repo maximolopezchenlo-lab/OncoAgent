@@ -123,28 +123,77 @@ def data_ingestion_node(state: AgentState) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# Node 2: RAG Retrieval — real ChromaDB query
+# Node 2: RAG Retrieval — SOTA multi-stage pipeline
+# Bi-Encoder → Distance Gate → Cross-Encoder Re-Rank → Token Trim
+# with optional HyDE (Hypothetical Document Embeddings) for recall.
 # ---------------------------------------------------------------------------
+
+
+def _generate_hyde_hypothesis(query: str) -> str:
+    """
+    Generate a hypothetical clinical guideline paragraph that *would*
+    answer the query.  The hypothesis is used only as an embedding
+    anchor — its factual content is never shown to the user.
+
+    Falls back to the raw query if vLLM is unreachable.
+
+    Args:
+        query: The structured clinical query.
+
+    Returns:
+        A plausible guideline-style paragraph (unverified).
+    """
+    try:
+        client = get_vllm_client()
+        response = client.chat.completions.create(
+            model="meta-llama/Meta-Llama-3.1-8B-Instruct",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a medical knowledge base. Given a clinical query, "
+                        "write a SHORT (3-4 sentences) paragraph that a clinical "
+                        "guideline WOULD contain to answer the query. "
+                        "Use formal medical English. Do NOT add disclaimers."
+                    ),
+                },
+                {"role": "user", "content": query},
+            ],
+            temperature=0.0,
+            max_tokens=150,
+        )
+        hypothesis = response.choices[0].message.content.strip()
+        logger.info("HyDE hypothesis generated (%d chars)", len(hypothesis))
+        return hypothesis
+    except Exception as exc:
+        logger.warning("HyDE generation failed (%s) — falling back to raw query.", exc)
+        return query
+
 
 def rag_retrieval_node(state: AgentState) -> Dict[str, Any]:
     """
-    Queries the ChromaDB vector database using PubMedBERT embeddings.
-    Constructs a semantic query from the extracted entities and the
-    original clinical text to maximise retrieval relevance.
+    SOTA multi-stage retrieval node.
+
+    Pipeline:
+      1. Build structured query from extracted entities.
+      2. Generate a HyDE hypothesis (optional, if vLLM is available).
+      3. Query ChromaDB via bi-encoder → distance gate → cross-encoder re-rank.
+      4. Compute confidence metrics for downstream safety decisions.
+      5. Trim context to fit within Llama 3.1 context window budget.
     """
     entities: Dict[str, Any] = state.get("extracted_entities", {})
     clinical_text: str = state.get("clinical_text", "")
 
-    # Build a targeted query combining entities + original text
+    # --- Build targeted query from entities ---
     cancer = entities.get("cancer_type", "Unknown")
     stage = entities.get("stage", "Unknown")
     mutations = ", ".join(entities.get("mutations", []))
 
     query_parts = []
     if cancer != "Unknown":
-        query_parts.append(f"{cancer}")
+        query_parts.append(cancer)
     if stage != "Unknown":
-        query_parts.append(f"{stage}")
+        query_parts.append(stage)
     if mutations:
         query_parts.append(f"mutations: {mutations}")
     query_parts.append("treatment recommendation guidelines")
@@ -153,14 +202,46 @@ def rag_retrieval_node(state: AgentState) -> Dict[str, Any]:
 
     try:
         retriever = _get_retriever()
-        results = retriever.query(query, n_results=5)
-        context_strings = [r["text"] for r in results]
+
+        # --- HyDE: generate hypothetical answer for embedding ---
+        hyde_hypothesis = _generate_hyde_hypothesis(query)
+
+        # If HyDE produced something different from the raw query, use it
+        if hyde_hypothesis and hyde_hypothesis != query:
+            results = retriever.query_with_hyde(
+                original_query=query,
+                hypothetical_answer=hyde_hypothesis,
+                n_results=5,
+            )
+        else:
+            # Fallback: standard SOTA retrieval (still uses re-ranking)
+            results = retriever.query(query, n_results=5)
+
+        # --- Format results for downstream nodes ---
+        context_strings = [
+            f"[Source: {r['source']}, Page: {r['page']}, Section: {r['header']}]\n{r['text']}"
+            for r in results
+        ]
+        source_strings = [
+            f"- **{r['source']}** (Page {r['page']}): {r['header']}"
+            for r in results
+        ]
+
+        # --- Compute confidence metrics ---
+        ce_scores = [r["cross_encoder_score"] for r in results if "cross_encoder_score" in r]
+        mean_confidence = sum(ce_scores) / len(ce_scores) if ce_scores else 0.0
+
     except Exception as exc:
         logger.error("RAG retrieval failed: %s", exc)
         context_strings = []
+        source_strings = []
+        mean_confidence = 0.0
 
     return {
         "rag_context": context_strings,
+        "rag_sources": source_strings,
+        "rag_confidence": round(mean_confidence, 4),
+        "rag_retrieval_count": len(context_strings),
     }
 
 
@@ -168,14 +249,34 @@ def rag_retrieval_node(state: AgentState) -> Dict[str, Any]:
 # Node 3: Clinical Specialist — LLM reasoning (placeholder for vLLM)
 # ---------------------------------------------------------------------------
 
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Initialize vLLM client (OpenAI compatible)
+# You should configure VLLM_API_BASE and VLLM_API_KEY in your .env
+_vllm_client = None
+
+def get_vllm_client():
+    global _vllm_client
+    if _vllm_client is None:
+        api_base = os.getenv("VLLM_API_BASE", "http://localhost:8000/v1")
+        api_key = os.getenv("VLLM_API_KEY", "EMPTY")
+        _vllm_client = OpenAI(base_url=api_base, api_key=api_key)
+    return _vllm_client
+
 def clinical_specialist_node(state: AgentState) -> Dict[str, Any]:
     """
     Synthesises patient data and RAG context into a clinical recommendation.
     Strictly grounded in the provided context (Anti-Hallucination Policy).
 
-    TODO: Replace stub with Llama 3.1 8B inference via vLLM on AMD MI300X.
+    Uses Llama 3.1 8B inference via vLLM on AMD MI300X.
     """
     context: list = state.get("rag_context", [])
+    clinical_text: str = state.get("clinical_text", "")
+    entities: Dict[str, Any] = state.get("extracted_entities", {})
 
     if not context:
         return {
@@ -185,13 +286,56 @@ def clinical_specialist_node(state: AgentState) -> Dict[str, Any]:
             )
         }
 
-    # For now, return a structured summary of the retrieved context
-    # This will be replaced by an actual LLM call to vLLM.
-    context_summary = "\n---\n".join(context[:3])  # top 3
-    return {
-        "clinical_recommendation": (
-            f"Based on retrieved clinical guidelines:\n\n{context_summary}"
+    # Prepare context string
+    context_summary = "\n---\n".join(context)
+
+    # Prompt Engineering for Anti-Hallucination
+    system_prompt = (
+        "You are an expert clinical oncologist. Your task is to provide a treatment recommendation "
+        "based STRICTLY on the provided clinical guidelines context.\n\n"
+        "ANTI-HALLUCINATION POLICY:\n"
+        "1. You are STRICTLY FORBIDDEN from inventing treatments.\n"
+        "2. If the answer is not explicitly contained in the provided guidelines, you MUST reply ONLY with: "
+        "'Información no concluyente en las guías provistas.'\n"
+        "3. Do not add external knowledge.\n\n"
+        "Provide your recommendation in Spanish, clearly citing the guidelines if possible."
+    )
+
+    user_prompt = (
+        f"Patient Information:\n"
+        f"- Original Text: {clinical_text}\n"
+        f"- Cancer Type: {entities.get('cancer_type', 'Unknown')}\n"
+        f"- Stage: {entities.get('stage', 'Unknown')}\n"
+        f"- Mutations: {', '.join(entities.get('mutations', []))}\n\n"
+        f"Clinical Guidelines Context:\n{context_summary}\n\n"
+        f"Based ONLY on the guidelines above, what is the recommended treatment?"
+    )
+
+    try:
+        client = get_vllm_client()
+        response = client.chat.completions.create(
+            model="meta-llama/Meta-Llama-3.1-8B-Instruct",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.0,  # Zero temperature for factual grounding
+            max_tokens=512,
         )
+        recommendation = response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error("Error connecting to vLLM: %s", e)
+        recommendation = (
+            "Error en el sistema de inferencia. "
+            "No se pudo generar la recomendación clínica en este momento."
+        )
+
+    # Fallback validation to ensure the strict phrase is used if context wasn't helpful
+    if "información no concluyente" in recommendation.lower() or "no concluyente" in recommendation.lower():
+        recommendation = "Información no concluyente en las guías provistas."
+
+    return {
+        "clinical_recommendation": recommendation
     }
 
 
@@ -204,19 +348,90 @@ def safety_validator_node(state: AgentState) -> Dict[str, Any]:
     Verifies that the clinical recommendation is grounded in the RAG
     context and does not hallucinate treatments absent from the sources.
 
-    TODO: Implement LLM-based grounding check with NLI or entailment.
+    Multi-layer validation:
+      1. Empty context / explicit "no info" check.
+      2. RAG confidence score check (cross-encoder threshold).
+      3. LLM-based entailment verification via vLLM.
     """
     recommendation: str = state.get("clinical_recommendation", "")
     context: list = state.get("rag_context", [])
+    rag_confidence: float = state.get("rag_confidence", 0.0)
+    retrieval_count: int = state.get("rag_retrieval_count", 0)
 
-    # Basic grounding: reject if no context was available
+    # Layer 1: Reject if no context was available
     if not context or "Información no concluyente" in recommendation:
         return {
             "safety_status": "Rejected: Insufficient evidence in clinical guidelines",
             "is_safe": False,
         }
 
-    return {
-        "safety_status": "Validated against clinical oncology guidelines",
-        "is_safe": True,
-    }
+    # Layer 2: Reject if RAG confidence is too low (cross-encoder based)
+    if rag_confidence < 0.3 and retrieval_count > 0:
+        logger.warning(
+            "Low RAG confidence (%.4f) — safety gate triggered.",
+            rag_confidence,
+        )
+        return {
+            "safety_status": (
+                f"Rejected: Low retrieval confidence ({rag_confidence:.2f}). "
+                "Retrieved guidelines may not be relevant to this case."
+            ),
+            "is_safe": False,
+        }
+
+    # Error handling fallback
+    if "Error en el sistema de inferencia" in recommendation:
+        return {
+            "safety_status": "Rejected: Inference system error",
+            "is_safe": False,
+        }
+
+    context_summary = "\n---\n".join(context)
+
+    system_prompt = (
+        "You are an expert clinical safety auditor. Your job is to verify if a given treatment "
+        "recommendation is STRICTLY grounded in the provided clinical guidelines context.\n"
+        "If the recommendation includes ANY specific treatment, drug, or procedure that is NOT "
+        "mentioned in the context, you must output 'FAIL'.\n"
+        "If the recommendation is fully supported by the context, output 'PASS'.\n"
+        "Output ONLY the word 'PASS' or 'FAIL', nothing else."
+    )
+
+    user_prompt = (
+        f"Context:\n{context_summary}\n\n"
+        f"Recommendation:\n{recommendation}\n\n"
+        f"Does the context fully support the recommendation? (PASS/FAIL):"
+    )
+
+    try:
+        client = get_vllm_client()
+        response = client.chat.completions.create(
+            model="meta-llama/Meta-Llama-3.1-8B-Instruct",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.0,
+            max_tokens=10,
+        )
+        validation_result = response.choices[0].message.content.strip().upper()
+        
+        is_safe = "PASS" in validation_result
+        status = (
+            "Validated against clinical oncology guidelines" 
+            if is_safe else 
+            "Rejected: Hallucination detected (unsupported claims)"
+        )
+        
+        return {
+            "safety_status": status,
+            "is_safe": is_safe,
+        }
+
+    except Exception as e:
+        logger.error("Error in safety validation via vLLM: %s", e)
+        # Fail safe
+        return {
+            "safety_status": "Rejected: Safety validation failed due to system error",
+            "is_safe": False,
+        }

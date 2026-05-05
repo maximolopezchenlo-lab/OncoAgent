@@ -1,4 +1,4 @@
-from typing import TypedDict, Annotated, List, Dict, Any
+from typing import TypedDict, Annotated, List, Dict, Any, Optional
 import operator
 
 class AgentState(TypedDict):
@@ -18,6 +18,9 @@ class AgentState(TypedDict):
     
     # 3. RAG Context (Retrieval Node)
     rag_context: List[str]
+    rag_sources: List[str]
+    rag_confidence: float           # Mean cross-encoder score (0–1 scale)
+    rag_retrieval_count: int        # Number of results that passed the gate
     
     # 4. Clinical Reasoning (Specialist Node)
     clinical_recommendation: str
