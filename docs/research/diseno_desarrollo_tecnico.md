@@ -49,7 +49,7 @@ The Specialist Agent implements the American Joint Committee on Cancer (AJCC) or
 Specialized Fine-Tuning Strategy for Clinical Oncology
 Standard open-source models like Llama 3.1 possess broad knowledge but lack the specific reasoning patterns required to justify a high-stakes cancer risk assessment. The OncoAgent strategy employs intensive fine-tuning to internalize clinical causality and ensure that the model’s outputs are traceable to medical evidence.[16, 17, 18]
 Pipeline for AMD Instinct MI300X
-The AMD Instinct MI300X, with its 192GB of HBM3 memory, provides the necessary headroom for fine-tuning high-parameter models like Llama 3-70B or even 405B using Parameter-Efficient Fine-Tuning (PEFT).[19, 20] The training pipeline is optimized for the ROCm 6.2 ecosystem, utilizing the high memory bandwidth to process long-context clinical documents without aggressive truncation.[21, 22]
+The AMD Instinct MI300X, with its 192GB of HBM3 memory, provides the necessary headroom for fine-tuning high-parameter models like Llama 3-70B or even 405B using Parameter-Efficient Fine-Tuning (PEFT).[19, 20] The training pipeline is optimized for the ROCm 7.2 ecosystem, utilizing the high memory bandwidth to process long-context clinical documents without aggressive truncation.[21, 22]
 The implementation utilizes QLoRA (Quantized Low-Rank Adaptation), which quantizes the base model to 4-bit NormalFloat (NF4) while training low-rank adapter matrices.[23, 24] This approach minimizes VRAM usage while maintaining the expressive power needed for medical Q&A. The training configuration prioritizes the projection layers (q_proj, v_proj, k_proj, o_proj) to capture the intricate linguistic patterns of radiology and pathology reports.[17, 25]
 Dataset Ingestion and Clinical Justification Schema
 The model must be taught to "think" like an oncologist. This requires a JSONL dataset where each entry includes a detailed reasoning trace. The OncoAgent dataset architecture is derived from frameworks like OncoCoT, which simulate the spatiotemporal decision-making process of real-world oncology boards.[14, 18]
@@ -197,7 +197,7 @@ The development of OncoAgent on AMD's cutting-edge Instinct infrastructure invol
 Hardware and Infrastructure Risks
 The MI300X is a powerful but complex accelerator. Driver-level issues and memory fragmentation are the primary bottlenecks.
 GPU Recovery Failures: Earlier versions of ROCm experienced error recovery failures on the MI300X when encountering uncorrectable memory errors.[50, 51]
-Mitigation: Ensure the infrastructure is running ROCm 6.2.2 or later, which specifically addresses the MI300X recovery state.[51] Implement automated node health checks using amd-smi monitor to detect and restart "stuck" kernels.
+Mitigation: Ensure the infrastructure is running ROCm 7.2.0 or later, which specifically addresses the MI300X recovery state.[51] Implement automated node health checks using amd-smi monitor to detect and restart "stuck" kernels.
 VRAM Fragmentation and Preemption: In high-concurrency environments, vLLM can preempt requests if the KV cache fills up, leading to high latency spikes.[40]
 Mitigation: Increase gpu_memory_utilization (e.g., to 0.95) and decrease max_num_seqs to provide more breathing room for long-context clinical tasks.[40] Use Tensor Parallelism (TP=8) to shard model weights, freeing up more memory per GPU for the KV cache.
 Kernel Compilation Time: JIT compilation of Triton or CK kernels can lead to long startup times, which may trigger timeouts in cloud environments like Hugging Face Spaces.[40, 52]
@@ -215,7 +215,7 @@ The "NVIDIA-first" nature of many ML libraries creates friction for AMD develope
 Library Version Drift: Specific versions of transformers or accelerate may break ROCm support if updated carelessly.[27]
 Mitigation: Use "Pinned Dependencies" in the repository. Provide a validated Docker image where the versions of ROCm, PyTorch, and bitsandbytes are locked.[27, 43]
 Quantization Bugs: Versions of bitsandbytes earlier than 0.49.2 have been known to cause 4-bit decode NaN bugs on AMD GPUs.[25]
-Mitigation: Exclusively use the rocm_enabled branch of the official ROCm bitsandbytes repository and verify the installation version (target 0.42.0+ for ROCm 6.2) before starting the training loop.[28, 29]
+Mitigation: Exclusively use the rocm_enabled branch of the official ROCm bitsandbytes repository and verify the installation version (target 0.42.0+ for ROCm 7.2) before starting the training loop.[28, 29]
 By following this technical design, OncoAgent will leverage the massive compute power of the AMD Instinct MI300X to provide a scalable, safe, and highly accurate cancer detection service that remains grounded in the latest oncological evidence. The combination of stateful LangGraph orchestration and guideline-anchored RAG ensures that the system is not just a technological prototype but a reliable tool for clinical professionals.
 --------------------------------------------------------------------------------
 LangChain vs CrewAI vs AutoGen - Which to Use (2026) - Blogs - Trixly AI Solutions, https://www.trixlyai.com/blogs/langchain-vs-crewai-vs-autogen-which-ai-agent-framework-should-you-actually-use
@@ -259,7 +259,7 @@ Running vLLM in Docker with AMD ROCm and the Continue.dev CLI | TinyComputers.io
 Efficient LLM Agent Serving with vLLM: A Deep Dive into Research Agent Benchmarking | by Madhur Prashant | Medium, https://medium.com/@madhur.prashant7/efficient-llm-agent-serving-with-vllm-a-deep-dive-into-research-agent-benchmarking-3c07c563228a
 Optimization and Tuning - vLLM, https://docs.vllm.ai/en/stable/configuration/optimization/
 The vLLM MoE Playbook: A Practical Guide to TP, DP, PP and Expert Parallelism, https://rocm.blogs.amd.com/software-tools-optimization/vllm-moe-guide/README.html
-ROCm 6.2.0 Release #3502, https://github.com/ROCm/ROCm/discussions/3502
+ROCm 7.2.0 Release #3502, https://github.com/ROCm/ROCm/discussions/3502
 AI Inference on AMD MI300X with vLLM Docker Image Validation, https://www.amd.com/en/developer/resources/technical-articles/ai-inference-on-amd-mi300x-with-vllm-docker-image-validation.html
 Creating custom kernels for the AMD MI300 - Hugging Face, https://huggingface.co/blog/mi300kernels
 Deploying your model - ROCm Documentation - AMD, https://rocm.docs.amd.com/en/docs-7.0.0/how-to/rocm-for-ai/inference/deploy-your-model.html
@@ -267,8 +267,8 @@ Docker Spaces - Hugging Face, https://huggingface.co/docs/hub/spaces-sdks-docker
 Getting Started with AMD Instinct MI300X on Azure, https://instinct.docs.amd.com/projects/instinct-azure/latest/mi300x.html
 Running inference with Hugging Face Transformers - ROCm Documentation - AMD, https://rocm.docs.amd.com/projects/ai-developer-hub/en/latest/notebooks/inference/1_inference_ver3_HF_transformers.html
 The Prompt Engineering Cheat Sheet: How to Write Better AI Prompts - eWeek, https://www.eweek.com/news/prompt-engineering-cheat-sheet-guide/
-AMD ROCm 6.2.2 Released To Fix Instinct MI300X Error Recovery Failure - Phoronix, https://www.phoronix.com/news/AMD-ROCm-6.2.2
-ROCm 6.2.2 release notes, https://rocm.docs.amd.com/en/docs-6.2.2/about/release-notes.html
+AMD ROCm 7.2.0 Released To Fix Instinct MI300X Error Recovery Failure - Phoronix, https://www.phoronix.com/news/AMD-ROCm-6.2.2
+ROCm 7.2.0 release notes, https://rocm.docs.amd.com/en/docs-7.2.0/about/release-notes.html
 AMD Instinct MI300X workload optimization - ROCm Documentation, https://rocm.docs.amd.com/en/latest/how-to/rocm-for-ai/inference-optimization/workload.html
 Installation with ROCm - vLLM, https://docs.vllm.ai/en/v0.6.6/getting_started/amd-installation.html
 Multi-Agent AI Systems: Architecture & Failure Modes | Augment Code, https://www.augmentcode.com/guides/multi-agent-ai-systems

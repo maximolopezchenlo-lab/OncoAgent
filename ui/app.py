@@ -96,60 +96,70 @@ def get_base64_image(image_path):
 def create_ui():
     lang_dict = I18N[LANG]
     
-    # Resolving path to logo
-    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", "assets", "brand", "logo", "oncoagent_logo_full_color.png")
-    logo_b64 = get_base64_image(logo_path)
+    # Resolving path to assets
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    css_path = os.path.join(current_dir, "style.css")
+    logo_path = os.path.join(os.path.dirname(current_dir), "docs", "assets", "brand", "logo", "oncoagent_logo_dark_mode.png")
     
-    logo_html = f"""
-    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-        <img src="data:image/png;base64,{logo_b64}" alt="OncoAgent Logo" style="height: 60px;">
-        <div>
-            <h1 style="margin: 0; padding: 0; color: #008080;">{lang_dict['title']}</h1>
-            <p style="margin: 0; padding: 0; font-size: 1.1em; color: var(--body-text-color);">{lang_dict['description']}</p>
-        </div>
-    </div>
-    """
+    logo_b64 = get_base64_image(logo_path)
     
     # Custom Brand Theme
     onco_theme = gr.themes.Soft(
         primary_hue=gr.themes.colors.teal,
-        secondary_hue=gr.themes.colors.yellow,
+        secondary_hue=gr.themes.colors.slate,
         neutral_hue=gr.themes.colors.slate,
     ).set(
         body_background_fill_dark="#0A192F",
-        block_background_fill_dark="#112240",
-        block_border_color_dark="#233554",
-        border_color_primary_dark="#233554",
-        button_primary_background_fill="#008080",
-        button_primary_background_fill_hover="#20A0A0",
-        button_primary_text_color="white",
-        button_primary_background_fill_dark="#008080",
-        button_primary_background_fill_hover_dark="#20A0A0",
+        block_background_fill_dark="rgba(255, 255, 255, 0.05)",
+        block_border_color_dark="rgba(255, 255, 255, 0.1)",
+        border_color_primary_dark="#0D9488",
     )
     
-    with gr.Blocks(theme=onco_theme, title="OncoAgent") as ui:
-        if logo_b64:
-            gr.HTML(logo_html)
-        else:
-            gr.Markdown(f"# {lang_dict['title']}")
-            gr.Markdown(lang_dict['description'])
+    with gr.Blocks(theme=onco_theme, css=css_path, title="OncoAgent") as ui:
+        with gr.Row(elem_id="header-row"):
+            with gr.Column(scale=1):
+                if logo_b64:
+                    gr.HTML(f"""
+                    <div style="display: flex; align-items: center; gap: 20px; padding: 20px 0;">
+                        <img src="data:image/png;base64,{logo_b64}" alt="OncoAgent Logo" style="height: 80px; filter: drop-shadow(0 0 10px rgba(13, 148, 136, 0.5));">
+                        <div>
+                            <h1 style="margin: 0; font-size: 2.5em; color: #5EEAD4;">OncoAgent</h1>
+                            <p style="margin: 0; font-size: 1.1em; color: #94A3B8;">{lang_dict['description']}</p>
+                        </div>
+                    </div>
+                    """)
+                else:
+                    gr.Markdown(f"# {lang_dict['title']}")
+                    gr.Markdown(lang_dict['description'])
         
         with gr.Row():
-            with gr.Column(scale=1):
+            with gr.Column(scale=1, elem_id="input-container"):
                 clinical_input = gr.Textbox(
                     label=lang_dict["input_label"],
                     placeholder=lang_dict["input_placeholder"],
-                    lines=10
+                    lines=15,
+                    elem_id="clinical-input"
                 )
                 with gr.Row():
-                    clear_btn = gr.Button(lang_dict["clear_btn"])
-                    submit_btn = gr.Button(lang_dict["submit_btn"], variant="primary")
+                    clear_btn = gr.Button(lang_dict["clear_btn"], elem_id="clear-btn")
+                    submit_btn = gr.Button(lang_dict["submit_btn"], variant="primary", elem_id="submit-btn")
+                
+                gr.Markdown("### 🛡️ Safety Disclaimer")
+                gr.Markdown("""
+                OncoAgent is an AI research prototype for the AMD Hackathon. It is **NOT** a certified medical device. 
+                Clinical decisions must always be made by qualified healthcare professionals.
+                """)
             
-            with gr.Column(scale=1):
-                status_output = gr.Markdown(label=lang_dict["output_status"])
-                entities_output = gr.Markdown(label=lang_dict["output_entities"])
-                sources_output = gr.Markdown(label=lang_dict["output_sources"])
-                recommendation_output = gr.Markdown(label=lang_dict["output_recommendation"])
+            with gr.Column(scale=1, elem_id="output-container"):
+                with gr.Group():
+                    status_output = gr.Markdown(label=lang_dict["output_status"], elem_id="status-badge")
+                    entities_output = gr.Markdown(label=lang_dict["output_entities"])
+                
+                with gr.Group():
+                    sources_output = gr.Markdown(label=lang_dict["output_sources"])
+                
+                with gr.Group(elem_id="recommendation-card"):
+                    recommendation_output = gr.Markdown(label=lang_dict["output_recommendation"])
                 
         submit_btn.click(
             fn=process_clinical_case,

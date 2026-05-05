@@ -1,6 +1,6 @@
 # 🧬 OncoAgent — Sistema Multi-Agente de Triaje Oncológico
 
-> **AMD Developer Hackathon 2026** · Potenciado por AMD Instinct™ MI300X · ROCm 6.2
+> **AMD Developer Hackathon 2026** · Potenciado por AMD Instinct™ MI300X · ROCm 7.2
 
 ## 🌍 100% Código Abierto: Democratizando la Oncología
 OncoAgent es orgullosamente 100% de código abierto. Creemos que la inteligencia clínica que salva vidas no debe estar bloqueada tras APIs propietarias. Nuestra solución está diseñada para:
@@ -37,7 +37,7 @@ OncoAgent es un sistema de triaje clínico multi-agente diseñado para combatir 
 ## ⚡ Objetivo de Hardware
 
 - **GPU:** AMD Instinct™ MI300X (192GB HBM3)
-- **Software Stack:** ROCm 6.2.x, PyTorch (HIP), vLLM con PagedAttention
+- **Software Stack:** ROCm 7.2.x, PyTorch (HIP), vLLM con PagedAttention
 - **Modelo Base:** `meta-llama/Meta-Llama-3.1-8B-Instruct`
 - **Inferencia:** Optimizada a través del servidor vLLM local.
 
@@ -46,7 +46,7 @@ OncoAgent es un sistema de triaje clínico multi-agente diseñado para combatir 
 ## 🚀 Inicio Rápido (Despliegue)
 
 ### Requisitos Previos
-- Instancia AMD MI300X (Ej. servidor bare-metal o nube con soporte ROCm 6.2)
+- Instancia AMD MI300X (Ej. servidor bare-metal o nube con soporte ROCm 7.2)
 - Docker y Docker Compose instalados.
 
 ### Instalación y Ejecución

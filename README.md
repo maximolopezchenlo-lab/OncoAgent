@@ -1,6 +1,6 @@
 # 🧬 OncoAgent — Multi-Agent Oncology Triage System
 
-> **AMD Developer Hackathon 2026** · Powered by AMD Instinct™ MI300X · ROCm 6.2
+> **AMD Developer Hackathon 2026** · Powered by AMD Instinct™ MI300X · ROCm 7.2
 
 ## 🌍 100% Open-Source: Democratizing Oncology
 OncoAgent is proudly 100% open-source. We believe that life-saving clinical intelligence should not be locked behind proprietary APIs. Our solution is designed to:
@@ -36,7 +36,7 @@ OncoAgent is a multi-agent clinical triage system designed to combat **unstructu
 ## ⚡ Hardware Target
 
 - **GPU:** AMD Instinct™ MI300X (192GB HBM3)
-- **Software Stack:** ROCm 6.2.x, PyTorch (HIP), vLLM with PagedAttention
+- **Software Stack:** ROCm 7.2.x, PyTorch (HIP), vLLM with PagedAttention
 - **Model:** `meta-llama/Meta-Llama-3.1-8B-Instruct` (QLoRA 4-bit fine-tuned)
 
 ---

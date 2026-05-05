@@ -1,5 +1,5 @@
 # OncoAgent - Pinned Dependencies for Reproducibility
-# Hardware: AMD Instinct MI300X | ROCm 6.2.x
+# Hardware: AMD Instinct MI300X | ROCm 7.2.x
 # ================================================
 
 # === Core ML Framework ===
