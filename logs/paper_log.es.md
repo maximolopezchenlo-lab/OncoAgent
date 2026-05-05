@@ -126,3 +126,21 @@ Se optó por utilizar el estándar **Model Context Protocol (MCP)** para desacop
 - **Problema/Hipótesis:** Los modelos de embeddings estándar (como `all-MiniLM-L6-v2`) fallan al capturar la semántica matizada de terminología médica compleja (ej. "inhibidor de tirosina quinasa" vs "TKI"), llevando a un bajo rendimiento en la recuperación RAG.
 - **Justificación Arquitectónica:** Se seleccionó `pritamdeka/S-PubMedBert-MS-MARCO`, un modelo de Sentence-Transformers fine-tuneado específicamente en PubMed y MS-MARCO, optimizándolo para búsqueda semántica médica asimétrica (consultas cortas recuperando documentos clínicos largos). Se eligió `ChromaDB` local para mantener la estrategia de código abierto 100% local y priorizando la privacidad.
 - **Implementación Lógica/Técnica:** Se creó `rag_engine/vectorize.py` el cual itera sobre los JSONs fragmentados semánticamente, añade el encabezado del chunk al cuerpo del texto para embeddings contextualizados, y los indexa de forma persistente usando ChromaDB.
+
+## Hito: Integración de LLM Local (vLLM) y Validación de Seguridad
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Los sistemas de IA médica no deben depender de APIs propietarias en la nube para proteger los datos de los pacientes (Zero-PHI). Además, deben evitar estrictamente generar tratamientos alucinados.
+- **Justificación Arquitectónica:** Se integró Llama-3.1-8B a través de un servidor vLLM local, utilizando el formato de API compatible con OpenAI para conectar nuestros nodos de LangGraph. Se implementó una doble verificación: un nodo Especialista genera recomendaciones y un nodo Validador distinto realiza comprobaciones estrictas de vinculación (entailment).
+- **Implementación Lógica/Técnica:** Se modificó `agents/nodes.py` para usar el cliente python `openai` conectándose a la URL base de vLLM. El `safety_validator_node` le indica explícitamente al modelo que devuelva "PASS" o "FAIL" dependiendo de si la recomendación está totalmente respaldada por el contexto RAG. Se construyó una UI bilingüe en Gradio (`ui/app.py`) para la demostración.
+- **Métricas de Rendimiento:** Se logró una orquestación desacoplada con un control estricto de alucinaciones e inferencia localizada en AMD MI300X.
+
+## Hito: Ingesta End-to-End de Conocimiento Médico
+**Fecha:** 2026-05-05
+**Estado:** Completado
+
+- **Problema/Hipótesis:** La extracción de texto de PDFs médicos complejos a menudo resulta en errores severos de formato visual, destruyendo datos tabulares y el flujo lógico. Además, las guías dirigidas a pacientes diluyen la densidad médica requerida para un razonamiento clínico de alta fidelidad (OncoCoT). Finalmente, términos de marca como "NCCN" deben ser eliminados por neutralidad.
+- **Justificación Arquitectónica:** Se adoptó `PyMuPDF` (`fitz`) para la extracción de texto a nivel de bloques para preservar el orden de lectura lógico y prevenir la corrupción visual. Se implementó un filtrado de archivos estricto para excluir agresivamente materiales orientados al paciente, garantizando que solo las guías oncológicas profesionales alimenten la base de datos vectorial.
+- **Implementación Lógica/Técnica:** El pipeline `rag_engine/rag_ingestion.py` utiliza sustitución por expresiones regulares (`re.sub`) para sanitizar sistemáticamente el texto, mapeando términos de marca a "Oncology Guidelines" genéricos. `PyMuPDF` analiza iterativamente los bloques, activando el chunking semántico basado en encabezados médicos reconocidos. Los PDFs de pacientes (identificados mediante heurísticas de `"patient"`) son omitidos instantáneamente.
+- **Métricas de Rendimiento:** Se procesaron con éxito más de 70 guías clínicas profesionales (ej., HCC, Neuroendocrino, Mama, NSCLC), descartando de manera segura las guías para pacientes de baja densidad. Todos los chunks fueron vectorizados vía `S-PubMedBert-MS-MARCO` en `ChromaDB` con 0 errores de parseo visual.

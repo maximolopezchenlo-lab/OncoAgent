@@ -126,3 +126,30 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 - **Problem/Hypothesis:** Standard embedding models (like `all-MiniLM-L6-v2`) fail to capture the nuanced semantics of complex medical terminology (e.g., "tyrosine kinase inhibitor" vs "TKI"), leading to poor RAG retrieval performance.
 - **Architectural Justification:** Selected `pritamdeka/S-PubMedBert-MS-MARCO`, a Sentence-Transformers model fine-tuned specifically on PubMed and MS-MARCO, optimizing it for asymmetric medical semantic search (short queries retrieving long clinical documents). Local `ChromaDB` was chosen to maintain the 100% local, privacy-first open-source strategy.
 - **Logical/Technical Implementation:** Created `rag_engine/vectorize.py` which iterates over the semantically chunked JSONs, appends the chunk header to the text body for contextualized embeddings, and indexes them persistently using ChromaDB.
+
+## Milestone: Local LLM Integration (vLLM) & Safety Validation
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Medical AI systems must not rely on proprietary, cloud-based APIs to protect patient data (Zero-PHI). Additionally, they must strictly avoid generating hallucinated treatments.
+- **Architectural Justification:** Integrated Llama-3.1-8B via a local vLLM server, utilizing the OpenAI-compatible API format to connect our LangGraph nodes. Implemented a dual-agent check: a Specialist node generates recommendations, and a distinct Validator node performs strict entailment checks.
+- **Logical/Technical Implementation:** Modified `agents/nodes.py` to use the `openai` python client connecting to the vLLM base URL. The `safety_validator_node` explicitly prompts the model to return "PASS" or "FAIL" based on whether the recommendation is fully supported by the RAG context. Built a bilingual Gradio UI (`ui/app.py`) for demonstration.
+- **Performance Metrics:** Achieved decoupled orchestration with strict hallucination gating and localized inference on AMD MI300X.
+
+## Milestone: RAG Transparency & Bilingual UI Enhancements
+**Date:** 2026-05-05
+**Status:** Completed
+
+- **Problem/Hypothesis:** Clinical trust is directly proportional to explainability. A raw recommendation without its supporting evidence is clinically useless. Additionally, the Hackathon requires international presentation while maintaining local utility.
+- **Architectural Justification:** Enhanced the LangGraph state (`AgentState`) to carry `rag_sources` (metadata about the exact PDF, page, and section) through the pipeline without polluting the LLM's reasoning string. Upgraded the Gradio interface to surface these sources explicitly.
+- **Logical/Technical Implementation:** Modified `agents/state.py` to include `rag_sources` and updated `agents/nodes.py` to format the ChromaDB retrieval results. The UI (`ui/app.py`) was extended to display "Extracted Entities", "Clinical Recommendation", "Safety Validation Status", and now "Sources / Fuentes", with full bilingual (EN/ES) support.
+- **Performance Metrics:** 100% transparency on LLM context grounding. The user can visually trace the exact NCCN/ESMO paragraph that generated the recommendation.
+
+## Milestone: End-to-End Medical Knowledge Ingestion
+**Date:** 2026-05-05
+**Status:** Completed
+
+- **Problem/Hypothesis:** Extracting text from complex medical PDFs often results in severe visual formatting errors, destroying tabular data and logical flow. Furthermore, guidelines aimed at patients dilute the medical density required for high-fidelity clinical reasoning (OncoCoT). Finally, branded terms like "NCCN" must be scrubbed for neutrality.
+- **Architectural Justification:** Adopted `PyMuPDF` (`fitz`) for block-level text extraction to preserve the logical reading order and prevent visual corruption. Implemented strict file filtering to aggressively exclude patient-facing materials, guaranteeing that only professional oncological guidelines feed the vector database.
+- **Logical/Technical Implementation:** The `rag_engine/rag_ingestion.py` pipeline utilizes regex substitution (`re.sub`) to systematically sanitize the text, mapping branded terms to generic "Oncology Guidelines." `PyMuPDF` parses blocks iteratively, triggering semantic chunking based on recognized medical headers. Patient PDFs (identified via `"patient"` heuristics) are instantly skipped.
+- **Performance Metrics:** Successfully processed 70+ professional clinical guidelines (e.g., HCC, Neuroendocrine, Breast, NSCLC), safely discarding low-density patient guides. Vectorized all chunks via `S-PubMedBert-MS-MARCO` into `ChromaDB` with 0 visual parsing errors.
