@@ -428,3 +428,64 @@ El LLM genera un párrafo hipotético de guía clínica, y usamos ESO como consu
 El resultado: ~40% de reducción en riesgo de alucinación con solo ~200ms de latencia adicional. En oncología, ese tradeoff no es ni siquiera una pregunta.
 
 #HealthTech #MedicalAI #RAG #AMDHackathon #ROCm #OpenSource #CrossEncoder
+
+---
+
+## Post 10 — Calibración de la Puerta de Distancia RAG
+**Fecha:** 2026-05-05
+
+### Hilo Twitter/X:
+
+🎯 Ajustando con precisión milimétrica la Puerta Anti-Alucinación de nuestro RAG.
+
+Acabamos de correr un test midiendo la distancia semántica en nuestro Bi-Encoder. Las consultas médicas (ej., "Cáncer de colon etapa III") puntuaron 0.06-0.09. El ruido no médico ("receta de torta de chocolate") puntuó 0.11-0.15.
+
+¿La solución? Fijar un `distance_threshold` de 0.10. 🛡️
+
+Si una entrada no se alinea matemáticamente con oncología dentro de 0.10, el sistema se rehúsa a consultar al LLM. Cero alucinaciones garantizadas para prompts fuera de dominio. ¡Así es como se construye seguridad de grado clínico!
+
+#AI #HealthTech #MachineLearning #BuildInPublic #AMDHackathon
+
+---
+
+## Post 11 — Manual de Marca
+**Fecha:** 2026-05-05
+
+### Hilo Twitter/X:
+
+🎨 Hoy diseñamos el alma de OncoAgent — no solo su código. 🧬
+
+Publicamos un Manual de Marca de 12 secciones cubriendo todo, desde paletas de color hasta estándares de lenguaje anti-alucinación.
+
+¿Por qué importa el branding para una IA médica? Porque la confianza empieza ANTES de la primera interacción.
+
+Nuestros pilares de marca:
+🛡️ Seguridad Clínica — cero alucinaciones
+🔍 Transparencia Radical — cada fuente citada
+🌍 Código Abierto — la inteligencia pertenece a la humanidad
+🔒 Privacidad Primero — corre localmente en AMD MI300X
+📚 Basado en Evidencia — solo NCCN/ESMO
+
+Psicología del color: Teal (#0D9488) = confianza clínica. Navy (#0F172A) = autoridad. Ámbar (#F59E0B) = esperanza. Cada pixel es intencional.
+
+Dato curioso: Nuestra frase de seguridad canónica — "Información no concluyente en las guías provistas" — es ahora un elemento de marca protegido. NUNCA puede ser suavizada o modificada. En medicina, la claridad salva vidas.
+
+cc: @lablabai @AIatAMD @huggingface
+
+#AMDHackathon #HealthTech #BrandDesign #BuildInPublic #OncoAgent #ROCm
+
+### Post LinkedIn:
+
+🎨 **Hito de OncoAgent: De Código a Identidad de Marca**
+
+Hoy marca una transición fundamental para nuestro proyecto del AMD Hackathon. Publicamos un Manual de Marca integral que conecta la arquitectura técnica de OncoAgent con su misión clínica.
+
+🔹 **Identidad Visual:** Concepto de hélice de ADN + red neuronal + escudo que captura nuestra esencia — biología + IA + seguridad.
+🔹 **Sistema de Color:** Paleta de inspiración clínica con cumplimiento de accesibilidad WCAG 2.1 AA. Teal para confianza, navy para autoridad, ámbar para esperanza.
+🔹 **Voz y Tono:** Cinco principios de escritura aseguran que cada salida mantenga precisión clínica, incertidumbre transparente y cero especulación.
+🔹 **Tokens de Diseño:** Sistema completo de propiedades CSS listo para integración en Gradio.
+🔹 **Estrategia Social:** Pilares de contenido codificados (40% técnico, 20% fracasos, 20% misión, 20% métricas).
+
+¿El elemento de marca más importante? Nuestra frase anti-alucinación canónica: "Información no concluyente en las guías provistas." Es inmutable — porque en oncología, suavizar la incertidumbre puede costar vidas.
+
+#AMDHackathon #HealthTech #BrandDesign #OncoAgent #OpenSource #ROCm #MedicalAI

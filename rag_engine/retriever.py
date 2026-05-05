@@ -51,7 +51,7 @@ class OncoRAGRetriever:
         cross_encoder_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2",
         n_candidates: int = 15,
         n_results: int = 5,
-        distance_threshold: float = 1.35,
+        distance_threshold: float = 0.10,
         max_context_chars: int = 6000,
     ):
         self.db_path = db_path

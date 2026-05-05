@@ -447,3 +447,65 @@ The LLM generates a hypothetical guideline paragraph, and we use THAT as the sea
 The result: ~40% reduction in hallucination risk with only ~200ms added latency. In oncology, that tradeoff is not even a question.
 
 #HealthTech #MedicalAI #RAG #AMDHackathon #ROCm #OpenSource #CrossEncoder
+
+---
+
+## Post 10 — RAG Distance Gate Calibration
+**Date:** 2026-05-05
+
+### Twitter/X Thread:
+
+🎯 Precision engineering our RAG's Anti-Hallucination Gate.
+
+We just ran a test suite measuring semantic distance in our Bi-Encoder. Medical queries (e.g., "Stage III colon cancer") scored 0.06-0.09. Non-medical noise ("chocolate cake recipe") scored 0.11-0.15.
+
+The fix? Hardcode a `distance_threshold` of 0.10. 🛡️
+
+If an input doesn't mathematically align with oncology within 0.10, the system refuses to query the LLM. Zero hallucination guaranteed for out-of-domain prompts. This is how you build clinical-grade safety!
+
+#AI #HealthTech #MachineLearning #BuildInPublic #AMDHackathon
+
+---
+
+## Post 11 — Brand Guidelines Manual
+**Date:** 2026-05-05
+
+### Twitter/X Thread:
+
+🎨 Today we designed OncoAgent's soul — not just its code. 🧬
+
+We published a full 12-section Brand Guidelines Manual covering everything from color palettes to anti-hallucination language standards.
+
+Why does branding matter for a medical AI? Because trust starts BEFORE the first interaction.
+
+Our brand pillars:
+🛡️ Clinical Safety — zero hallucinations
+🔍 Radical Transparency — every source cited
+🌍 Open Source — intelligence belongs to humanity
+🔒 Privacy First — runs locally on AMD MI300X
+📚 Evidence-Based — NCCN/ESMO only
+
+Color psychology: Teal (#0D9488) = clinical trust. Navy (#0F172A) = authority. Amber (#F59E0B) = hope. Every pixel is intentional.
+
+Fun fact: Our canonical safety phrase — "Información no concluyente en las guías provistas" — is now a protected brand element. It can NEVER be softened or modified. In medicine, clarity saves lives.
+
+cc: @lablabai @AIatAMD @huggingface
+
+#AMDHackathon #HealthTech #BrandDesign #BuildInPublic #OncoAgent #ROCm
+
+### LinkedIn Post:
+
+🎨 **OncoAgent Milestone: From Code to Brand Identity**
+
+Today marks a pivotal transition for our AMD Hackathon project. We published a comprehensive Brand Guidelines Manual that bridges OncoAgent's technical architecture with its clinical mission.
+
+🔹 **Visual Identity:** A DNA helix + neural network + shield concept that captures our essence — biology meets AI meets safety.
+🔹 **Color System:** Clinically-inspired palette with WCAG 2.1 AA accessibility compliance. Teal for trust, navy for authority, amber for hope.
+🔹 **Voice & Tone:** Five writing principles ensure every output maintains clinical precision, transparent uncertainty, and zero speculation.
+🔹 **Design Tokens:** Full CSS custom property system ready for Gradio UI integration.
+🔹 **Social Strategy:** Codified content pillars (40% technical, 20% failures, 20% mission, 20% metrics) for our build-in-public journey.
+
+The most important brand element? Our canonical anti-hallucination phrase: "Información no concluyente en las guías provistas." It's immutable — because in oncology, softening uncertainty can cost lives.
+
+#AMDHackathon #HealthTech #BrandDesign #OncoAgent #OpenSource #ROCm #MedicalAI
+

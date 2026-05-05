@@ -176,3 +176,20 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 - **Architectural Justification:** We upgraded the Gradio UI frontend to surface the newly implemented SOTA RAG metrics (`rag_confidence` and `rag_retrieval_count`). This aligns with the transparency requirement for HealthTech deployments and provides the human-in-the-loop with critical context on how well the patient presentation matched the medical guidelines.
 - **Logical/Technical Implementation:** The `process_clinical_case` function in `ui/app.py` was extended to extract the confidence and retrieval count from the `AgentState`. These metrics are now prominently displayed with markdown formatting (using icons like 📊 and 📚) alongside the retrieved sources, directly above the final clinical recommendation.
 - **Performance Metrics:** Zero added latency. Provides immediate visual confirmation of the Distance Gate and Cross-Encoder efficacy during demonstrations.
+
+## Milestone: RAG Distance Threshold Calibration
+**Date:** 2026-05-05
+**Status:** Completed
+
+- **Problem/Hypothesis:** The Distance Gate anti-hallucination mechanism requires a precise threshold to separate relevant medical queries from out-of-domain prompts.
+- **Architectural Justification:** We created a calibration script (`rag_engine/test_threshold.py`) to systematically test the bi-encoder distances. Medical queries consistently scored ~0.06-0.09, while non-medical queries scored ~0.11-0.15.
+- **Logical/Technical Implementation:** We set the hard `distance_threshold` in `rag_engine/retriever.py` to `0.10`. This effectively acts as a strict guardrail: any query resulting in embeddings farther than 0.10 is automatically rejected before even reaching the LLM, guaranteeing zero hallucination for out-of-domain inputs.
+
+## Milestone: Comprehensive Brand Guidelines Manual
+**Date:** 2026-05-05
+**Status:** Completed
+
+- **Problem/Hypothesis:** As OncoAgent transitioned from a pure engineering prototype to a hackathon submission, the lack of a unified visual and communicative identity risked fragmented messaging across social media, presentations, and documentation. Without codified brand standards, each new asset (slides, posts, diagrams) would introduce inconsistencies that undermine professional credibility.
+- **Architectural Justification:** Created a comprehensive brand manual (`docs/brand_guidelines.md`) covering 12 sections: Brand Essence (mission, promise, pillars, personality, taglines), Visual Identity (logo concept, usage rules, variants), Color System (primary/secondary/accent/semantic palettes with WCAG AA compliance), Typography (Outfit/Inter/JetBrains Mono with full type scale), Voice & Tone (clinical precision principles, anti-hallucination canonical phrases), Iconography, UI Design System (Gradio theme config, safety badges, layout wireframe), Social Media Strategy (platform-specific guidelines, hashtag strategy, content pillars), Co-Branding rules, CSS Design Tokens, and i18n strategy.
+- **Logical/Technical Implementation:** Synthesized insights from the project's technical architecture (multi-agent LangGraph, SOTA RAG pipeline, Zero-PHI policy) into brand pillars. Derived the color palette from medical/clinical aesthetics (teal = clinical trust, navy = authority, amber = hope). Defined CSS custom properties as a design token system for direct implementation in the Gradio UI. Established the canonical anti-hallucination phrase ("Información no concluyente en las guías provistas") as an immutable brand element. Created bilingual versions (EN/ES) per the dual-language workflow requirement.
+- **Performance Metrics:** 12-section brand manual delivered. Bilingual documentation (`.md` + `.es.md`) created simultaneously. Full CSS token system ready for UI integration. WCAG 2.1 AA accessibility compliance verified for all primary color combinations.

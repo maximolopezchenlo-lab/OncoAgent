@@ -20,6 +20,9 @@ I18N = {
         "output_recommendation": "Clinical Recommendation",
         "output_status": "Safety Validation Status",
         "phi_warning": "⚠️ PHI Detected! Patient data was anonymized for safety.",
+        "output_sources": "Retrieved Guidelines & Sources",
+        "rag_confidence_label": "📊 **RAG Confidence Score:**",
+        "rag_sources_label": "📚 **Sources Retrieved:**",
     },
     "es": {
         "title": "OncoAgent: Soporte de Decisión en Oncología Clínica",
@@ -32,6 +35,9 @@ I18N = {
         "output_recommendation": "Recomendación Clínica",
         "output_status": "Estado de Validación de Seguridad",
         "phi_warning": "⚠️ PHI Detectado! Los datos del paciente fueron anonimizados por seguridad.",
+        "output_sources": "Guías y Fuentes Recuperadas",
+        "rag_confidence_label": "📊 **Nivel de Confianza RAG:**",
+        "rag_sources_label": "📚 **Fuentes Recuperadas:**",
     }
 }
 
@@ -66,7 +72,7 @@ def process_clinical_case(text: str):
         rag_confidence = final_state.get("rag_confidence", 0.0)
         retrieval_count = final_state.get("rag_retrieval_count", 0)
         
-        metrics_str = f"📊 **RAG Confidence Score:** {rag_confidence} | 📚 **Sources Retrieved:** {retrieval_count}\n\n"
+        metrics_str = f"{I18N[LANG]['rag_confidence_label']} {rag_confidence} | {I18N[LANG]['rag_sources_label']} {retrieval_count}\n\n"
         sources_str = metrics_str + sources_list_str
         
         # Get Safety Status
@@ -102,7 +108,7 @@ def create_ui():
             with gr.Column(scale=1):
                 status_output = gr.Markdown(label=lang_dict["output_status"])
                 entities_output = gr.Markdown(label=lang_dict["output_entities"])
-                sources_output = gr.Markdown(label=lang_dict.get("output_sources", "Sources / Fuentes"))
+                sources_output = gr.Markdown(label=lang_dict["output_sources"])
                 recommendation_output = gr.Markdown(label=lang_dict["output_recommendation"])
                 
         submit_btn.click(
