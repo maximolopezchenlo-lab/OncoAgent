@@ -3,7 +3,7 @@ import chromadb.utils.embedding_functions as embedding_functions
 import json
 import os
 
-def vectorize_chunks(input_dir="data/processed/nccn_chunks", db_dir="data/chroma_db"):
+def vectorize_chunks(input_dir="data/processed/chunks", db_dir="data/chroma_db"):
     # Ensure directories exist
     os.makedirs(db_dir, exist_ok=True)
     

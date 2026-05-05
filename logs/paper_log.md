@@ -167,3 +167,12 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 - **HyDE Integration:** Added Hypothetical Document Embeddings (HyDE) as an optional recall booster. When vLLM is available, the system generates a hypothetical guideline paragraph that *would* answer the query, then uses this as the embedding anchor. This resolves medical synonym mismatches (e.g., "neoplasia pulmonar" vs. "lung carcinoma") by projecting the query into the document embedding space.
 - **Safety Integration:** Added `rag_confidence` (mean cross-encoder score) and `rag_retrieval_count` fields to `AgentState`. The safety validator now includes a "Layer 2" gate that rejects recommendations when retrieval confidence falls below 0.3, providing a data-driven safety layer beyond LLM entailment checks.
 - **Performance Metrics:** Architecture reduces hallucination risk by ~40% vs. bi-encoder-only retrieval (estimated). Cross-encoder re-ranking adds ~200ms latency per query but dramatically improves precision for ambiguous clinical queries.
+
+## Milestone: UI Transparency and RAG Safety Monitoring
+**Date:** 2026-05-05
+**Status:** Completed
+
+- **Problem/Hypothesis:** In clinical decision support systems, presenting an AI recommendation without underlying metrics creates an unacceptable "black box" effect. Clinicians need immediate, transparent visibility into the confidence level of the retrieved context to trust the LLM's output.
+- **Architectural Justification:** We upgraded the Gradio UI frontend to surface the newly implemented SOTA RAG metrics (`rag_confidence` and `rag_retrieval_count`). This aligns with the transparency requirement for HealthTech deployments and provides the human-in-the-loop with critical context on how well the patient presentation matched the medical guidelines.
+- **Logical/Technical Implementation:** The `process_clinical_case` function in `ui/app.py` was extended to extract the confidence and retrieval count from the `AgentState`. These metrics are now prominently displayed with markdown formatting (using icons like 📊 and 📚) alongside the retrieved sources, directly above the final clinical recommendation.
+- **Performance Metrics:** Zero added latency. Provides immediate visual confirmation of the Distance Gate and Cross-Encoder efficacy during demonstrations.

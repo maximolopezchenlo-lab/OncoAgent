@@ -1,94 +1,84 @@
-# 🧬 OncoAgent — Sistema Multi-Agente de Triage Oncológico
+# 🧬 OncoAgent — Sistema Multi-Agente de Triaje Oncológico
 
 > **AMD Developer Hackathon 2026** · Potenciado por AMD Instinct™ MI300X · ROCm 6.2
 
-## 🌍 100% Open-Source: Democratizando la Oncología
-OncoAgent es orgullosamente 100% de código abierto. Creemos que la inteligencia clínica que salva vidas no debería estar bloqueada tras APIs propietarias. Nuestra solución está diseñada para:
-- **Garantizar la Privacidad del Paciente:** Al ejecutarse localmente en hardware AMD MI300X o nubes privadas, aseguramos que ningún dato del paciente salga del hospital.
-- **Fomentar la Contribución Global:** Permite que comunidades médicas de todo el mundo puedan auditar, modificar y contribuir fácilmente a la base de conocimiento RAG.
+## 🌍 100% Código Abierto: Democratizando la Oncología
+OncoAgent es orgullosamente 100% de código abierto. Creemos que la inteligencia clínica que salva vidas no debe estar bloqueada tras APIs propietarias. Nuestra solución está diseñada para:
+- **Garantizar la Privacidad del Paciente:** Ejecutándose localmente en hardware AMD MI300X o nubes privadas, asegurando que ningún dato del paciente salga del hospital (Zero-PHI).
+- **Fomentar la Contribución Global:** Permitiendo a las comunidades médicas de todo el mundo auditar, modificar y contribuir fácilmente a la base de conocimientos RAG.
 
-OncoAgent es un sistema de triage clínico multi-agente diseñado para combatir la **ceguera de datos no estructurados** en la oncología de atención primaria. Aprovecha un modelo Llama 3.1 8B con fine-tuning, orquestado a través de LangGraph para proporcionar razonamiento oncológico basado en evidencia y fundamentado en las guías clínicas de NCCN/ESMO.
+OncoAgent es un sistema de triaje clínico multi-agente diseñado para combatir la **ceguera de datos no estructurados** en oncología de atención primaria. Aprovecha un modelo Llama 3.1 8B ajustado (fine-tuned) y orquestado mediante LangGraph para proporcionar razonamiento oncológico basado en evidencia, fundamentado en las guías clínicas de NCCN/ESMO.
 
 ---
 
 ## 🏗️ Arquitectura
 
 ```
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│   Enrutador  │───▶│ Motor RAG    │───▶│ Especialista │
-│  (Limpieza   │    │ (ChromaDB +  │    │  (Razonamiento│
-│   PHI)       │    │  BioBERT)    │    │   OncoCoT)   │
-└──────────────┘    └──────────────┘    └──────────────┘
-        │                                       │
-        └──── LangGraph StateGraph ─────────────┘
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│   Enrutador  │───▶│ Motor RAG    │───▶│ Especialista │───▶│ Validador de │
+│(Limpieza PHI)│    │(ChromaDB +   │    │  Clínico     │    │  Seguridad   │
+│              │    │ PubMedBERT)  │    │ (Llama 3.1)  │    │ (Anti-Aluci) │
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+        │                                                           │
+        └─────────────── LangGraph StateGraph ──────────────────────┘
 ```
 
 **Componentes Clave:**
 
 | Módulo | Descripción |
 |--------|-------------|
-| `data_prep/` | Generador de datasets: PMC-Patients/OncoCoT → JSONL (plantilla Llama 3) |
-| `rag_engine/` | Chunking semántico de PDFs NCCN/ESMO + vectorización en ChromaDB |
-| `agents/` | Orquestación multi-agente en LangGraph (Enrutador → RAG → Especialista) |
-| `ui/` | Interfaz en Gradio para el ingreso de notas clínicas y salida de razonamiento |
+| `data_prep/` | Generador de datasets: PMC-Patients/OncoCoT → JSONL |
+| `rag_engine/` | Fragmentación semántica de PDFs NCCN/ESMO + Vectorización ChromaDB |
+| `agents/` | Orquestación multi-agente en LangGraph (Enrutador → RAG → Especialista → Validador) |
+| `ui/` | Interfaz bilingüe en Gradio para el ingreso de notas clínicas, justificación de fuentes y resultados |
 
 ---
 
-## ⚡ Hardware Objetivo
+## ⚡ Objetivo de Hardware
 
 - **GPU:** AMD Instinct™ MI300X (192GB HBM3)
 - **Software Stack:** ROCm 6.2.x, PyTorch (HIP), vLLM con PagedAttention
-- **Modelo:** `meta-llama/Meta-Llama-3.1-8B-Instruct` (QLoRA 4-bit fine-tuned)
+- **Modelo Base:** `meta-llama/Meta-Llama-3.1-8B-Instruct`
+- **Inferencia:** Optimizada a través del servidor vLLM local.
 
 ---
 
-## 🚀 Inicio Rápido
+## 🚀 Inicio Rápido (Despliegue)
+
+### Requisitos Previos
+- Instancia AMD MI300X (Ej. servidor bare-metal o nube con soporte ROCm 6.2)
+- Docker y Docker Compose instalados.
+
+### Instalación y Ejecución
 
 ```bash
-# 1. Clonar y preparar
+# 1. Clonar el repositorio
 git clone <repo-url>
 cd OncoAgent
 
-# 2. Instalar dependencias
+# 2. Iniciar el entorno virtual y dependencias
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# 3. Configurar entorno
-cp .env.example .env
-# Edita .env con tu HF_TOKEN
+# 3. Iniciar el Servidor de Inferencia vLLM (Docker)
+# Esto iniciará Llama 3.1 8B optimizado para hardware AMD
+docker run --device /dev/kfd --device /dev/dri -p 8000:8000 rocm/vllm:latest \
+    --model meta-llama/Meta-Llama-3.1-8B-Instruct --tensor-parallel-size 1
 
-# 4. Iniciar la UI
+# 4. Configurar entorno e Iniciar la Interfaz de Usuario
+cp .env.example .env
+# Asegúrate de configurar VLLM_API_BASE=http://localhost:8000/v1 en .env
 python -m ui.app
 ```
 
 ---
 
-## 📁 Estructura del Proyecto
+## 🩺 Garantías de Seguridad Médica
 
-```
-├── docs/                   # Documentación e investigación
-│   ├── research/           # Documentos de análisis (Deep Research)
-│   ├── ADR/                # Registros de Decisiones Arquitectónicas
-│   ├── oncoagent_master_directive.md
-│   └── antigravity_rules.md
-├── data_prep/              # Preparación del dataset (Fase 0)
-├── rag_engine/             # Ingesta y recuperación RAG (Fase 0-3)
-├── agents/                 # Orquestación LangGraph (Fase 3)
-├── ui/                     # Frontend en Gradio (Fase 4)
-├── tests/                  # Pruebas unitarias y de integración
-├── scripts/                # Scripts de utilidad
-├── logs/                   # Logs de papers y de redes sociales
-├── requirements.txt        # Dependencias fijadas (pinned)
-└── Dockerfile              # Despliegue en HF Spaces
-```
-
----
-
-## 🩺 Garantías de Seguridad
-
-- **Anti-Alucinación:** El agente Especialista responde *"Evidencia insuficiente"* cuando el contexto del RAG no basta.
-- **Cero-PHI:** Eliminación de PII (Información Personal Identificable) basada en expresiones regulares antes de cualquier procesamiento.
+- **Verificación Anti-Alucinaciones:** Un nodo "Validador de Seguridad" revisa obligatoriamente la salida del Especialista contra el contexto RAG recuperado. Si no hay concordancia, rechaza la respuesta.
+- **Zero-PHI:** Eliminación de PII basada en Regex antes de cualquier procesamiento RAG o LLM para proteger la identidad del paciente.
+- **Trazabilidad (Fuentes RAG):** La interfaz muestra las fuentes exactas de la guía médica (Página y Sección) en la recomendación final.
 - **Reproducibilidad:** Semillas fijas (`torch.manual_seed(42)`) en todos los scripts de Machine Learning.
 
 ---
@@ -96,9 +86,4 @@ python -m ui.app
 ## 📄 Licencia
 
 Este proyecto fue construido para el AMD Developer Hackathon 2026.
-
----
-
-## 👥 Equipo
-
-Construido con ❤️ y AMD Instinct MI300X.
+Abierto para la comunidad de salud, por la comunidad.

@@ -9,13 +9,12 @@ __pycache__/
 .env
 
 # === Data (generated, not tracked) ===
-*.pdf
-*.jsonl
+data/chroma_db/          # Vector DB persistence (regenerable)
+data/processed/          # Intermediate chunks (regenerable)
 processed_data/
-chroma_db/
-clinical_guides/
 raw_data/
 checkpoints/
+*.jsonl
 
 # === Node/Tooling ===
 node_modules/

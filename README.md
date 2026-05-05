@@ -14,13 +14,12 @@ OncoAgent is a multi-agent clinical triage system designed to combat **unstructu
 ## 🏗️ Architecture
 
 ```
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│   Router     │───▶│   RAG Engine │───▶│  Specialist  │
-│  (PHI Clean) │    │ (ChromaDB +  │    │  (OncoCoT    │
-│              │    │  BioBERT)    │    │   Reasoning) │
-└──────────────┘    └──────────────┘    └──────────────┘
-        │                                       │
-        └──── LangGraph StateGraph ─────────────┘
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│   Router     │───▶│   RAG Engine │───▶│  Specialist  │───▶│  Validator   │
+│  (PHI Clean) │    │ (ChromaDB +  │    │ (Llama 3.1)  │    │(Safety Check)│
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+        │                                                           │
+        └───────────── LangGraph StateGraph ────────────────────────┘
 ```
 
 **Key Components:**
@@ -29,8 +28,8 @@ OncoAgent is a multi-agent clinical triage system designed to combat **unstructu
 |--------|-------------|
 | `data_prep/` | Dataset builder: PMC-Patients/OncoCoT → JSONL (Llama 3 template) |
 | `rag_engine/` | Semantic chunking of NCCN/ESMO PDFs + ChromaDB vectorization |
-| `agents/` | LangGraph multi-agent orchestration (Router → RAG → Specialist) |
-| `ui/` | Gradio interface for clinical note input and reasoning output |
+| `agents/` | LangGraph multi-agent orchestration (Router → RAG → Specialist → Validator) |
+| `ui/` | Gradio interface for clinical note input, source citations, and reasoning output |
 
 ---
 
@@ -54,11 +53,14 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your HF_TOKEN
+# 3. Start Inference Server (vLLM on Docker)
+# This spins up Llama 3.1 8B optimized for AMD MI300X via ROCm
+docker run --device /dev/kfd --device /dev/dri -p 8000:8000 rocm/vllm:latest \
+    --model meta-llama/Meta-Llama-3.1-8B-Instruct --tensor-parallel-size 1
 
-# 4. Run the UI
+# 4. Configure environment & Run UI
+cp .env.example .env
+# Set VLLM_API_BASE=http://localhost:8000/v1 in .env
 python -m ui.app
 ```
 
@@ -87,7 +89,7 @@ python -m ui.app
 
 ## 🩺 Safety Guarantees
 
-- **Anti-Hallucination:** Specialist agent responds *"Evidencia insuficiente"* when RAG context is insufficient
+- **Anti-Hallucination Validator:** A dedicated safety node audits the Specialist's output against the RAG context. Rejects ungrounded claims.
 - **Zero-PHI:** Regex-based PII redaction before any processing
 - **Reproducibility:** Fixed seeds (`torch.manual_seed(42)`) across all ML scripts
 

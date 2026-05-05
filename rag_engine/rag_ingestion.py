@@ -105,10 +105,10 @@ class OncoRAGIngestor:
 
 if __name__ == "__main__":
     # Iniciar pipeline de ingesta
-    ingestor = OncoRAGIngestor(output_dir="data/processed/nccn_chunks")
+    ingestor = OncoRAGIngestor(output_dir="data/processed/chunks")
     
-    # Directorio de guías clínicas
-    guides_dir = "data/clinical_guides/nccn"
+    # Directorio principal de guías clínicas
+    guides_dir = "data/clinical_guides"
     
     if os.path.exists(guides_dir):
         pdf_files = []
@@ -118,7 +118,7 @@ if __name__ == "__main__":
                     pdf_files.append(os.path.join(root, file))
                     
         if not pdf_files:
-            print(f"⚠️ El directorio {guides_dir} está vacío. Agrega los PDFs.")
+            print(f"⚠️ El directorio {guides_dir} no contiene PDFs. Agrega los PDFs.")
             
         for path in pdf_files:
             file = os.path.basename(path)

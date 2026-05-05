@@ -158,3 +158,12 @@ Se optó por utilizar el estándar **Model Context Protocol (MCP)** para desacop
 - **Integración HyDE:** Se añadió Hypothetical Document Embeddings (HyDE) como refuerzo opcional de recall. Cuando vLLM está disponible, el sistema genera un párrafo hipotético de guía clínica que *respondería* a la consulta, y luego usa este como ancla de embedding. Esto resuelve desajustes de sinónimos médicos (ej., "neoplasia pulmonar" vs. "lung carcinoma") proyectando la consulta al espacio de embeddings de documentos.
 - **Integración con Seguridad:** Se añadieron campos `rag_confidence` (puntuación media del cross-encoder) y `rag_retrieval_count` al `AgentState`. El validador de seguridad ahora incluye una "Capa 2" que rechaza recomendaciones cuando la confianza de recuperación cae por debajo de 0.3, proporcionando una capa de seguridad basada en datos más allá de las verificaciones de vinculación del LLM.
 - **Métricas de Rendimiento:** La arquitectura reduce el riesgo de alucinación en ~40% vs. recuperación solo con bi-encoder (estimado). El re-ranking con cross-encoder añade ~200ms de latencia por consulta pero mejora drásticamente la precisión para consultas clínicas ambiguas.
+
+## Hito: Transparencia UI y Monitoreo de Seguridad RAG
+**Fecha:** 2026-05-05
+**Estado:** Completado
+
+- **Problema/Hipótesis:** En los sistemas de soporte a la decisión clínica, presentar una recomendación de IA sin las métricas subyacentes crea un efecto de "caja negra" inaceptable. Los médicos necesitan una visibilidad inmediata y transparente del nivel de confianza del contexto recuperado para confiar en la salida del LLM.
+- **Justificación Arquitectónica:** Actualizamos el frontend de la UI de Gradio para exponer las nuevas métricas SOTA de RAG (`rag_confidence` y `rag_retrieval_count`). Esto se alinea con el requisito de transparencia para despliegues de HealthTech y proporciona al humano en el bucle un contexto crítico sobre qué tan bien coincidió la presentación del paciente con las guías médicas.
+- **Implementación Lógica/Técnica:** La función `process_clinical_case` en `ui/app.py` fue extendida para extraer la confianza y el conteo de recuperación desde el `AgentState`. Estas métricas ahora se muestran prominentemente con formato markdown (usando íconos como 📊 y 📚) junto a las fuentes recuperadas, directamente encima de la recomendación clínica final.
+- **Métricas de Rendimiento:** Cero latencia añadida. Proporciona confirmación visual inmediata de la eficacia de la Puerta de Distancia y el Cross-Encoder durante las demostraciones.
