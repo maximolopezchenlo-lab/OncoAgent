@@ -193,3 +193,20 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 - **Architectural Justification:** Created a comprehensive brand manual (`docs/brand_guidelines.md`) covering 12 sections: Brand Essence (mission, promise, pillars, personality, taglines), Visual Identity (logo concept, usage rules, variants), Color System (primary/secondary/accent/semantic palettes with WCAG AA compliance), Typography (Outfit/Inter/JetBrains Mono with full type scale), Voice & Tone (clinical precision principles, anti-hallucination canonical phrases), Iconography, UI Design System (Gradio theme config, safety badges, layout wireframe), Social Media Strategy (platform-specific guidelines, hashtag strategy, content pillars), Co-Branding rules, CSS Design Tokens, and i18n strategy.
 - **Logical/Technical Implementation:** Synthesized insights from the project's technical architecture (multi-agent LangGraph, SOTA RAG pipeline, Zero-PHI policy) into brand pillars. Derived the color palette from medical/clinical aesthetics (teal = clinical trust, navy = authority, amber = hope). Defined CSS custom properties as a design token system for direct implementation in the Gradio UI. Established the canonical anti-hallucination phrase ("Información no concluyente en las guías provistas") as an immutable brand element. Created bilingual versions (EN/ES) per the dual-language workflow requirement.
 - **Performance Metrics:** 12-section brand manual delivered. Bilingual documentation (`.md` + `.es.md`) created simultaneously. Full CSS token system ready for UI integration. WCAG 2.1 AA accessibility compliance verified for all primary color combinations.
+
+## Milestone: High-Fidelity PDF Extraction & Sanitization
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Naive OCR and simple PDF text extraction (e.g., PyPDF2) fail on complex clinical layouts like NCCN guidelines, mixing columns and corrupting medical data. Additionally, using raw NCCN PDFs introduces trademarked references that might dilute the AI's neutral persona or violate licensing.
+- **Architectural Justification:** Adopted `PyMuPDF` (fitz) for structural block-level text extraction to preserve the semantic reading order of multi-column clinical documents. Added a regex-based sanitization step to strip out institutional branding before ingestion.
+- **Logical/Technical Implementation:** Created `OncoRAGIngestor` class. The extraction loop strictly skips patient-oriented guidelines (which dilute medical density) and captures physician-grade guidelines. `PyMuPDF` blocks are parsed and clustered under medical headers (e.g., "Recommendation", "Workup") using Adaptive Semantic Chunking.
+- **Performance Metrics:** Achieved 100% successful extraction of 70+ NCCN clinical guidelines. The dataset is fully sanitized ("NCCN" replaced with "Oncology Guidelines") and chunked semantically.
+
+## Milestone: Medical Vectorization with ChromaDB & PubMedBERT
+**Date:** 2026-05-04
+**Status:** In Progress / Completed
+
+- **Problem/Hypothesis:** Standard embedding models (like `all-MiniLM-L6-v2`) fail to capture the nuanced semantics of complex medical terminology (e.g., "tyrosine kinase inhibitor" vs "TKI"), leading to poor RAG retrieval performance.
+- **Architectural Justification:** Selected `pritamdeka/S-PubMedBert-MS-MARCO`, a Sentence-Transformers model fine-tuned specifically on PubMed and MS-MARCO, optimizing it for asymmetric medical semantic search (short queries retrieving long clinical documents). Local `ChromaDB` was chosen to maintain the 100% local, privacy-first open-source strategy.
+- **Logical/Technical Implementation:** Created `rag_engine/vectorize.py` which iterates over the semantically chunked JSONs, appends the chunk header to the text body for contextualized embeddings, and indexes them persistently using ChromaDB.

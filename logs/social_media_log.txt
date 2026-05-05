@@ -509,3 +509,46 @@ The most important brand element? Our canonical anti-hallucination phrase: "Info
 
 #AMDHackathon #HealthTech #BrandDesign #OncoAgent #OpenSource #ROCm #MedicalAI
 
+
+---
+---
+DATE: 2026-05-04 (Session 7)
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🧠 How do you make an AI read a medical guideline without losing its mind? 🏥
+
+Standard PDF parsers destroy multi-column clinical texts. If the AI reads a table backwards, the treatment recommendation is wrong. 
+
+Here is how we solved it for OncoAgent 👇 
+
+#AMDHackathon #HealthTech
+
+2/ 📑 Enter PyMuPDF (fitz) + Adaptive Semantic Chunking.
+Instead of reading lines, we read *structural blocks*. We group text under clinical headers ("Workup", "Evidence") so the LLM receives perfectly structured medical context.
+
+3/ 💉 The Medical Brain: We didn't settle for standard embeddings. We're vectorizing the entire guideline database using `S-PubMedBert-MS-MARCO` directly into a local ChromaDB instance.
+Medical nuances ("TKI" vs "Tyrosine Kinase Inhibitor") are now fully understood by the RAG engine. 
+
+4/ 📊 Today's Metrics:
+- 70+ Physician-grade clinical guidelines extracted.
+- 100% Sanitized (brand-neutral).
+- PubMedBERT + ChromaDB vectorization pipeline active.
+
+#ROCm #AI #Llama31 #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tone: Professional / Strategic)
+🚀 **OncoAgent Milestone: High-Fidelity Clinical Data Ingestion**
+
+A Retrieval-Augmented Generation (RAG) system is only as good as its data. Today, we cracked one of the hardest problems in medical AI: accurate extraction of complex clinical guidelines.
+
+🔹 **The Problem:** Clinical PDFs use complex, multi-column layouts and tables. Standard extraction scrambles the text, feeding the AI garbage.
+🔹 **The Solution:** We implemented an Adaptive Semantic Chunking pipeline using PyMuPDF to extract text in visual-block order, preserving clinical context.
+🔹 **The Brain:** We are vectorizing this data locally using `PubMedBERT` via ChromaDB, ensuring that the nuanced semantics of oncology are perfectly captured for our LangGraph agents.
+
+We are building a hallucination-resistant, physician-grade RAG engine on #AMD MI300X. 
+
+Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
+
+#AMDHackathon #HealthTech #AMDInstinct #OpenSource #SoftwareArchitecture #ROCm

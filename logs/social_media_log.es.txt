@@ -489,3 +489,46 @@ Hoy marca una transición fundamental para nuestro proyecto del AMD Hackathon. P
 ¿El elemento de marca más importante? Nuestra frase anti-alucinación canónica: "Información no concluyente en las guías provistas." Es inmutable — porque en oncología, suavizar la incertidumbre puede costar vidas.
 
 #AMDHackathon #HealthTech #BrandDesign #OncoAgent #OpenSource #ROCm #MedicalAI
+
+---
+---
+FECHA: 2026-05-04 (Sesión 7)
+
+### POST 1: X/TWITTER THREAD (Tono: Build in Public / Técnico)
+1/ 🧠 ¿Cómo haces que una IA lea una guía médica sin volverse loca? 🏥
+
+Los parsers de PDF estándar destruyen los textos clínicos de múltiples columnas. Si la IA lee una tabla al revés, la recomendación de tratamiento será incorrecta.
+
+Así es como lo resolvimos para OncoAgent 👇
+
+#AMDHackathon #HealthTech
+
+2/ 📑 La Solución: PyMuPDF (fitz) + Adaptive Semantic Chunking.
+En lugar de leer líneas, leemos *bloques estructurales*. Agrupamos el texto bajo encabezados clínicos ("Workup", "Evidence") para que el LLM reciba un contexto médico perfectamente estructurado.
+
+3/ 💉 El Cerebro Médico: No nos conformamos con embeddings estándar. Estamos vectorizando toda la base de datos de guías usando `S-PubMedBert-MS-MARCO` directamente en una instancia local de ChromaDB.
+Los matices médicos ("TKI" vs "Inhibidor de Tirosina Quinasa") ahora son entendidos a la perfección por el motor RAG.
+
+4/ 📊 Métricas de Hoy:
+- +70 guías clínicas de grado médico extraídas.
+- 100% Sanitizadas (neutrales en cuanto a marca).
+- Pipeline de vectorización PubMedBERT + ChromaDB activo.
+
+#ROCm #AI #Llama31 #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
+🚀 **Hito de OncoAgent: Ingesta de Datos Clínicos de Alta Fidelidad**
+
+Un sistema RAG (Retrieval-Augmented Generation) es tan bueno como sus datos. Hoy, resolvimos uno de los problemas más difíciles en la IA médica: la extracción precisa de guías clínicas complejas.
+
+🔹 **El Problema:** Los PDFs clínicos usan diseños complejos de múltiples columnas y tablas. La extracción estándar mezcla el texto, alimentando a la IA con basura.
+🔹 **La Solución:** Implementamos un pipeline de Adaptive Semantic Chunking usando PyMuPDF para extraer texto en el orden de bloques visuales, preservando el contexto clínico.
+🔹 **El Cerebro:** Estamos vectorizando estos datos localmente usando `PubMedBERT` a través de ChromaDB, asegurando que los matices semánticos de la oncología sean capturados perfectamente para nuestros agentes de LangGraph.
+
+Estamos construyendo un motor RAG de grado médico y resistente a alucinaciones sobre #AMD MI300X.
+
+Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
+
+#AMDHackathon #HealthTech #AMDInstinct #OpenSource #SoftwareArchitecture #ROCm

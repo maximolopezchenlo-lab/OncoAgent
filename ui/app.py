@@ -1,7 +1,7 @@
 import os
 import sys
 import gradio as gr
-
+import base64
 # Ensure the parent directory is in the sys.path to import agents
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -87,12 +87,52 @@ def process_clinical_case(text: str):
     except Exception as e:
         return f"Error processing request: {str(e)}", "", "", ""
 
+def get_base64_image(image_path):
+    if not os.path.exists(image_path):
+        return ""
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode('utf-8')
+
 def create_ui():
     lang_dict = I18N[LANG]
     
-    with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue")) as ui:
-        gr.Markdown(f"# {lang_dict['title']}")
-        gr.Markdown(lang_dict['description'])
+    # Resolving path to logo
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "docs", "assets", "brand", "logo", "oncoagent_logo_full_color.png")
+    logo_b64 = get_base64_image(logo_path)
+    
+    logo_html = f"""
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+        <img src="data:image/png;base64,{logo_b64}" alt="OncoAgent Logo" style="height: 60px;">
+        <div>
+            <h1 style="margin: 0; padding: 0; color: #008080;">{lang_dict['title']}</h1>
+            <p style="margin: 0; padding: 0; font-size: 1.1em; color: var(--body-text-color);">{lang_dict['description']}</p>
+        </div>
+    </div>
+    """
+    
+    # Custom Brand Theme
+    onco_theme = gr.themes.Soft(
+        primary_hue=gr.themes.colors.teal,
+        secondary_hue=gr.themes.colors.yellow,
+        neutral_hue=gr.themes.colors.slate,
+    ).set(
+        body_background_fill_dark="#0A192F",
+        block_background_fill_dark="#112240",
+        block_border_color_dark="#233554",
+        border_color_primary_dark="#233554",
+        button_primary_background_fill="#008080",
+        button_primary_background_fill_hover="#20A0A0",
+        button_primary_text_color="white",
+        button_primary_background_fill_dark="#008080",
+        button_primary_background_fill_hover_dark="#20A0A0",
+    )
+    
+    with gr.Blocks(theme=onco_theme, title="OncoAgent") as ui:
+        if logo_b64:
+            gr.HTML(logo_html)
+        else:
+            gr.Markdown(f"# {lang_dict['title']}")
+            gr.Markdown(lang_dict['description'])
         
         with gr.Row():
             with gr.Column(scale=1):
