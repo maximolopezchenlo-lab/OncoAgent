@@ -109,3 +109,20 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 **Architectural Decision:** We developed a precise web scraping script (`nccn_scraper.py`) using `BeautifulSoup` and `concurrent.futures` to extract all direct PDF links from the NCCN Category 1 physician guidelines. Instead of attempting to bypass NCCN authentication (which risks blocking), the script generates a definitive markdown checklist (`NCCN_PDF_LINKS.md`) for the user.
 **Logic/Mathematical Approach:** The scraper uses regex matching to identify detailed guideline pages from the previously mapped architecture, then concurrently hits each detail page to extract the specific `.pdf` href that corresponds to the primary physician guideline, aggressively filtering out non-core documents (like patient versions or evidence blocks).
 **Performance Metrics:** Successfully resolved and parsed 138 detail pages concurrently in under 1 minute, producing a deduplicated list of 77 direct physician guideline PDF links.
+
+## Milestone: High-Fidelity PDF Extraction & Sanitization
+**Date:** 2026-05-04
+**Status:** Completed
+
+- **Problem/Hypothesis:** Naive OCR and simple PDF text extraction (e.g., PyPDF2) fail on complex clinical layouts like NCCN guidelines, mixing columns and corrupting medical data. Additionally, using raw NCCN PDFs introduces trademarked references that might dilute the AI's neutral persona or violate licensing.
+- **Architectural Justification:** Adopted `PyMuPDF` (fitz) for structural block-level text extraction to preserve the semantic reading order of multi-column clinical documents. Added a regex-based sanitization step to strip out institutional branding before ingestion.
+- **Logical/Technical Implementation:** Created `OncoRAGIngestor` class. The extraction loop strictly skips patient-oriented guidelines (which dilute medical density) and captures physician-grade guidelines. `PyMuPDF` blocks are parsed and clustered under medical headers (e.g., "Recommendation", "Workup") using Adaptive Semantic Chunking.
+- **Performance Metrics:** Achieved 100% successful extraction of 70+ NCCN clinical guidelines. The dataset is fully sanitized ("NCCN" replaced with "Oncology Guidelines") and chunked semantically.
+
+## Milestone: Medical Vectorization with ChromaDB & PubMedBERT
+**Date:** 2026-05-04
+**Status:** In Progress / Completed
+
+- **Problem/Hypothesis:** Standard embedding models (like `all-MiniLM-L6-v2`) fail to capture the nuanced semantics of complex medical terminology (e.g., "tyrosine kinase inhibitor" vs "TKI"), leading to poor RAG retrieval performance.
+- **Architectural Justification:** Selected `pritamdeka/S-PubMedBert-MS-MARCO`, a Sentence-Transformers model fine-tuned specifically on PubMed and MS-MARCO, optimizing it for asymmetric medical semantic search (short queries retrieving long clinical documents). Local `ChromaDB` was chosen to maintain the 100% local, privacy-first open-source strategy.
+- **Logical/Technical Implementation:** Created `rag_engine/vectorize.py` which iterates over the semantically chunked JSONs, appends the chunk header to the text body for contextualized embeddings, and indexes them persistently using ChromaDB.

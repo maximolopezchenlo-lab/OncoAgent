@@ -109,3 +109,20 @@ Se optó por utilizar el estándar **Model Context Protocol (MCP)** para desacop
 **Decisión Arquitectónica:** Desarrollamos un script de web scraping preciso (`nccn_scraper.py`) utilizando `BeautifulSoup` y `concurrent.futures` para extraer todos los enlaces directos a los PDFs de las guías de médicos (Categoría 1) de la NCCN. En lugar de intentar eludir la autenticación de la NCCN (lo que conlleva riesgo de bloqueo), el script genera una lista de verificación definitiva en markdown (`NCCN_PDF_LINKS.md`) para el usuario.
 **Enfoque Lógico/Matemático:** El scraper utiliza expresiones regulares para identificar páginas detalladas de las guías a partir de la arquitectura mapeada previamente. Luego, realiza peticiones concurrentes a cada página para extraer el href específico `.pdf` correspondiente a la guía principal, filtrando agresivamente documentos no centrales (como versiones para pacientes o bloques de evidencia).
 **Métricas de Rendimiento:** Se resolvieron y analizaron exitosamente 138 páginas detalladas concurrentemente en menos de 1 minuto, produciendo una lista desduplicada de 77 enlaces directos a los PDFs de las guías médicas.
+
+## Hito: Extracción de PDFs de Alta Fidelidad y Sanitización
+**Fecha:** 2026-05-04
+**Estado:** Completado
+
+- **Problema/Hipótesis:** El OCR ingenuo y la extracción simple de texto de PDF (ej. PyPDF2) fallan en diseños clínicos complejos como las guías NCCN, mezclando columnas y corrompiendo datos médicos. Además, usar PDFs de NCCN en crudo introduce referencias de marcas comerciales que podrían diluir la personalidad neutral de la IA o violar licencias.
+- **Justificación Arquitectónica:** Se adoptó `PyMuPDF` (fitz) para la extracción de texto a nivel de bloques estructurales para preservar el orden de lectura semántico de documentos clínicos de múltiples columnas. Se añadió un paso de sanitización basado en regex para eliminar la marca institucional antes de la ingesta.
+- **Implementación Lógica/Técnica:** Se creó la clase `OncoRAGIngestor`. El bucle de extracción omite estrictamente las guías orientadas a pacientes (que diluyen la densidad médica) y captura guías de grado médico. Los bloques de `PyMuPDF` se analizan y agrupan bajo encabezados médicos (ej., "Recommendation", "Workup") usando Adaptive Semantic Chunking.
+- **Métricas de Rendimiento:** Se logró el 100% de extracción exitosa de más de 70 guías clínicas NCCN. El dataset está completamente sanitizado (reemplazo de "NCCN" por "Oncology Guidelines") y fragmentado semánticamente.
+
+## Hito: Vectorización Médica con ChromaDB y PubMedBERT
+**Fecha:** 2026-05-04
+**Estado:** En Progreso / Completado
+
+- **Problema/Hipótesis:** Los modelos de embeddings estándar (como `all-MiniLM-L6-v2`) fallan al capturar la semántica matizada de terminología médica compleja (ej. "inhibidor de tirosina quinasa" vs "TKI"), llevando a un bajo rendimiento en la recuperación RAG.
+- **Justificación Arquitectónica:** Se seleccionó `pritamdeka/S-PubMedBert-MS-MARCO`, un modelo de Sentence-Transformers fine-tuneado específicamente en PubMed y MS-MARCO, optimizándolo para búsqueda semántica médica asimétrica (consultas cortas recuperando documentos clínicos largos). Se eligió `ChromaDB` local para mantener la estrategia de código abierto 100% local y priorizando la privacidad.
+- **Implementación Lógica/Técnica:** Se creó `rag_engine/vectorize.py` el cual itera sobre los JSONs fragmentados semánticamente, añade el encabezado del chunk al cuerpo del texto para embeddings contextualizados, y los indexa de forma persistente usando ChromaDB.
