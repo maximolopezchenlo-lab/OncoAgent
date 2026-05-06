@@ -14,9 +14,12 @@ datasets>=2.20.0            # HuggingFace datasets loading
 trl>=0.9.0                  # SFT Trainer
 
 # === RAG Engine ===
-PyMuPDF>=1.24.0             # PDF extraction (fitz) — Rule #13
-chromadb>=0.5.0             # Local vector database — Rule #15
-sentence-transformers>=3.0.0 # BioBERT embeddings + CrossEncoder re-ranking — SOTA pipeline
+PyMuPDF>=1.24.0             # PDF extraction (fitz)
+pymupdf4llm>=0.0.17         # SOTA: PDF to Markdown with table support
+chromadb>=0.5.0             # Local vector database
+sentence-transformers>=3.0.0 # BioBERT embeddings + CrossEncoder re-ranking
+networkx>=3.0               # SOTA: Knowledge Graph / GraphRAG
+requests>=2.31.0            # SOTA: API connectivity (CIViC/ClinicalTrials)
 
 # === Agent Orchestration ===
 langgraph>=0.1.0            # Multi-agent state graph — Rule #17

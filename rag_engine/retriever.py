@@ -15,10 +15,14 @@ Architecture inspired by:
 
 import logging
 import os
+import re
 from typing import List, Dict, Optional, Tuple
 
 import chromadb
 import chromadb.utils.embedding_functions as embedding_functions
+import networkx as nx
+
+from .api_clients import CivicAPIClient, ClinicalTrialsClient
 
 logger = logging.getLogger(__name__)
 
@@ -53,12 +57,14 @@ class OncoRAGRetriever:
         n_results: int = 5,
         distance_threshold: float = 0.10,
         max_context_chars: int = 6000,
+        graph_path: str = "data/processed/knowledge_graph.gml",
     ):
         self.db_path = db_path
         self.n_candidates = n_candidates
         self.n_results = n_results
         self.distance_threshold = distance_threshold
         self.max_context_chars = max_context_chars
+        self.graph_path = graph_path
 
         # --- Bi-Encoder (Stage 1: recall) ---
         self._client = chromadb.PersistentClient(path=db_path)
@@ -79,6 +85,11 @@ class OncoRAGRetriever:
         # --- Cross-Encoder (Stage 2: precision) ---
         self._cross_encoder = None
         self._cross_encoder_model_name = cross_encoder_model
+
+        # --- SOTA Components (APIs & Graph) ---
+        self._civic_api = CivicAPIClient()
+        self._clinical_trials_api = ClinicalTrialsClient()
+        self._graph: Optional[nx.Graph] = None
 
     # Lazy-load the cross encoder to avoid blocking import time
     def _get_cross_encoder(self):
@@ -101,6 +112,87 @@ class OncoRAGRetriever:
             except Exception as exc:
                 logger.error("Failed to load Cross-Encoder: %s", exc)
         return self._cross_encoder
+
+    def _get_graph(self) -> Optional[nx.Graph]:
+        """Return the Knowledge Graph (lazy init)."""
+        if self._graph is None:
+            if os.path.exists(self.graph_path):
+                try:
+                    self._graph = nx.read_gml(self.graph_path)
+                    logger.info("Knowledge Graph loaded from %s", self.graph_path)
+                except Exception as e:
+                    logger.error("Failed to load Knowledge Graph: %s", e)
+            else:
+                logger.warning("Knowledge Graph file not found at %s", self.graph_path)
+        return self._graph
+
+    def _graph_search(self, query_text: str) -> List[Dict]:
+        """
+        Search the Knowledge Graph for clinical relationships.
+        Matches keywords from query to graph nodes.
+        """
+        graph = self._get_graph()
+        if not graph:
+            return []
+        
+        query_lower = query_text.lower()
+        findings = []
+        
+        # Simple keyword matching for graph nodes
+        for node in graph.nodes:
+            if str(node).lower() in query_lower:
+                # Find neighbors (related entities)
+                neighbors = list(graph.neighbors(node))
+                for neighbor in neighbors:
+                    edge_data = graph.get_edge_data(node, neighbor)
+                    relation = edge_data.get("relation", "connected_to")
+                    source = edge_data.get("source", "Knowledge Graph")
+                    findings.append({
+                        "text": f"Graph Finding: {node} {relation} {neighbor}.",
+                        "source": source,
+                        "type": "graph_relation"
+                    })
+        return findings
+
+    def _external_api_search(self, query_text: str) -> List[Dict]:
+        """
+        Search external clinical APIs (CIViC and ClinicalTrials.gov).
+        """
+        results = []
+        
+        # 1. CIViC Search (if query contains gene/variant-like patterns)
+        # For simplicity, we search for common genes in the query
+        genes = ["BRAF", "EGFR", "ALK", "KRAS", "NRAS", "HER2", "BRCA1", "BRCA2"]
+        found_genes = [g for g in genes if g in query_text.upper()]
+        
+        for gene in found_genes:
+            # We look for a variant pattern like V600E, T790M
+            variant_match = re.search(r"[A-Z]\d+[A-Z]", query_text.upper())
+            variant = variant_match.group(0) if variant_match else ""
+            
+            civic_evidence = self._civic_api.search_variant_evidence(gene, variant)
+            for item in civic_evidence[:2]: # Limit to top 2
+                results.append({
+                    "text": f"CIViC Evidence: Gene {gene} Variant {item.get('variant', {}).get('name')}. Evidence: {item.get('description', 'No description available.')}",
+                    "source": "CIViC Database",
+                    "type": "genomic_evidence"
+                })
+        
+        # 2. ClinicalTrials.gov Search
+        # We look for condition keywords
+        conditions = ["Lung Cancer", "Breast Cancer", "Colorectal Cancer", "Hepatocellular Carcinoma", "Melanoma"]
+        found_conditions = [c for c in conditions if c.lower() in query_text.lower()]
+        
+        for cond in found_conditions:
+            trials = self._clinical_trials_api.search_trials(cond)
+            for trial in trials[:2]: # Limit to top 2
+                results.append({
+                    "text": f"Active Clinical Trial ({trial['nctId']}): {trial['title']}. Summary: {trial['briefSummary']}",
+                    "source": "ClinicalTrials.gov",
+                    "type": "clinical_trial"
+                })
+        
+        return results
 
     # ------------------------------------------------- stage 1: bi-encoder
     def _bi_encoder_retrieve(
@@ -318,9 +410,25 @@ class OncoRAGRetriever:
         # Stage 4: Token trimming for LLM context budget
         final = self._trim_to_budget(final)
 
+        # Stage 5: SOTA Expansion (Graph + APIs)
+        # We append these as high-priority evidence at the top
+        sota_evidence = []
+        
+        # Graph Search
+        graph_findings = self._graph_search(query_text)
+        sota_evidence.extend(graph_findings)
+        
+        # API Search
+        api_findings = self._external_api_search(query_text)
+        sota_evidence.extend(api_findings)
+        
+        # Combine: SOTA evidence comes first as it's often more specific/recent
+        final = sota_evidence + final
+
         logger.info(
-            "Final retrieval: %d results (total chars: %d / %d budget)",
+            "Final retrieval: %d results (%d SOTA) | (total chars: %d / %d budget)",
             len(final),
+            len(sota_evidence),
             sum(len(r["text"]) for r in final),
             self.max_context_chars,
         )
@@ -382,6 +490,19 @@ class OncoRAGRetriever:
 
         # Stage 4: Token trim
         final = self._trim_to_budget(final)
+
+        # Stage 5: SOTA Expansion (Graph + APIs)
+        # Re-ranking is against ORIGINAL query, so we do expansion here too.
+        sota_evidence = []
+        graph_findings = self._graph_search(original_query)
+        sota_evidence.extend(graph_findings)
+        
+        api_findings = self._external_api_search(original_query)
+        sota_evidence.extend(api_findings)
+        
+        # Combine: SOTA evidence comes first
+        final = sota_evidence + final
+
         return final
 
     # ------------------------------------------------- public: format for LLM

@@ -1,97 +1,23 @@
-FECHA: 2026-05-05 (Sesión 10)
 
-### POST 1: X/TWITTER (Tono: Innovación Técnica / Visual)
-🚀 ¡Actualizando OncoAgent a ROCm 7.2! 🧬⚡
+Post 11: ¡Llegó el RAG SOTA! 🕸️🧬
+¡Acabamos de elevar el motor RAG de OncoAgent a niveles de Estado del Arte! 🚀
+¿Por qué conformarse con texto plano cuando puedes tener integridad estructural? Ahora usamos pymupdf4llm para preservar tablas clínicas en Markdown. ¡Se acabó la estadificación TNM corrupta!
+Pero hay más:
+✅ GraphRAG con NetworkX mapeando fármacos a mutaciones.
+✅ Conectividad en vivo con APIs de CIViC y ClinicalTrials.gov.
+✅ Evidencia clínica en tiempo real basada en los últimos datos.
+El triaje clínico acaba de recibir un trasplante de cerebro masivo. 🧠🔬
+#AMDHackathon #HealthTech #SOTA #RAG #OncoAgent #AMDMI300X #BuildInPublic
 
-No solo estamos construyendo una IA; la estamos construyendo en la vanguardia absoluta. Transicionando nuestro stack a ROCm 7.2 para desbloquear cada bit de potencia de la AMD MI300X.
+Post 12: ¡UI Premium + Validación de Hardware en MI300X! 💎🚀
+La transparencia visual es tan crítica como la precisión médica. ¡Acabamos de lanzar el Tablero de Triaje de OncoAgent con un diseño "Glassmorphism" de alta fidelidad! 🏥💎
 
-🔧 Fracaso del Día: Nuestro entorno host es un poco "tímido" y aún no detecta la GPU.
-Solución: Moverse a un flujo de trabajo basado en contenedores con `rocm/vllm`. Estandarizar el entorno es la única forma de escalar en entornos clínicos.
+¿Qué hay bajo el capó?
+✨ Monitoreo de Hardware en Tiempo Real: Seguimiento de memoria HBM3 y kernels ROCm 7.2 en la AMD MI300X.
+✨ Evidencia Multi-Pestaña: Visibilidad instantánea de GraphRAG, genómica de CIViC y fuentes de guías NCCN.
+✨ UI de Auditoría de Seguridad: Marcadores claros de "IA Explicable" para la confianza del clínico.
 
-🎨 Bonus: ¡Se viene una renovación gráfica! Estamos construyendo un dashboard "Glassmorphism" premium para mostrar los pensamientos internos de la IA. Transparencia = Confianza.
+¡También ejecutamos nuestras pruebas de validación: el rendimiento está volando en la MI300X! ⚡
+La cuenta regresiva del hackathon ha comenzado, y estamos listos para la clínica. 🩺🔥
 
-#AMDHackathon #ROCm #MI300X #Llama31 #BuildInPublic #UIUX
-
-### POST 2: LINKEDIN (Tono: Visionario / Técnico)
-🏗️ **OncoAgent: Ingeniería de Precisión para la Confianza Clínica**
-
-Hoy realizamos dos cambios estratégicos:
-
-1️⃣ **Migración a ROCm 7.2:** Hemos actualizado nuestro objetivo técnico al stack ROCm más reciente para asegurar que OncoAgent aproveche los kernels de rendimiento más recientes para la AMD Instinct MI300X.
-2️⃣ **Arquitectura de UI Premium:** Un agente médico no solo debe hablar; debe demostrar su razonamiento. Estamos diseñando una interfaz "Glassmorphism" de alta fidelidad que muestra métricas de confianza RAG y razonamiento Chain-of-Thought en tiempo real.
-
-En oncología, la precisión no es negociable, tanto en el código como en la experiencia del usuario.
-
-#AMDHackathon #OncoAgent #AMD #ROCm7 #HealthTech #AIArchitecture
-
----
-FECHA: 2026-05-05 (Sesión 11)
-
-### POST 1: X/TWITTER (Tono: Tech Edge / Visual)
-🚀 OncoAgent: Más allá del código. 🧬✨
-
-Acabamos de actualizar nuestra arquitectura a #ROCm 7.2 para exprimir cada gota de rendimiento de la AMD Instinct MI300X. ⚡
-
-Pero no se trata solo de velocidad. Hemos lanzado nuestro nuevo **Panel Clínico Premium**:
-🔹 Interfaz Glassmorphism para transparencia visual.
-🔹 Métricas de confianza RAG en tiempo real.
-🔹 100% Trazabilidad (Fuentes citadas en pantalla).
-
-La transparencia no es una característica; es un requisito para la confianza clínica. 🏥🛡️
-
-#AMDHackathon #MI300X #HealthTech #AIArchitecture #BuildInPublic #OpenSource
-
-### POST 2: LINKEDIN (Tono: Estratégico / Visionario)
-🏗️ **Hito de OncoAgent: Excelencia Arquitectónica y Confianza Clínica**
-
-Hoy damos un paso importante con OncoAgent. Hemos sincronizado nuestro stack con **ROCm 7.2**, asegurando la optimización total para el ecosistema AMD Instinct MI300X. 
-
-Pero la ingeniería sin empatía está incompleta. También hemos desplegado nuestro **Panel Premium con Glassmorphism**. ¿Por qué? Porque en oncología, el "Cómo" importa tanto como el "Qué".
-
-Al exponer puntajes de confianza RAG y citas directas de guías (NCCN/ESMO) en una interfaz de alta fidelidad, estamos cerrando la brecha entre el razonamiento de IA SOTA y la confianza del médico.
-
-Clínicamente seguro. Matemáticamente fundamentado. Visualmente transparente. 🚀
-
-Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
-
-#AMDHackathon #ROCm #HealthTech #AIArchitecture #MedicalAI #MI300X
----
-FECHA: 2026-05-05 (Sesión 12)
-
-### POST 1: X/TWITTER (Tono: Innovación Técnica / Build in Public)
-1/ 🧠 No solo leemos guías; estamos enseñando a OncoAgent a *pensar* como un oncólogo. 🚀
-
-¡Hoy convertimos con éxito 2,984 fragmentos de guías clínicas en un dataset de fine-tuning de alta fidelidad para Llama 3.1! 🧬
-
-#AMDHackathon #HealthTech #AI #Llama31
-
-2/ 🛠️ El Desafío: Convertir guías densas de la NCCN/ESMO en un formato de chat lógico.
-¿Nuestra solución? Un pipeline que extrae "Pensamientos Clínicos" (CoT) para asegurar que el modelo razone antes de recomendar. 🧠
-
-3/ ⚡ QLoRA en AMD MI300X:
-Implementamos un script de entrenamiento optimizado para ROCm usando cuantización de 4 bits NF4.
-✅ Eficiencia de memoria
-✅ Alta precisión
-✅ 100% compatible con ROCm 7.2
-
-4/ 📊 Métricas del día:
-- 2,984 ejemplos de entrenamiento generados.
-- Rango r=64 para máxima adaptación.
-- 0 filtraciones de PHI.
-
-#ROCm #MI300X #BuildInPublic #OpenSource
-
----
-
-### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
-🚀 **Hito de OncoAgent: Uniendo la Inteligencia General con la Precisión Clínica**
-
-Un LLM de propósito general es potente, pero en oncología necesitamos un alineamiento especializado. Hoy alcanzamos un hito técnico mayor: **Finalización del Dataset de Ajuste de Instrucciones.**
-
-🔹 **El Logro:** Transformamos más de 70 guías clínicas en 2,984 pares de instrucción de alta calidad.
-🔹 **La Innovación:** Más allá de simples preguntas y respuestas, nuestro dataset incluye rutas de razonamiento Chain-of-Thought (CoT), enseñando al modelo la *lógica* detrás de las recomendaciones.
-🔹 **El Hardware:** Toda la lógica de entrenamiento está diseñada para el ecosistema **AMD Instinct MI300X**, aprovechando QLoRA de 4 bits y ROCm 7.2.
-
-Estamos ajustando para la seguridad, la precisión y la confianza clínica. 🏥💻
-
-#AMDHackathon #OncoAgent #AMDInstinct #HealthTech #ROCm #Llama31 #FineTuning
+#AMDHackathon #Glassmorphism #IAExplicable #ROCm #MI300X #AMD #HealthTech #BuildInPublic

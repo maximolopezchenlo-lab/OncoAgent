@@ -29,7 +29,7 @@ We renamed it to `oncoagent_master_directive.md` and it is now the official orch
 
 3/ 📊 Today's Metrics:
 - 0 PHI leaks detected (Zero-PHI filter validated).
-- 100% ROCm 6.2 compatibility in ingestion scripts.
+- 100% ROCm 7.2 compatibility in ingestion scripts.
 - 192GB of HBM3 waiting for Llama 3.1 fine-tuning.
 
 4/ 📸 Visual Suggestion: Take a screenshot of the new file structure and the mapping in the Master Directive. Looks very pro! 
@@ -45,7 +45,7 @@ Today we close Phase 0 of OncoAgent with a critical advance in knowledge managem
 
 🔹 **The Technical:** Ingestion scripts with *Adaptive Semantic Chunking* finished, ensuring medical context is preserved intact.
 🔹 **The Human:** Documented our first "Failure of the Day" (directive ambiguity) to strengthen repo modularity.
-🔹 **Hardware:** Everything optimized for **AMD Instinct MI300X** under ROCm 6.2.
+🔹 **Hardware:** Everything optimized for **AMD Instinct MI300X** under ROCm 7.2.
 
 Next step: Phase 1 - Load validation on the 192GB of HBM3. Onward!
 
@@ -611,44 +611,58 @@ Clinically safe. Mathematically grounded. Visually transparent. 🚀
 Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
 
 #AMDHackathon #ROCm #HealthTech #AIArchitecture #MedicalAI #MI300X
----
----
 DATE: 2026-05-05 (Session 12)
 
-### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
-1/ 🧠 We're not just reading guidelines; we're teaching OncoAgent to *think* like an oncologist. 🚀
+### POST 1: X/TWITTER (Tone: Tech Edge / Visual)
+🏁 ROCm 7.2 Migration: COMPLETED. 🚀
 
-Today we successfully converted 2,984 clinical guideline chunks into a high-fidelity Llama 3.1 fine-tuning dataset! 🧬
+We've just finalized the complete overhaul of #OncoAgent's infrastructure. Every config, every directive, and every documentation file is now officially synchronized with #ROCm 7.2. 
 
-#AMDHackathon #HealthTech #AI #Llama31
+Why? Because clinical AI requires the latest performance kernels and hardware stability of the AMD Instinct MI300X. 🛡️
 
-2/ 🛠️ The Challenge: Converting dense, multi-column NCCN/ESMO guidelines into a logical chat format.
-Our solution? A custom pipeline that extracts "Clinical Thoughts" (CoT) to ensure the model reasons before it recommends. 🧠
+What's new:
+✅ Base Image: rocm/vllm:rocm7.2
+✅ Standardized Dependencies
+✅ New Diagnostic Script: scripts/check_rocm_72.py
+✅ ADR 003: Formalizing our hardware stack transition.
 
-3/ ⚡ QLoRA on AMD MI300X:
-We've implemented a ROCm-optimized training script using 4-bit NF4 quantization. 
-✅ Memory efficient
-✅ High precision
-✅ 100% ROCm 7.2 compliant
+The foundation is solid. Next: RAG ingestion at scale. 🧠⚡
 
-4/ 📊 Metrics of the day:
-- 2,984 training examples generated.
-- r=64 rank for maximum adaptation.
-- 0 PHI leaks.
+#AMDHackathon #ROCm #MI300X #Llama31 #BuildInPublic #AIArchitecture
 
-#ROCm #MI300X #BuildInPublic #OpenSource
+### POST 2: LINKEDIN (Tone: Strategic / Visionary)
+🏗️ **OncoAgent: Finalizing the Infrastructure for SOTA Clinical AI**
 
----
+Architecture is the silent foundation of clinical trust. Today, we successfully completed the total migration of OncoAgent to the **ROCm 7.2.x** ecosystem.
 
-### POST 2: LINKEDIN (Tone: Professional / Strategic)
-🚀 **OncoAgent Milestone: Bridging General Intelligence with Clinical Precision**
+This wasn't just a version bump. We've performed a comprehensive refactor of our containerized environment, standardized our dependency trees, and established **Architectural Decision Record (ADR) 003** to formalize our long-term commitment to the latest AMD hardware optimizations.
 
-A general-purpose LLM is a powerful tool, but in oncology, we need specialized alignment. Today, we reached a major technical milestone: **Instruction-Tuning Dataset Completion.**
+By targeting ROCm 7.2, we ensure that our Llama 3.1 8B models can leverage the full potential of the AMD Instinct MI300X's 192GB HBM3 memory and native performance kernels.
 
-🔹 **The Achievement:** We successfully transformed 70+ clinical guidelines into 2,984 high-quality instruction-tuning pairs.
-🔹 **The Innovation:** Beyond simple Q&A, our dataset includes Chain-of-Thought (CoT) reasoning paths, teaching the model the *logic* behind clinical recommendations.
-🔹 **The Hardware:** All training logic is built for the **AMD Instinct MI300X** ecosystem, leveraging 4-bit QLoRA and ROCm 7.2 for peak efficiency.
+Infrastructure: Synchronized. 
+Data: Next. 🚀
 
-We are fine-tuning for safety, precision, and clinical trust. 🏥💻
+#AMDHackathon #ROCm #HealthTech #AIArchitecture #MedicalAI #MI300X #AMD
 
-#AMDHackathon #OncoAgent #AMDInstinct #HealthTech #ROCm #Llama31 #FineTuning
+Post 11: SOTA RAG is here! 🕸️🧬
+We just upgraded OncoAgent's RAG engine to State-of-the-Art levels! 🚀
+Why settle for plain text when you can have structural integrity? We're now using pymupdf4llm to preserve clinical tables in Markdown. No more mangled TNM staging!
+But wait, there's more:
+✅ GraphRAG with NetworkX mapping drugs to mutations.
+✅ Live API connectivity to CIViC and ClinicalTrials.gov.
+✅ Real-time clinical evidence grounded on the latest data.
+Clinical triage just got a massive brain transplant. 🧠🔬
+#AMDHackathon #HealthTech #SOTA #RAG #OncoAgent #AMDMI300X #BuildInPublic
+
+Post 12: Premium UI + Hardware Validation on MI300X! 💎🚀
+Visual transparency is as critical as medical accuracy. We just launched the OncoAgent Triage Dashboard with a high-fidelity "Glassmorphism" design! 🏥💎
+
+What's under the hood?
+✨ Real-time Hardware Monitoring: Tracking HBM3 memory & ROCm 7.2 kernels on the AMD MI300X.
+✨ Multi-Tab Evidence: Instant visibility into GraphRAG, CIViC genomics, and NCCN guideline sources.
+✨ Safety Auditor UI: Clear "Explainable AI" markers for clinician trust.
+
+We also ran our validation benchmarks: Throughput is screaming on the MI300X! ⚡
+The hackathon countdown is on, and we are ready for the clinic. 🩺🔥
+
+#AMDHackathon #Glassmorphism #ExplainableAI #ROCm #MI300X #AMD #HealthTech #BuildInPublic

@@ -218,16 +218,27 @@ def rag_retrieval_node(state: AgentState) -> Dict[str, Any]:
             results = retriever.query(query, n_results=5)
 
         # --- Format results for downstream nodes ---
-        context_strings = [
-            f"[Source: {r['source']}, Page: {r['page']}, Section: {r['header']}]\n{r['text']}"
-            for r in results
-        ]
-        source_strings = [
-            f"- **{r['source']}** (Page {r['page']}): {r['header']}"
-            for r in results
-        ]
+        context_strings = []
+        source_strings = []
+        graph_rag_strings = []
+        api_evidence_strings = []
 
-        # --- Compute confidence metrics ---
+        for r in results:
+            res_type = r.get("type", "standard")
+            if res_type == "graph_relation":
+                graph_rag_strings.append(r["text"])
+            elif res_type in ["genomic_evidence", "clinical_trial"]:
+                api_evidence_strings.append(r["text"])
+            else:
+                # Standard RAG
+                context_strings.append(
+                    f"[Source: {r['source']}, Page: {r.get('page', '?')}, Section: {r.get('header', 'Unknown')}]\n{r['text']}"
+                )
+                source_strings.append(
+                    f"- **{r['source']}** (Page {r.get('page', '?')}): {r.get('header', 'Unknown')}"
+                )
+
+        # --- Compute confidence metrics (only for standard RAG with cross-encoder scores) ---
         ce_scores = [r["cross_encoder_score"] for r in results if "cross_encoder_score" in r]
         mean_confidence = sum(ce_scores) / len(ce_scores) if ce_scores else 0.0
 
@@ -235,11 +246,15 @@ def rag_retrieval_node(state: AgentState) -> Dict[str, Any]:
         logger.error("RAG retrieval failed: %s", exc)
         context_strings = []
         source_strings = []
+        graph_rag_strings = []
+        api_evidence_strings = []
         mean_confidence = 0.0
 
     return {
         "rag_context": context_strings,
         "rag_sources": source_strings,
+        "graph_rag_context": graph_rag_strings,
+        "api_evidence_context": api_evidence_strings,
         "rag_confidence": round(mean_confidence, 4),
         "rag_retrieval_count": len(context_strings),
     }

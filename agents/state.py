@@ -19,6 +19,8 @@ class AgentState(TypedDict):
     # 3. RAG Context (Retrieval Node)
     rag_context: List[str]
     rag_sources: List[str]
+    graph_rag_context: List[str]    # Extracted from Clinical Knowledge Graph
+    api_evidence_context: List[str]  # Real-time evidence from APIs (CIViC/ClinicalTrials)
     rag_confidence: float           # Mean cross-encoder score (0–1 scale)
     rag_retrieval_count: int        # Number of results that passed the gate
     
