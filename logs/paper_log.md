@@ -247,3 +247,12 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 - **Architectural Justification:** Established a strict "Bilingual Sync" protocol where every major milestone update must be reflected simultaneously in English and Spanish documentation. This ensures that the global judging panel and local clinicians have access to the same level of architectural transparency.
 - **Logical/Technical Implementation:** Performed a comprehensive audit of `paper_log.md` vs `paper_log.es.md` and `social_media_log.txt` vs `social_media_log.es.txt`. Standardized the Session numbering and date formats. Codified the transition to ROCm 7.2 across all ADRs and README files. Automated the deployment of these logs through the dual-language workflow.
 - **Performance Metrics:** 100% parity achieved between EN and ES logs. All 14 technical sessions are now fully documented and synchronized. Repository structure validated for final submission readiness.
+
+## Milestone: Phase 4 — Dockerization & Hugging Face Spaces Preparation
+**Date:** 2026-05-06
+**Status:** Completed
+
+- **Problem/Hypothesis:** To deploy the OncoAgent solution on Hugging Face Spaces for the hackathon judges, the system requires a strict Dockerized environment that maintains compatibility with the ROCm stack for AMD Instinct MI300X accelerators. A standard Python image would fail to leverage the necessary GPU drivers.
+- **Architectural Justification:** Selected the official `rocm/vllm:latest` image as the base. This guarantees that PyTorch and vLLM will natively utilize the ROCm 7.2 layer. Exposed port 7860 as required by Gradio on HF Spaces and injected environment variables to ensure `cuda` calls map to `hip` correctly (`HSA_OVERRIDE_GFX_VERSION`).
+- **Logical/Technical Implementation:** Created the `Dockerfile` installing necessary build essentials and Python requirements via `pip`. Kept the container size optimized by leveraging Docker cache for `requirements.txt` before copying the main source code. Set the entrypoint to the Glassmorphism UI (`ui/app.py`).
+- **Performance Metrics:** The repository is now formally compliant with the "Strict Dockerization" directive, allowing a one-click deployment onto an AMD-accelerated Space.

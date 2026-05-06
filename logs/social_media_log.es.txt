@@ -433,3 +433,12 @@ Acabamos de completar una auditoría total de nuestro `paper_log.md` y `social_m
 OncoAgent no es solo una demo; es un ecosistema reproducible y totalmente documentado para IA clínica en hardware AMD. 🚀
 
 #AMDHackathon #OncoAgent #AIArchitecture #ROCm #Documentation #BuildInPublic #AMD #HealthTech
+
+### POST 3: LINKEDIN (Tono: Técnico / Despliegue)
+🐳 **OncoAgent Milestone: Dockerización Estricta para AMD MI300X**
+
+El despliegue importa tanto como los modelos. Hemos sellado oficialmente la Fase 4 al empaquetar OncoAgent con un Dockerfile personalizado basado en la imagen `rocm/vllm`. 
+
+Al aprovechar el soporte nativo de ROCm 7.2 y exponer nuestra UI Glassmorphism en el puerto 7860, nos aseguramos de que los jueces del AMD Developer Hackathon puedan probar nuestro motor RAG clínico en un entorno reproducible y de alto rendimiento en Hugging Face Spaces. Se acabó el "funciona en mi máquina" en HealthTech. 🏥💻
+
+#AMDHackathon #Docker #ROCm #MI300X #HealthTech #BuildInPublic #OpenSource

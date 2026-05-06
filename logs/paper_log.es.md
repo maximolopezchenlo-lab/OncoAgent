@@ -197,3 +197,12 @@ Optamos por utilizar el estándar **Model Context Protocol (MCP)** para desacopl
 - **Justificación Arquitectónica:** Se estableció un protocolo estricto de "Sincronización Bilingüe" donde cada actualización importante de hito debe reflejarse simultáneamente en la documentación en inglés y español. Esto asegura que el panel de jueces global y los médicos locales tengan acceso al mismo nivel de transparencia arquitectónica.
 - **Implementación Lógica/Técnica:** Se realizó una auditoría exhaustiva de `paper_log.md` vs `paper_log.es.md` y `social_media_log.txt` vs `social_media_log.es.txt`. Se estandarizó la numeración de las sesiones y los formatos de fecha. Se codificó la transición a ROCm 7.2 en todos los ADRs y archivos README. Se automatizó el despliegue de estos logs a través del flujo de trabajo de doble idioma.
 - **Métricas de Rendimiento:** Paridad del 100% lograda entre los logs EN y ES. Las 14 sesiones técnicas están ahora completamente documentadas y sincronizadas. Estructura del repositorio validada para la entrega final.
+
+## Hito: Fase 4 — Dockerización y Preparación para Hugging Face Spaces
+**Fecha:** 2026-05-06
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Para desplegar la solución OncoAgent en Hugging Face Spaces para los jueces del hackathon, el sistema requiere un entorno Dockerizado estricto que mantenga la compatibilidad con el ecosistema ROCm para aceleradores AMD Instinct MI300X. Una imagen estándar de Python no lograría aprovechar los controladores de GPU necesarios.
+- **Justificación Arquitectónica:** Se seleccionó la imagen oficial `rocm/vllm:latest` como base. Esto garantiza que PyTorch y vLLM utilizarán nativamente la capa de ROCm 7.2. Se expuso el puerto 7860 como requiere Gradio en HF Spaces y se inyectaron variables de entorno para asegurar que las llamadas a `cuda` se mapeen correctamente a `hip` (`HSA_OVERRIDE_GFX_VERSION`).
+- **Implementación Lógica/Técnica:** Se creó el `Dockerfile` instalando dependencias de compilación y los requisitos de Python vía `pip`. Se optimizó el tamaño del contenedor aprovechando el caché de Docker para `requirements.txt` antes de copiar el código fuente. Se configuró el punto de entrada a la interfaz Glassmorphism (`ui/app.py`).
+- **Métricas de Rendimiento:** El repositorio cumple ahora formalmente con la directiva de "Dockerización Estricta", permitiendo un despliegue con un solo clic en un Space acelerado por AMD.
