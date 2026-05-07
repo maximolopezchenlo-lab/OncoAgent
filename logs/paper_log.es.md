@@ -246,3 +246,14 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 - **Justificación Arquitectónica:** Se refactorizó el script usando `argparse` para permitir seleccionar el nivel (tier) en tiempo de ejecución. Imponemos la cuantización 4-bit NormalFloat4 (NF4). A pesar de la consulta inicial del usuario sobre 8-bits, 4-bit NF4 ofrece una calidad de razonamiento clínico idéntica reduciendo a la mitad el consumo de VRAM, lo cual es crítico para entrenar el modelo de 27B en la MI300X sin errores OOM (Out-Of-Memory).
 - **Implementación Lógica/Técnica:** Se añadió `argparse` para seleccionar `--tier 1` (9B) o `--tier 2` (27B). Se actualizaron los `LORA_TARGET_MODULES` para incluir exhaustivamente todas las capas lineales (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) para maximizar las capacidades de adaptación de Qwen. Los directorios de salida se adaptan dinámicamente según el nivel seleccionado.
 - **Métricas de Rendimiento:** El uso de 4-bit NF4 garantiza de manera exitosa que el grafo de entrenamiento del modelo de 27B entre en la capacidad de 192GB de VRAM de un solo nodo MI300X, permitiéndonos mantener tamaños de lote (batch sizes) altos.
+
+## Sesión 19: Generación Local en GPU sobre MI300X (2026-05-07)
+
+### Hito: Generación Sintética Local de Alta Velocidad
+**Fecha:** 2026-05-07
+**Estado:** Completado (En progreso hasta los 100K)
+
+- **Problema/Hipótesis:** La generación de datos sintéticos basada en API (vía Featherless.ai) era lenta (~120 casos/hora localmente) y dependía en gran medida de la red. El hardware masivo de la MI300X estaba inactivo cuando podría estar acelerando la creación de datos. Además, el modelo Qwen3.6-27B ocasionalmente devolvía errores de análisis JSON debido a que sus tokens de "razonamiento" (thinking) se filtraban en el campo de contenido.
+- **Justificación Arquitectónica:** Se migró el pipeline de generación por completo al droplet local AMD Instinct MI300X utilizando vLLM (`rocm/vllm:latest`). Aprovechando la inmensa capacidad de memoria y cómputo de la MI300X, desplegamos el modelo mucho más grande `Qwen/Qwen3.6-27B` directamente en la GPU para generación auto-alojada.
+- **Implementación Lógica/Técnica:** Se creó `data_prep/synthetic_generator_gpu.py`. Se corrigió el error de "thinking" de Qwen 3.6 inyectando dinámicamente `extra_body={"chat_template_kwargs": {"enable_thinking": False}}` en la solicitud de vLLM (compatible con OpenAI). Se implementó una lógica robusta de reintentos y puntos de control.
+- **Métricas de Rendimiento:** Se logró una **aceleración de ~56x en el rendimiento**: de ~120 casos/hora vía API a **~6,800 casos/hora** ejecutándose localmente en la MI300X. El servidor satura la GPU al 100% de utilización. A este ritmo, los 100,000 casos objetivo se generarán completamente en aproximadamente 15 horas en lugar de las 18-22 horas proyectadas anteriormente (que requerían 8 workers paralelos de API).

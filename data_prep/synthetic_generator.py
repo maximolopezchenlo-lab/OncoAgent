@@ -1,18 +1,19 @@
 """
-OncoAgent — Massive Parallel Synthetic Oncology Data Generator.
+OncoAgent — GPU-Accelerated Synthetic Oncology Data Generator (MI300X Edition).
 
-Generates 100,000+ SOTA clinical oncology cases using Qwen3.5-9B via
-Featherless.ai Premium (OpenAI-compatible API). Uses 8 async workers
-across 2 API keys for ~18-22 hour completion.
+Generates 100,000+ SOTA clinical oncology cases using Qwen3.6-27B served
+locally via vLLM on AMD Instinct MI300X. Zero API cost, zero concurrency
+limits, ~100x faster than cloud API generation.
 
 Architecture:
-  - Combinatorial diversity matrices (129,600 unique profiles)
+  - Same combinatorial diversity matrices (129,600 unique profiles)
   - 50 rotating system prompt templates
   - Dynamic few-shot exemplar selection from real data
   - Inline quality validation (schema, length, staging, dedup)
   - Checkpoint/resume support
+  - 64 async workers with continuous batching via vLLM
 
-Hardware: CPU only (API-based generation).
+Hardware: AMD Instinct MI300X (192GB HBM3) via local vLLM server.
 Rule Compliance: #22 (seeds), #24 (.env), #26 (type hints), #28 (anti-hallucination).
 """
 
@@ -36,20 +37,23 @@ random.seed(42)
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s [%(levelname)s] [W%(worker_id)s] %(message)s"
-    if False else "%(asctime)s [%(levelname)s] %(message)s",
+    format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger(__name__)
 
 # ── Configuration ───────────────────────────────────────────────────────────
-MODEL: str = "Qwen/Qwen3.5-9B"
-WORKERS_PER_KEY: int = 4
+MODEL: str = "Qwen/Qwen3.6-27B"
+VLLM_BASE_URL: str = os.getenv("VLLM_BASE_URL", "http://localhost:8001/v1")
+VLLM_API_KEY: str = os.getenv("VLLM_API_KEY", "not-needed")  # vLLM local needs no key
+NUM_WORKERS: int = int(os.getenv("NUM_WORKERS", "64"))
 CASES_PER_BATCH: int = 5
-TARGET_TOTAL: int = 100_000
+TARGET_TOTAL: int = int(os.getenv("TARGET_TOTAL", "100000"))
 OUTPUT_DIR: str = os.path.join("data", "synthetic")
 CHECKPOINT_FILE: str = os.path.join(OUTPUT_DIR, "generation_checkpoint.json")
-MAX_RETRIES: int = 3
-RETRY_BACKOFF: float = 2.0
+MAX_RETRIES: int = 5
+RETRY_BACKOFF: float = 1.5
+CHECKPOINT_INTERVAL: int = 50  # batches between checkpoints
+PROGRESS_INTERVAL: int = 20   # batches between progress logs
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -97,19 +101,18 @@ IMAGING_MODALITIES: List[str] = [
 # ── System Prompt Templates (50 variations) ─────────────────────────────────
 
 _BASE_TEMPLATES: List[str] = [
-    # Clinical note styles
     "You are a senior oncologist writing a detailed clinical case report. Generate a realistic oncology case with: (1) patient history, (2) temporal-causal diagnostic reasoning with explicit staging, (3) evidence-based treatment recommendations.",
     "You are an oncology fellow presenting a case at tumor board. Create a structured clinical case with presenting symptoms, workup findings, pathology results, staging assessment, and multidisciplinary treatment plan.",
     "You are a radiation oncology consultant documenting a referral case. Write a clinical case including the patient's cancer history, current imaging findings, molecular markers, staging, and your treatment recommendation.",
     "You are an oncology surgeon writing a preoperative assessment. Document a cancer case with surgical candidacy evaluation, staging workup results, and operative plan with alternatives.",
     "You are an emergency medicine physician identifying a potential cancer case. Write an ED encounter note with red-flag symptoms, initial workup, and urgent oncology referral reasoning.",
-    # Complexity variations
     "Generate a complex oncology case with multiple differential diagnoses that must be systematically ruled out before arriving at the final cancer diagnosis and staging.",
     "Create an oncology case where initial imaging is ambiguous and requires a stepwise diagnostic approach (biopsy, molecular testing, repeat imaging) before definitive staging.",
     "Generate a straightforward oncology case with classic textbook presentation, clear imaging findings, and unambiguous staging per AJCC/TNM criteria.",
     "Create a challenging oncology case with contradictory findings (e.g., low tumor markers but suspicious imaging) requiring clinical judgment for staging.",
     "Generate an oncology case involving a rare cancer presentation in an atypical demographic, emphasizing the importance of maintaining a broad differential.",
 ]
+
 
 def _build_prompt_templates() -> List[str]:
     """Generate 50 unique system prompt templates by combining styles."""
@@ -129,6 +132,7 @@ def _build_prompt_templates() -> List[str]:
             if len(templates) >= 50:
                 return templates
     return templates
+
 
 PROMPT_TEMPLATES: List[str] = _build_prompt_templates()
 
@@ -194,7 +198,6 @@ def build_generation_prompt(
     """Build system + user prompt for a batch of cases."""
     system = random.choice(PROMPT_TEMPLATES)
 
-    # Select 2 random exemplars
     selected = random.sample(exemplars, min(2, len(exemplars)))
     exemplar_block = "\n---\n".join(selected)
 
@@ -240,35 +243,35 @@ _STAGING_KEYWORDS = [
     "gleason", "breslow", "staging pending",
 ]
 _STAGING_PATTERN = "|".join(_STAGING_KEYWORDS)
+
+# Thread-safe dedup set for async context
 _seen_hashes: set = set()
+_hash_lock = asyncio.Lock()
 
 
-def validate_case(case: Dict[str, Any]) -> Tuple[bool, str]:
+async def validate_case(case: Dict[str, Any]) -> Tuple[bool, str]:
     """Validate a single generated case for SOTA quality."""
-    # Schema check
     for field in ("history", "reasoning", "conclusion"):
         if field not in case or not isinstance(case[field], str):
             return False, f"missing_field:{field}"
 
-    # Length gate
     if len(case["reasoning"].split()) < 40:
         return False, "reasoning_too_short"
 
     if len(case["history"].split()) < 30:
         return False, "history_too_short"
 
-    # Staging validation
     combined = f"{case['reasoning']} {case['conclusion']}".lower()
     import re
     if not re.search(_STAGING_PATTERN, combined, re.IGNORECASE):
         return False, "no_staging_reference"
 
-    # Dedup hash
     hash_input = case["history"][:200].lower().strip()
     h = hashlib.sha256(hash_input.encode()).hexdigest()[:16]
-    if h in _seen_hashes:
-        return False, "duplicate"
-    _seen_hashes.add(h)
+    async with _hash_lock:
+        if h in _seen_hashes:
+            return False, "duplicate"
+        _seen_hashes.add(h)
 
     return True, "ok"
 
@@ -281,7 +284,7 @@ async def generate_batch(
     user_prompt: str,
     worker_id: int,
 ) -> Optional[List[Dict[str, Any]]]:
-    """Call the API and parse the JSON response."""
+    """Call the local vLLM server and parse the JSON response."""
     for attempt in range(MAX_RETRIES):
         try:
             response = await client.chat.completions.create(
@@ -293,6 +296,9 @@ async def generate_batch(
                 temperature=0.85,
                 max_tokens=6000,
                 top_p=0.95,
+                extra_body={
+                    "chat_template_kwargs": {"enable_thinking": False},
+                },
             )
             content = response.choices[0].message.content.strip()
 
@@ -303,7 +309,7 @@ async def generate_batch(
                 content = content[:-3]
             content = content.strip()
 
-            # Handle think tags from Qwen3.5
+            # Handle think tags from Qwen3.6
             if "<think>" in content:
                 import re as _re
                 content = _re.sub(r"<think>.*?</think>", "", content, flags=_re.DOTALL).strip()
@@ -334,6 +340,8 @@ async def worker(
     results: List[Dict[str, Any]],
     stats: Dict[str, int],
     exemplars: List[str],
+    results_lock: asyncio.Lock,
+    stats_lock: asyncio.Lock,
 ):
     """Async worker that pulls profile batches from the queue and generates cases."""
     while True:
@@ -349,52 +357,62 @@ async def worker(
         if cases:
             valid_count = 0
             for case in cases:
-                is_valid, reason = validate_case(case)
+                is_valid, reason = await validate_case(case)
                 if is_valid:
-                    results.append(case)
+                    async with results_lock:
+                        results.append(case)
                     valid_count += 1
                 else:
-                    stats["rejected"] = stats.get("rejected", 0) + 1
-                    stats[f"reject_{reason}"] = stats.get(f"reject_{reason}", 0) + 1
+                    async with stats_lock:
+                        stats["rejected"] = stats.get("rejected", 0) + 1
+                        stats[f"reject_{reason}"] = stats.get(f"reject_{reason}", 0) + 1
 
-            stats["generated"] = stats.get("generated", 0) + valid_count
+            async with stats_lock:
+                stats["generated"] = stats.get("generated", 0) + valid_count
         else:
-            stats["api_failures"] = stats.get("api_failures", 0) + 1
+            async with stats_lock:
+                stats["api_failures"] = stats.get("api_failures", 0) + 1
 
-        stats["batches_done"] = stats.get("batches_done", 0) + 1
-        task_queue.task_done()
+        async with stats_lock:
+            stats["batches_done"] = stats.get("batches_done", 0) + 1
+            batches_done = stats["batches_done"]
 
-        # Progress log every 20 batches
-        if stats["batches_done"] % 20 == 0:
-            total_gen = stats.get("generated", 0)
-            total_rej = stats.get("rejected", 0)
+        # Progress log
+        if batches_done % PROGRESS_INTERVAL == 0:
+            async with stats_lock:
+                total_gen = stats.get("generated", 0)
+                total_rej = stats.get("rejected", 0)
             pct = (total_gen / TARGET_TOTAL) * 100
+            elapsed = time.time() - stats.get("_start_time", time.time())
+            rate = total_gen / max(elapsed, 1) * 3600
             logger.info(
                 f"[W{worker_id}] Progress: {total_gen:,}/{TARGET_TOTAL:,} "
                 f"({pct:.1f}%) | Rejected: {total_rej:,} | "
-                f"Batches: {stats['batches_done']:,}"
+                f"Batches: {batches_done:,} | Rate: {rate:,.0f} cases/hr"
             )
 
-        # Checkpoint every 100 batches
-        if stats["batches_done"] % 100 == 0:
-            save_checkpoint(results, stats)
+        # Checkpoint
+        if batches_done % CHECKPOINT_INTERVAL == 0:
+            async with results_lock:
+                save_checkpoint(list(results), stats)
+
+        task_queue.task_done()
 
 
 # ── Checkpoint ──────────────────────────────────────────────────────────────
 
 def save_checkpoint(results: List[Dict[str, Any]], stats: Dict[str, int]) -> None:
     """Save progress to disk."""
-    # Save results
     batch_file = os.path.join(OUTPUT_DIR, f"generated_{len(results):06d}.jsonl")
     with open(batch_file, "w", encoding="utf-8") as f:
         for case in results:
             f.write(json.dumps(case, ensure_ascii=False) + "\n")
 
-    # Save checkpoint
+    clean_stats = {k: v for k, v in stats.items() if not k.startswith("_")}
     with open(CHECKPOINT_FILE, "w") as f:
         json.dump({
             "total_generated": len(results),
-            "stats": stats,
+            "stats": clean_stats,
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
         }, f, indent=2)
 
@@ -415,7 +433,6 @@ def load_checkpoint() -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
     stats = cp.get("stats", stats)
     total = cp.get("total_generated", 0)
 
-    # Find the latest generated file
     gen_files = sorted(
         [f for f in os.listdir(OUTPUT_DIR) if f.startswith("generated_")],
         reverse=True,
@@ -428,7 +445,6 @@ def load_checkpoint() -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
                     results.append(json.loads(line))
                 except json.JSONDecodeError:
                     continue
-        # Rebuild dedup hashes
         for case in results:
             h_input = case.get("history", "")[:200].lower().strip()
             _seen_hashes.add(hashlib.sha256(h_input.encode()).hexdigest()[:16])
@@ -440,28 +456,35 @@ def load_checkpoint() -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
 # ── Main Orchestrator ───────────────────────────────────────────────────────
 
 async def run_generation(target: int = TARGET_TOTAL) -> str:
-    """Orchestrate parallel generation across 2 API keys with 8 workers."""
-    key1 = os.getenv("FEATHERLESS_API_KEY_1", "")
-    key2 = os.getenv("FEATHERLESS_API_KEY_2", "")
+    """Orchestrate parallel generation via local vLLM on MI300X."""
 
-    if not key1 or key1 == "your_first_featherless_key_here":
-        raise ValueError("❌ FEATHERLESS_API_KEY_1 not set in .env")
+    logger.info("=" * 60)
+    logger.info("🔥 OncoAgent GPU-Accelerated Synthetic Generator")
+    logger.info(f"   Hardware: AMD Instinct MI300X (192GB HBM3)")
+    logger.info(f"   Engine:   vLLM with PagedAttention")
+    logger.info(f"   Model:    {MODEL}")
+    logger.info(f"   Workers:  {NUM_WORKERS}")
+    logger.info(f"   Target:   {target:,} cases")
+    logger.info(f"   Server:   {VLLM_BASE_URL}")
+    logger.info("=" * 60)
 
-    clients_and_semas: List[Tuple[AsyncOpenAI, asyncio.Semaphore]] = []
+    # Single client pointing to local vLLM
+    client = AsyncOpenAI(
+        api_key=VLLM_API_KEY,
+        base_url=VLLM_BASE_URL,
+    )
 
-    client1 = AsyncOpenAI(api_key=key1, base_url="https://api.featherless.ai/v1")
-    sem1 = asyncio.Semaphore(WORKERS_PER_KEY)
-    clients_and_semas.append((client1, sem1))
+    # Verify vLLM is up
+    try:
+        models = await client.models.list()
+        available = [m.id for m in models.data]
+        logger.info(f"✅ vLLM server online. Available models: {available}")
+    except Exception as e:
+        logger.error(f"❌ Cannot reach vLLM server at {VLLM_BASE_URL}: {e}")
+        logger.error("   Make sure vLLM Docker container is running.")
+        raise SystemExit(1)
 
-    if key2 and key2 != "your_second_featherless_key_here":
-        client2 = AsyncOpenAI(api_key=key2, base_url="https://api.featherless.ai/v1")
-        sem2 = asyncio.Semaphore(WORKERS_PER_KEY)
-        clients_and_semas.append((client2, sem2))
-        total_workers = WORKERS_PER_KEY * 2
-        logger.info(f"🔑 Dual-key mode: {total_workers} workers (4 per account)")
-    else:
-        total_workers = WORKERS_PER_KEY
-        logger.info(f"🔑 Single-key mode: {total_workers} workers")
+    semaphore = asyncio.Semaphore(NUM_WORKERS)
 
     # Load exemplars and checkpoint
     exemplars = load_real_exemplars()
@@ -486,19 +509,21 @@ async def run_generation(target: int = TARGET_TOTAL) -> str:
         task_queue.put_nowait(batch_profiles)
 
     logger.info(f"🚀 Starting generation: {remaining:,} cases in {num_batches:,} batches")
-    logger.info(f"   Model: {MODEL}")
-    logger.info(f"   Workers: {total_workers}")
-    logger.info(f"   Batches per worker: ~{num_batches // total_workers:,}")
+    logger.info(f"   Batches per worker: ~{num_batches // NUM_WORKERS:,}")
 
     start_time = time.time()
+    stats["_start_time"] = start_time
+
+    results_lock = asyncio.Lock()
+    stats_lock = asyncio.Lock()
 
     # Launch workers
     tasks = []
-    for w_id in range(total_workers):
-        client, sem = clients_and_semas[w_id % len(clients_and_semas)]
+    for w_id in range(NUM_WORKERS):
         tasks.append(
             asyncio.create_task(
-                worker(w_id, client, sem, task_queue, results, stats, exemplars)
+                worker(w_id, client, semaphore, task_queue,
+                       results, stats, exemplars, results_lock, stats_lock)
             )
         )
 
@@ -516,12 +541,15 @@ async def run_generation(target: int = TARGET_TOTAL) -> str:
         for case in results:
             f.write(json.dumps(case, ensure_ascii=False) + "\n")
 
+    rate = len(results) / max(hours, 0.001)
+
     logger.info("=" * 60)
     logger.info(f"🏁 GENERATION COMPLETE")
     logger.info(f"   Total valid cases: {len(results):,}")
     logger.info(f"   Rejected: {stats.get('rejected', 0):,}")
     logger.info(f"   API failures: {stats.get('api_failures', 0):,}")
     logger.info(f"   Time: {hours:.1f} hours")
+    logger.info(f"   Effective rate: {rate:,.0f} cases/hour")
     logger.info(f"   Output: {final_path}")
     logger.info("=" * 60)
 

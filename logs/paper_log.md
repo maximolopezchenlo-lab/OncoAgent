@@ -305,3 +305,14 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 - **Architectural Justification:** The script was refactored using `argparse` to allow selecting the tier at runtime. We enforce 4-bit NormalFloat4 (NF4) quantization. Despite the user's initial inquiry about 8-bit, 4-bit NF4 offers identical clinical reasoning quality while halving the VRAM footprint, which is critical for training the 27B model on the MI300X without OOM errors.
 - **Logical/Technical Implementation:** Added `argparse` to select `--tier 1` (9B) or `--tier 2` (27B). Updated `LORA_TARGET_MODULES` to comprehensively include all linear layers (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) to maximize Qwen's adapter capabilities. Output directories dynamically adapt based on the selected tier.
 - **Performance Metrics:** 4-bit NF4 successfully guarantees that the 27B model training graph fits inside a single MI300X's 192GB VRAM envelope, allowing us to maintain high batch sizes.
+
+## Session 19: Local GPU Generation on MI300X (2026-05-07)
+
+### Milestone: High-Speed Local Synthetic Generation
+**Date:** 2026-05-07
+**Status:** Completed (In Progress to 100K)
+
+- **Problem/Hypothesis:** API-based synthetic data generation (via Featherless.ai) was slow (~120 cases/hour locally) and heavily network-bound. The massive MI300X hardware was sitting idle when it could be accelerating data creation. Also, the Qwen3.6-27B model occasionally returned JSON parse errors due to its "thinking" tokens bleeding into the content field.
+- **Architectural Justification:** Migrated the generation pipeline entirely to the local AMD Instinct MI300X droplet using vLLM (`rocm/vllm:latest`). Utilizing the immense memory capacity and compute of the MI300X, we deployed the much larger `Qwen/Qwen3.6-27B` model directly to the GPU for self-hosted generation.
+- **Logical/Technical Implementation:** Created `data_prep/synthetic_generator_gpu.py`. Fixed the Qwen 3.6 thinking bug by dynamically injecting `extra_body={"chat_template_kwargs": {"enable_thinking": False}}` into the OpenAI-compatible vLLM request. Implemented robust retry logic and checkpointing. 
+- **Performance Metrics:** Achieved a **~56x throughput acceleration**—from ~120 cases/hour via API to **~6,800 cases/hour** running locally on the MI300X. The server saturates the GPU at 100% utilization. At this rate, the target 100,000 cases will be fully generated in approximately 15 hours instead of the previously projected 18-22 hours (which required 8 parallel API workers).

@@ -769,3 +769,45 @@ Thanks to the massive 192GB VRAM on the AMD Instinct MI300X, we're locking in 4-
 The hardware is hungry. The data is ready. Let's train. 🧠🏥
 
 #AMDHackathon #ROCm #MI300X #OncoAgent #FineTuning #BuildInPublic #AI #Qwen
+
+### POST 2: X/TWITTER (Tone: Casual / Blooper of the Day)
+🤦‍♂️ The "Failure of the Day" belongs in a museum:
+
+In our excitement to kick off Phase 3 (Fine-Tuning), we accidentally launched the `train_specialist.py` script locally instead of SSH'ing into our provisioned AMD MI300X instance. 
+
+The poor local machine (rocking a vintage NVIDIA Quadro 4000) was suddenly asked to load a 9B parameter Qwen model in 4-bit precision. It sat there, completely frozen, contemplating the meaning of life. 🧊💻
+
+Quick `kill -9`, switch to the actual AMD cloud node, and we're back in business. Hardware targets matter, folks!
+
+#AMDHackathon #BuildInPublic #MachineLearning #DevLife #Blooper
+
+---
+## SESSION 19 — Local GPU Generation on MI300X (2026-05-07)
+
+### POST 1: X/TWITTER (Tone: Technical / High Performance)
+🚀 56x Speedup in Synthetic Data Generation! 🤯
+
+We realized our AMD MI300X droplet was sitting idle while we waited on slow API calls. So we changed the rules: we moved the entire 100K case generation pipeline to run locally on vLLM using Qwen3.6-27B.
+
+Results?
+API throughput: ~120 cases/hour 🐢
+Local MI300X throughput: ~6,800 cases/hour ⚡️
+
+We are saturating the GPU at 100% utilization. The massive 100,000 clinical case dataset will be finished in ~15 hours flat.
+
+#AMDHackathon #MI300X #ROCm #vLLM #MachineLearning #BuildInPublic
+
+### POST 2: LINKEDIN (Tone: Strategic / Problem Solving)
+🧠 **OncoAgent: Eliminating the API Bottleneck with AMD MI300X**
+
+In Hackathons, time is the ultimate currency. Generating 100,000 highly-detailed, synthetically diversified oncology cases via cloud APIs was creating a massive bottleneck. 
+
+Our solution? Bring the compute home. We deployed the massive Qwen3.6-27B model on a local vLLM server running natively on our AMD Instinct MI300X instance.
+
+**The "Failure of the Day":** The Qwen 3.6 model kept breaking our JSON parsing because it was outputting its "thinking" tokens directly into the content response!
+**The Fix:** We injected `enable_thinking: False` into the vLLM `chat_template_kwargs` to force strict, clean JSON output.
+
+**The Impact:** A staggering **~56x performance leap**, skyrocketing from ~120 cases/hour to **~6,800 cases/hour**. Our 100K training corpus will be ready in under 15 hours. Hardware matters.
+
+#AMDHackathon #HealthTech #AI #AMD #SyntheticData #ROCm #OpenSource
+
