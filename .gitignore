@@ -33,3 +33,11 @@ logs/social_media_log*
 .vscode/
 .idea/
 *.swp
+# Ignore data binaries
+data/chroma_db/
+data/raw/
+data/synthetic/
+data/final/
+*.sqlite3
+*.bin
+*.pickle

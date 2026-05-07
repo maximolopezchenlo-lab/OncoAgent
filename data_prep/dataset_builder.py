@@ -1,84 +1,166 @@
+"""
+OncoAgent — Dataset Builder / Unifier.
+
+Combines real (HuggingFace-filtered) and synthetic (Qwen3.5-9B generated)
+oncology data into a single training-ready JSONL corpus in Llama 3.1
+chat template format.
+
+Hardware Target: CPU only.
+Rule Compliance: #12 (JSONL + Llama 3 format), #22 (seeds), #26 (type hints).
+"""
+
 import json
 import os
-import re
 import random
-import torch
-from typing import List, Dict
+import logging
+from typing import Dict, List
 
-# Reproducibilidad: Semilla fija según reglas
-def set_seed(seed: int = 42):
-    random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
+from dotenv import load_dotenv
 
-class OncoDatasetBuilder:
+load_dotenv()
+
+random.seed(42)
+
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# ── Paths ───────────────────────────────────────────────────────────────────
+FILTERED_REAL: str = os.path.join("data", "filtered", "onco_real_filtered.jsonl")
+SYNTHETIC_DIR: str = os.path.join("data", "synthetic")
+FINAL_OUTPUT: str = os.path.join("data", "final", "train_oncoagent.jsonl")
+
+SYSTEM_PROMPT: str = (
+    "You are an expert clinical oncologist specializing in cancer triage. "
+    "Analyze the patient's clinical presentation using temporal-causal "
+    "reasoning (OncoCoT). Provide: (1) key findings, (2) step-by-step "
+    "diagnostic reasoning with staging, and (3) evidence-based recommendations "
+    "citing NCCN/ESMO guidelines where applicable."
+)
+
+
+def format_synthetic_to_llama3(case: Dict[str, str]) -> str:
+    """Convert a synthetic case dict to Llama 3.1 chat template.
+
+    Args:
+        case: Dict with 'history', 'reasoning', 'conclusion' keys.
+
+    Returns:
+        Formatted Llama 3 chat template string.
     """
-    Transformador de datasets médicos a formato JSONL (Llama 3.1).
-    Incluye limpieza de PHI (Private Health Information).
-    """
-    
-    def __init__(self, output_file: str = "oncoagent_finetuning.jsonl"):
-        self.output_file = output_file
-        set_seed(42)
-        
-        # Patrones para Zero-PHI (Básico)
-        self.phi_patterns = [
-            r"\b[A-Z][a-z]+ [A-Z][a-z]+\b",  # Nombres Propios
-            r"\d{2}/\d{2}/\d{4}",             # Fechas DD/MM/YYYY
-            r"\b\d{9,}\b",                    # Posibles IDs numéricos
-            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b" # Emails
-        ]
+    history = case.get("history", "")
+    reasoning = case.get("reasoning", "")
+    conclusion = case.get("conclusion", "")
 
-    def redact_phi(self, text: str) -> str:
-        """Aplica filtros de redacción para asegurar Zero-PHI."""
-        redacted = text
-        for pattern in self.phi_patterns:
-            redacted = re.sub(pattern, "[REDACTED]", redacted)
-        return redacted
+    user_msg = f"Clinical Presentation:\n{history}"
+    assistant_msg = (
+        f"Diagnostic Reasoning:\n{reasoning}\n\n"
+        f"Assessment & Plan:\n{conclusion}"
+    )
 
-    def format_llama3_chat(self, system_msg: str, user_msg: str, assistant_msg: str) -> str:
-        """Aplica el template de chat estricto de Llama 3."""
-        template = (
-            f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n{system_msg}<|eot_id|>"
-            f"<|start_header_id|>user<|end_header_id|>\n\n{user_msg}<|eot_id|>"
-            f"<|start_header_id|>assistant<|end_header_id|>\n\n{assistant_msg}<|eot_id|>"
-        )
-        return template
+    return (
+        f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
+        f"{SYSTEM_PROMPT}<|eot_id|>"
+        f"<|start_header_id|>user<|end_header_id|>\n\n"
+        f"{user_msg}<|eot_id|>"
+        f"<|start_header_id|>assistant<|end_header_id|>\n\n"
+        f"{assistant_msg}<|eot_id|>"
+    )
 
-    def process_oncocot_sample(self, sample: Dict) -> str:
-        """
-        Procesa una muestra del dataset OncoCoT.
-        Asume campos: 'history', 'reasoning', 'conclusion'
-        """
-        system = "Eres un oncólogo especialista. Analiza la historia clínica y proporciona un razonamiento cronológico (OncoCoT)."
-        user = self.redact_phi(sample.get("history", ""))
-        assistant = self.redact_phi(f"Razonamiento: {sample.get('reasoning', '')}\nConclusión: {sample.get('conclusion', '')}")
-        
-        return self.format_llama3_chat(system, user, assistant)
 
-    def build(self, raw_data_path: str):
-        """Lee datos crudos y genera el archivo JSONL."""
-        if not os.path.exists(raw_data_path):
-            print(f"⚠️ No se encontró el archivo: {raw_data_path}")
-            return
+def load_real_data() -> List[Dict[str, str]]:
+    """Load real filtered oncology data."""
+    if not os.path.exists(FILTERED_REAL):
+        logger.warning(f"⚠️  Real data not found: {FILTERED_REAL}")
+        return []
 
-        processed_count = 0
-        with open(self.output_file, 'w', encoding='utf-8') as outfile:
-            with open(raw_data_path, 'r', encoding='utf-8') as infile:
-                # Asumiendo que el raw data es una lista de JSONs o JSONL
+    entries: List[Dict[str, str]] = []
+    with open(FILTERED_REAL, "r", encoding="utf-8") as f:
+        for line in f:
+            try:
+                entries.append(json.loads(line.strip()))
+            except json.JSONDecodeError:
+                continue
+
+    logger.info(f"📚 Loaded {len(entries):,} real oncology samples")
+    return entries
+
+
+def load_synthetic_data() -> List[Dict[str, str]]:
+    """Load all synthetic generated data and format to Llama 3."""
+    if not os.path.exists(SYNTHETIC_DIR):
+        logger.warning(f"⚠️  Synthetic dir not found: {SYNTHETIC_DIR}")
+        return []
+
+    # Look for the final consolidated file first
+    final = os.path.join(SYNTHETIC_DIR, "onco_synthetic_final.jsonl")
+    files_to_read = []
+
+    if os.path.exists(final):
+        files_to_read = [final]
+    else:
+        files_to_read = sorted([
+            os.path.join(SYNTHETIC_DIR, f)
+            for f in os.listdir(SYNTHETIC_DIR)
+            if f.endswith(".jsonl") and f.startswith("generated_")
+        ])
+
+    entries: List[Dict[str, str]] = []
+    for fpath in files_to_read:
+        with open(fpath, "r", encoding="utf-8") as f:
+            for line in f:
                 try:
-                    data = json.load(infile) if raw_data_path.endswith(".json") else [json.loads(line) for line in infile]
-                    for entry in data:
-                        formatted = self.process_oncocot_sample(entry)
-                        outfile.write(json.dumps({"text": formatted}, ensure_ascii=False) + "\n")
-                        processed_count += 1
-                except Exception as e:
-                    print(f"❌ Error procesando {raw_data_path}: {e}")
+                    case = json.loads(line.strip())
+                    formatted = format_synthetic_to_llama3(case)
+                    entries.append({
+                        "text": formatted,
+                        "source": "synthetic_qwen35",
+                    })
+                except (json.JSONDecodeError, KeyError):
+                    continue
 
-        print(f"✅ Dataset completado: {processed_count} muestras guardadas en {self.output_file}")
+    logger.info(f"🧬 Loaded {len(entries):,} synthetic oncology samples")
+    return entries
+
+
+def build_unified_corpus() -> str:
+    """Build the final unified training corpus.
+
+    Returns:
+        Path to the output JSONL file.
+    """
+    logger.info("🚀 Building unified OncoAgent training corpus...")
+    logger.info("=" * 60)
+
+    real = load_real_data()
+    synthetic = load_synthetic_data()
+
+    combined = real + synthetic
+    random.shuffle(combined)
+
+    os.makedirs(os.path.dirname(FINAL_OUTPUT), exist_ok=True)
+
+    with open(FINAL_OUTPUT, "w", encoding="utf-8") as f:
+        for entry in combined:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+    # Statistics
+    source_counts: Dict[str, int] = {}
+    for e in combined:
+        src = e.get("source", "unknown")
+        source_counts[src] = source_counts.get(src, 0) + 1
+
+    logger.info(f"📊 UNIFIED CORPUS BUILT — {len(combined):,} total samples")
+    for src, cnt in sorted(source_counts.items(), key=lambda x: -x[1]):
+        pct = (cnt / len(combined)) * 100
+        logger.info(f"   ├── {src}: {cnt:,} ({pct:.1f}%)")
+    logger.info(f"   └── Output: {FINAL_OUTPUT}")
+    logger.info("=" * 60)
+
+    return FINAL_OUTPUT
+
 
 if __name__ == "__main__":
-    builder = OncoDatasetBuilder()
-    # builder.build("raw_data/oncocot_samples.json")
-    print("🚀 Dataset Builder listo. Ejecuta builder.build(path) con tus datos crudos.")
+    build_unified_corpus()

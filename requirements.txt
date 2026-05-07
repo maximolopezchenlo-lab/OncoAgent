@@ -34,6 +34,7 @@ gradio>=4.36.0              # Frontend interface — Rule #29
 # === Utilities ===
 python-dotenv>=1.0.0        # .env secret management — Rule #24
 huggingface-hub>=0.23.0     # Model/dataset downloads
+openai>=1.30.0              # Featherless.ai API (OpenAI-compatible)
 
 # === Testing & Dev ===
 pytest>=8.0.0               # Test framework

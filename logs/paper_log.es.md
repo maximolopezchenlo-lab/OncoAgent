@@ -206,3 +206,23 @@ Optamos por utilizar el estándar **Model Context Protocol (MCP)** para desacopl
 - **Justificación Arquitectónica:** Se seleccionó la imagen oficial `rocm/vllm:latest` como base. Esto garantiza que PyTorch y vLLM utilizarán nativamente la capa de ROCm 7.2. Se expuso el puerto 7860 como requiere Gradio en HF Spaces y se inyectaron variables de entorno para asegurar que las llamadas a `cuda` se mapeen correctamente a `hip` (`HSA_OVERRIDE_GFX_VERSION`).
 - **Implementación Lógica/Técnica:** Se creó el `Dockerfile` instalando dependencias de compilación y los requisitos de Python vía `pip`. Se optimizó el tamaño del contenedor aprovechando el caché de Docker para `requirements.txt` antes de copiar el código fuente. Se configuró el punto de entrada a la interfaz Glassmorphism (`ui/app.py`).
 - **Métricas de Rendimiento:** El repositorio cumple ahora formalmente con la directiva de "Dockerización Estricta", permitiendo un despliegue con un solo clic en un Space acelerado por AMD.
+
+## Sesión 17: Pipeline de Datos SOTA — Arquitectura de Generación Sintética Paralela (2026-05-06)
+
+### Hito: Pipeline de Datos Oncológicos a Gran Escala
+
+**Problema:** Entrenar un especialista clínico SOTA requiere >100,000 muestras de alta calidad. Generar este volumen con DeepSeek V4 Pro (1.6T params) tomaría ~21 días — inaceptable.
+
+**Solución — Generación Paralela Multi-Cuenta con Qwen3.5-9B:**
+
+Arquitectura que explota el modelo de concurrencia de Featherless.ai Premium:
+- Qwen3.5-9B (9B params): 1/4 slots de concurrencia → **4 requests concurrentes/cuenta**
+- Con **2 cuentas Premium: 8 workers paralelos → ~18-22 horas para 100K muestras**
+
+Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B gracias a su arquitectura híbrida Gated DeltaNet.
+
+**Sistema Anti-Repetición — Matrices Combinatorias:**
+- 25 tipos × 3 riesgos × 6 edades × 3 sexos × 4 presentaciones × 8 comorbilidades × 6 imágenes = **129,600 perfiles únicos**
+- 50 plantillas rotativas + few-shot dinámico + validación inline (schema, longitud, staging, dedup SHA-256)
+
+**Scripts:** `download_hf_datasets.py`, `synthetic_generator.py`, `dataset_builder.py`, `train_specialist.py`

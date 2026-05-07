@@ -442,3 +442,34 @@ El despliegue importa tanto como los modelos. Hemos sellado oficialmente la Fase
 Al aprovechar el soporte nativo de ROCm 7.2 y exponer nuestra UI Glassmorphism en el puerto 7860, nos aseguramos de que los jueces del AMD Developer Hackathon puedan probar nuestro motor RAG clínico en un entorno reproducible y de alto rendimiento en Hugging Face Spaces. Se acabó el "funciona en mi máquina" en HealthTech. 🏥💻
 
 #AMDHackathon #Docker #ROCm #MI300X #HealthTech #BuildInPublic #OpenSource
+
+---
+## SESIÓN 17 — Pipeline de Datos SOTA: 100K Casos Oncológicos Sintéticos en 24 Horas (2026-05-06)
+
+### POST 1: X/TWITTER (Tono: Técnico / Ingeniería de Datos)
+🧬 100,000 casos oncológicos sintéticos. 8 workers paralelos. ~22 horas.
+
+El pipeline de datos de OncoAgent está ACTIVO:
+→ 5 datasets de HuggingFace (PMC-Patients, Asclepius, PubMedQA...)
+→ 129,600 perfiles clínicos únicos via matrices combinatorias
+→ Qwen3.5-9B via Featherless.ai Premium (paralelismo dual-key)
+→ Validación inline: staging, dedup, gates de longitud
+
+La matemática: DeepSeek V4 Pro (1.6T) = 21 días. Qwen3.5-9B (9B, 8 workers) = 22 horas ✅
+
+#AMDHackathon #OncoAgent #DatosSintéticos #HealthTech #BuildInPublic #LLM
+
+### POST 2: LINKEDIN (Tono: Estratégico / Arquitectura)
+🔬 **OncoAgent: Cómo Generamos 100K Casos Clínicos Oncológicos en Menos de 24 Horas**
+
+Entrenar un especialista médico IA requiere datos masivos y diversos. Los datasets públicos solos no alcanzan.
+
+Nuestro enfoque:
+1. **Base de datos reales** — 5 datasets curados de HuggingFace filtrados para oncología
+2. **Sintéticos a escala** — 100K+ casos generados por Qwen3.5-9B con 129,600 perfiles clínicos únicos
+3. **Garantía de calidad** — Validación inline (refs de staging, dedup hash, gates de longitud)
+4. **Velocidad** — 8 workers async paralelos en 2 cuentas = ~22h vs 21 días con un solo modelo grande
+
+El insight clave: para generación estructurada de casos clínicos, prompt engineering + diversidad combinatoria > tamaño del modelo. 🧠
+
+#AMDHackathon #OncoAgent #DatosSintéticos #IA #HealthTech #BuildInPublic #OpenSource

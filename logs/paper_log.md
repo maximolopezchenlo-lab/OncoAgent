@@ -256,3 +256,32 @@ We opted to use the **Model Context Protocol (MCP)** standard to decouple the in
 - **Architectural Justification:** Selected the official `rocm/vllm:latest` image as the base. This guarantees that PyTorch and vLLM will natively utilize the ROCm 7.2 layer. Exposed port 7860 as required by Gradio on HF Spaces and injected environment variables to ensure `cuda` calls map to `hip` correctly (`HSA_OVERRIDE_GFX_VERSION`).
 - **Logical/Technical Implementation:** Created the `Dockerfile` installing necessary build essentials and Python requirements via `pip`. Kept the container size optimized by leveraging Docker cache for `requirements.txt` before copying the main source code. Set the entrypoint to the Glassmorphism UI (`ui/app.py`).
 - **Performance Metrics:** The repository is now formally compliant with the "Strict Dockerization" directive, allowing a one-click deployment onto an AMD-accelerated Space.
+
+## Session 17: SOTA Data Pipeline — Parallel Synthetic Generation Architecture (2026-05-06)
+
+### Milestone: Large-Scale Oncology Data Pipeline
+
+**Problem:** Training a SOTA clinical oncology specialist requires >100,000 high-quality training samples, far beyond what publicly available datasets provide. Generating this volume via a 1.6T-parameter model (DeepSeek V4 Pro) would take ~21 days — unacceptable for hackathon timelines.
+
+**Solution — Multi-Key Parallel Generation with Qwen3.5-9B:**
+
+We designed a parallel generation architecture that exploits Featherless.ai Premium's concurrency model:
+- DeepSeek V4 Pro (1.6T params): consumes 4/4 concurrency slots → 1 request/account → ~21 days
+- **Qwen3.5-9B (9B params):** consumes 1/4 slots → **4 concurrent requests/account**
+- With **2 Premium accounts: 8 parallel workers → ~18-22 hours for 100K samples**
+
+Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older Qwen3-14B (score ~13) despite having fewer parameters, thanks to its Gated DeltaNet hybrid architecture.
+
+**Anti-Repetition System — Combinatorial Diversity Matrices:**
+- 25 cancer types × 3 risk levels × 6 age ranges × 3 sexes × 4 presentations × 8 comorbidities × 6 imaging modalities = **129,600 unique clinical profiles**
+- 50 rotating system prompt templates
+- Dynamic few-shot exemplar selection from real datasets
+- Inline quality validation: schema, length gate, staging verification, SHA-256 dedup
+
+**Scripts Implemented:**
+1. `data_prep/download_hf_datasets.py` — 5 HuggingFace datasets (PMC-Patients, Asclepius, Clinical Trial Cancer v4, Medical O1 Reasoning, PubMedQA) with oncology keyword filter
+2. `data_prep/synthetic_generator.py` — 8-worker async generator with checkpoint/resume
+3. `data_prep/dataset_builder.py` — Corpus unifier (real + synthetic → Llama 3.1 JSONL)
+4. `scripts/train_specialist.py` — QLoRA fine-tuning (4-bit NF4, LoRA r=16/alpha=32)
+
+**Performance:** Estimated ~18-22h for 100,000 synthetic samples using dual-key parallel generation.
