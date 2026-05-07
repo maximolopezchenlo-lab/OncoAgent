@@ -287,3 +287,12 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 **Performance:** Estimated ~18-22h for 100,000 synthetic samples using dual-key parallel generation.
 
 **Execution Status:** Resolved a memory-exhaustion/`len()` exception bug by implementing `streaming=True` correctly for massive HuggingFace datasets (e.g. PMC-Patients). Both Phase 1 (real data filtering) and Phase 2 (dual-key parallel synthetic generation) have been successfully launched and are currently executing concurrently in the background.
+
+## Milestone: Phase 3 Architecture Pivot — Dual-Tier Qwen
+**Date:** 2026-05-06
+**Status:** Accepted (See ADR-002)
+
+- **Problem/Hypothesis:** The original architecture specified `meta-llama/Meta-Llama-3.1-8B-Instruct` as the exclusive base model. However, to maximize the 192GB VRAM capacity of the AMD Instinct MI300X and offer flexible deployment options to healthcare providers, a pivot to the Qwen model family was proposed.
+- **Architectural Justification:** We are pivoting to a "Dual-Tier" architecture using Qwen 3.5 9B (for fast, low-latency initial triage) and Qwen 3.6 27B (for complex reasoning). Both models feature "Day 0" ROCm compatibility and upstream vLLM support for their hybrid Gated DeltaNet architectures. The MI300X handles the 27B model comfortably under QLoRA 4-bit precision (~30GB VRAM required).
+- **Logical/Technical Implementation:** Created ADR-002 to formalize the pivot. The fine-tuning scripts and data generation pipelines will need to account for Qwen's ChatML template instead of Llama's format.
+- **Performance Metrics:** Expected reduction in inference latency for Tier 1 (9B) and significant increase in clinical accuracy for Tier 2 (27B), fully utilizing the MI300X's 192GB HBM3 memory.

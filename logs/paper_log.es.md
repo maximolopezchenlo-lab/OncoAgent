@@ -228,3 +228,12 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 **Scripts:** `download_hf_datasets.py`, `synthetic_generator.py`, `dataset_builder.py`, `train_specialist.py`
 
 **Estado de Ejecución:** Se resolvió un bug de excepción `len()` y de agotamiento de memoria implementando `streaming=True` correctamente para iterar sobre datasets masivos de HuggingFace (ej. PMC-Patients). Tanto la Fase 1 (filtrado de datos reales) como la Fase 2 (generación sintética paralela multi-cuenta) han sido lanzadas exitosamente y se encuentran ejecutándose de forma concurrente en segundo plano.
+
+## Hito: Pivot a Arquitectura de Fase 3 — Qwen de Doble Nivel
+**Fecha:** 2026-05-06
+**Estado:** Aceptado (Ver ADR-002)
+
+- **Problema/Hipótesis:** La arquitectura original especificaba `meta-llama/Meta-Llama-3.1-8B-Instruct` como el modelo base exclusivo. Sin embargo, para maximizar la capacidad de 192GB de VRAM del AMD Instinct MI300X y ofrecer opciones de despliegue flexibles, se propuso un pivot hacia la familia de modelos Qwen.
+- **Justificación Arquitectónica:** Pivoteamos hacia una arquitectura de "Doble Nivel" (Dual-Tier) utilizando Qwen 3.5 9B (para un triaje rápido de baja latencia) y Qwen 3.6 27B (para razonamiento complejo). Ambos modelos cuentan con compatibilidad "Día Cero" con ROCm y soporte en vLLM. El MI300X maneja el modelo de 27B cómodamente bajo precisión de 4 bits con QLoRA (~30GB VRAM requeridos).
+- **Implementación Lógica/Técnica:** Creación del ADR-002 para formalizar el pivot. Los scripts de fine-tuning deberán ajustarse para usar el formato ChatML de Qwen en lugar del de Llama.
+- **Métricas de Rendimiento:** Reducción esperada en la latencia de inferencia para el Nivel 1 (9B) y aumento significativo en la precisión clínica para el Nivel 2 (27B), utilizando a tope la memoria HBM3 de 192GB del MI300X.

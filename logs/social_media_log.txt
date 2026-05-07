@@ -745,3 +745,19 @@ The key insight: for structured clinical case generation, prompt engineering + c
 Swapped to manual counters and both Phase 1 (real data) and Phase 2 (dual-key synthetic generation) are now running smoothly in the background. The 100K race is ON! 🏁
 
 #AMDHackathon #Debugging #Python #MachineLearning #BuildInPublic
+
+---
+## SESSION 18 — Dual-Tier Model Architecture Pivot (2026-05-06)
+
+### POST 1: LINKEDIN (Tone: Strategic / Architecture)
+🧠 **OncoAgent Milestone: Pivoting to a Dual-Tier Qwen Architecture**
+
+We just made a major architectural pivot! While we initially planned to fine-tune Llama 3.1 8B, we're shifting gears to fully maximize the massive 192GB VRAM of the AMD Instinct MI300X accelerators provided for the #AMDHackathon.
+
+Enter our new **Dual-Tier Architecture**:
+1️⃣ **Tier 1 (Speed):** Qwen 9B for lightning-fast, low-latency initial triage.
+2️⃣ **Tier 2 (Depth):** Qwen 27B for deep, complex clinical reasoning.
+
+By using QLoRA (4-bit quantization), training the massive 27B model will only consume ~30GB VRAM, meaning the MI300X won't even break a sweat. Both models have "Day 0" ROCm compatibility and vLLM upstream support for their Gated DeltaNet architecture.
+
+#AMDHackathon #ROCm #MI300X #OncoAgent #MachineLearning #BuildInPublic #AI

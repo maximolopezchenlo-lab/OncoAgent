@@ -480,3 +480,19 @@ El insight clave: para generación estructurada de casos clínicos, prompt engin
 Cambiamos a contadores manuales y tanto la Fase 1 (datos reales) como la Fase 2 (generación sintética dual-key) están corriendo sin problemas en segundo plano. ¡La carrera por los 100K ha comenzado! 🏁
 
 #AMDHackathon #Debugging #Python #MachineLearning #BuildInPublic
+
+---
+## SESIÓN 18 — Pivot a Arquitectura de Doble Nivel (2026-05-06)
+
+### POST 1: LINKEDIN (Tono: Estratégico / Arquitectura)
+🧠 **Hito de OncoAgent: Pivot a una Arquitectura Qwen de Doble Nivel**
+
+¡Acabamos de hacer un gran pivot arquitectónico! Aunque inicialmente planeábamos entrenar Llama 3.1 8B, estamos cambiando el rumbo para aprovechar al máximo los masivos 192GB de VRAM de las GPUs AMD Instinct MI300X provistas para el #AMDHackathon.
+
+Entra nuestra nueva **Arquitectura de Doble Nivel (Dual-Tier)**:
+1️⃣ **Nivel 1 (Velocidad):** Qwen 9B para un triaje inicial ultra-rápido y de baja latencia.
+2️⃣ **Nivel 2 (Profundidad):** Qwen 27B para un razonamiento clínico profundo y complejo.
+
+Al usar QLoRA (cuantización de 4 bits), entrenar el modelo de 27B solo consumirá ~30GB de VRAM, lo que significa que el MI300X ni siquiera transpirará. Ambos modelos cuentan con compatibilidad "Día Cero" en ROCm y soporte en vLLM para su arquitectura Gated DeltaNet.
+
+#AMDHackathon #ROCm #MI300X #OncoAgent #MachineLearning #BuildInPublic #AI
