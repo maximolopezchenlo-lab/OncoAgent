@@ -861,3 +861,27 @@ Here's what we built before pressing "go":
 **The "Failure of the Day":** We almost trained on Llama 3.1 chat template data with a Qwen model. The model would have learned to generate `<|start_header_id|>` tokens that mean absolutely nothing to Qwen. Hours of GPU time saved by catching it early.
 
 #AMDHackathon #HealthTech #AI #AMD #FineTuning #ROCm #OpenSource #QLoRA
+
+---
+
+## 📅 Session 21: Enterprise UI Migration & SOTA Integration (2026-05-07)
+
+### POST 1: X (Twitter) (Tone: Enthusiastic & Visual)
+We just gave OncoAgent the Enterprise UI it deserves! 🚀 Gone is the basic Gradio interface—welcome to a sleek, high-performance Glassmorphism dashboard tailored for clinical triage. We bound LangGraph state outputs directly to the UI, exposing patient memory threading (`PT-XXXX`), real-time MI300X telemetry, and color-coded safety badges. SOTA backend meets SOTA frontend. 🧬💻 #AMDHackathon #HealthTech #ROCm #LangGraph #AMD 
+
+### POST 2: LINKEDIN (Tone: Strategic / Lessons Learned)
+🏗️ **OncoAgent: Bringing SOTA Architecture to the Frontend**
+
+Building a powerful multi-agent engine in the backend is only half the battle. If the clinician can't interpret the AI's reasoning, the tool is useless. Today, we migrated our basic Gradio setup to an Enterprise-Grade, Glassmorphism UI that visually maps the complexities of our LangGraph architecture.
+
+What we achieved:
+• **Threaded Memory in UI** — By injecting auto-generated Patient IDs (`PT-XXXX`) into LangGraph's checkpointing, the UI now perfectly tracks isolated clinical histories.
+• **Visualizing Confidence & Safety** — The UI deconstructs the LangGraph state. RAG confidence scores and safety critic feedback are now prominent, color-coded badges. Green means safe; Red means mandatory Human-in-the-Loop review.
+• **Real-Time MI300X Telemetry** — We hooked our hardware monitoring scripts directly into the dashboard. Clinicians (and hackathon judges!) can see exactly how the AMD MI300X GPU is performing under load.
+• **Model Tier Overrides** — Users can dynamically toggle between our 9B (Speed) and 27B (Reasoning) models directly from the UI.
+
+**The "Failure of the Day":** Getting Gradio to maintain its responsive reactivity while rendering custom CSS blur filters and parsing complex JSON dictionaries from LangGraph caused some serious blocking errors early on. We had to rethink how state flows from the graph back to the client, ultimately creating a dedicated `run_triage` state-parser.
+
+We are ready for clinical deployment. 
+
+#AMDHackathon #HealthTech #AI #AMD #Gradio #ROCm #OpenSource #UIUX

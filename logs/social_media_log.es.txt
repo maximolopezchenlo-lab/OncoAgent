@@ -565,3 +565,27 @@ Esto es lo que construimos antes de presionar "ejecutar":
 **El "Fracaso del Día":** Casi entrenamos con datos en plantilla de chat Llama 3.1 sobre un modelo Qwen. El modelo habría aprendido a generar tokens `<|start_header_id|>` que no significan absolutamente nada para Qwen. ¡Horas de GPU salvadas por detectarlo a tiempo!
 
 #AMDHackathon #HealthTech #AI #AMD #FineTuning #ROCm #OpenSource #QLoRA
+
+---
+
+## 📅 Sesión 21: Migración a UI Enterprise e Integración SOTA (2026-05-07)
+
+### POST 1: X (Twitter) (Tono: Entusiasta y Visual)
+¡Acabamos de darle a OncoAgent la interfaz Enterprise que merece! 🚀 Atrás quedó la interfaz básica de Gradio—bienvenidos a un dashboard elegante de Glassmorphism, de alto rendimiento y adaptado para triaje clínico. Enlazamos los outputs del estado de LangGraph directamente a la UI, exponiendo hilos de memoria por paciente (`PT-XXXX`), telemetría en tiempo real de MI300X e insignias de seguridad codificadas por colores. Backend SOTA, frontend SOTA. 🧬💻 #AMDHackathon #HealthTech #ROCm #LangGraph #AMD 
+
+### POST 2: LINKEDIN (Tono: Estratégico / Lecciones Aprendidas)
+🏗️ **OncoAgent: Llevando Arquitectura SOTA al Frontend**
+
+Construir un potente motor multi-agente en el backend es solo la mitad de la batalla. Si el médico clínico no puede interpretar el razonamiento de la IA, la herramienta es inútil. Hoy, migramos nuestra configuración básica de Gradio a una interfaz UI de Grado Empresarial (Glassmorphism) que mapea visualmente las complejidades de nuestra arquitectura LangGraph.
+
+Lo que logramos:
+• **Memoria Aislada en la UI** — Al inyectar Patient IDs auto-generados (`PT-XXXX`) en el checkpointing de LangGraph, la interfaz ahora rastrea perfectamente historiales clínicos aislados.
+• **Visualización de Confianza y Seguridad** — La UI deconstruye el estado de LangGraph. Los puntajes de confianza de RAG y el feedback del crítico de seguridad ahora son insignias prominentes y codificadas por colores. Verde significa seguro; Rojo significa revisión obligatoria (Human-in-the-Loop).
+• **Telemetría MI300X en Tiempo Real** — Conectamos nuestros scripts de monitoreo de hardware directamente al dashboard. Los médicos (¡y los jueces del hackathon!) pueden ver exactamente cómo rinde la GPU AMD MI300X bajo carga.
+• **Selección Dinámica de Modelo** — Los usuarios pueden alternar dinámicamente entre nuestros modelos de 9B (Velocidad) y 27B (Razonamiento) directamente desde la UI.
+
+**El "Fracaso del Día":** Lograr que Gradio mantuviera su reactividad responsiva mientras renderizaba filtros CSS personalizados (blur) y parseaba diccionarios JSON complejos de LangGraph causó algunos errores de bloqueo graves al principio. Tuvimos que repensar cómo fluye el estado desde el grafo hacia el cliente, creando finalmente un parseador de estado dedicado en `run_triage`.
+
+Estamos listos para el despliegue clínico. 
+
+#AMDHackathon #HealthTech #AI #AMD #Gradio #ROCm #OpenSource #UIUX

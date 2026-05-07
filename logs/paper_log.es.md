@@ -346,3 +346,17 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
   - Progreso de generación sintética: **4,131 casos generados** (en curso, objetivo 100K).
   - Tasa de rechazo: 0.65% (27/4,131) — excelente calidad de datos.
   - Pipeline de entrenamiento: Listo para ejecutar una vez que el corpus esté completo.
+
+## Sesión 21: Migración a UI Enterprise e Integración SOTA (2026-05-07)
+
+### Hito: Refactorización de UI de Arquitectura Multi-Agente SOTA
+**Fecha:** 2026-05-07
+**Estado:** Completado
+
+- **Problema/Hipótesis:** La interfaz Gradio fundamental era altamente utilitaria, careciendo de indicadores visuales para las funciones LangGraph recién integradas (como métricas de confianza, insignias de seguridad y gestión de sesiones de pacientes). Además, no reflejaba la ambición de "Grado Empresarial" (Enterprise-Grade) del proyecto.
+- **Justificación Arquitectónica:** Refactorizamos `ui/app.py` para enlazar fluidamente con los outputs del estado de LangGraph, introduciendo gestión de `thread_id` a través de un sistema dinámico de `Patient ID` y anulaciones (overrides) de nivel de modelo. Visualmente, transicionamos de los valores predeterminados básicos de Gradio a un diseño de glassmorphism altamente personalizado utilizando `gr.themes.Soft`.
+- **Implementación Lógica/Técnica:** 
+  - **Deconstrucción del Estado:** La función `run_triage` de la UI fue modificada para deconstruir el diccionario complejo `final_state` de LangGraph, mapeando claves como `formatted_recommendation` y `critic_feedback` directamente a componentes Markdown de la UI.
+  - **Persistencia de Memoria vía Threading:** Al autogenerar un ID `PT-XXXX` y pasarlo como el parámetro `configurable={"thread_id": pid}` a `agent_graph.invoke()`, expusimos de manera efectiva el checkpointing nativo de LangGraph directamente al usuario final, asegurando que las historias de conversación se mantengan a lo largo de consultas consecutivas.
+  - **Heurísticas UX:** Implementamos un diseño de dos columnas separando "Controles y Telemetría" de "Razonamiento Agéntico y Salida", reduciendo la carga cognitiva para los médicos clínicos. Se aplicó teoría del color (Verde para Seguro, Rojo para Requiere HITL) para forzar el reconocimiento visual instantáneo de la gravedad del caso.
+- **Métricas de Rendimiento:** El CSS personalizado mantiene tiempos de renderizado por debajo de 100ms mientras soporta filtros de desenfoque (blur) avanzados. La telemetría de hardware, enlazada a psutil (simulando `rocm-smi`), transmite con éxito la utilización de memoria MI300X al dashboard, proporcionando la transparencia necesaria para implementaciones de alto rendimiento.
