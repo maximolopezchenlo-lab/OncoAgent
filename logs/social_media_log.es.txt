@@ -1,3 +1,23 @@
+FECHA: 2026-05-07
+
+🚀 Build-in-Public Update: ¡Arquitectura Multi-Agente SOTA!
+
+¡Hoy rediseñamos por completo la topología LangGraph de OncoAgent! Pasamos de un pipeline lineal simple a una arquitectura multi-agente de estado del arte (SOTA) inspirada en Claude Code y Hermes Agent. 🤯
+
+✅ ¿Qué construimos?
+- **RAG Correctivo (CRAG):** Los documentos se califican individualmente y las consultas se reescriben si la evidencia es débil.
+- **Bucle de Reflexión:** El Especialista (Generador) y el Crítico validan cada recomendación en 3 capas de seguridad antes de emitir un resultado.
+- **Asignación por Niveles (Tiering):** Un clasificador automático de complejidad enruta los casos estándar a Qwen 9B (velocidad) y los casos complejos (ej. Estadío IV) a Qwen 27B (razonamiento profundo).
+- **Puerta HITL:** Los casos de alta agudeza se marcan automáticamente para revisión médica obligatoria.
+
+🔧 Retos del día: Integrar el bucle de Reflexión y configurar los límites de recursión correctos en LangGraph para evitar bucles infinitos y a la vez permitir al Crítico guiar al Especialista. ¡Resuelto con límites de iteración deterministas!
+
+Nuestra arquitectura MI300X es oficialmente de grado producción. Siguiente paso: ¡integrar la UI para controlar estas nuevas capacidades! 💻
+
+#AMDHackathon #HealthTech #ROCm #AI #MultiAgent #LangGraph #Qwen #BuildInPublic
+
+---
+
 🚀 Actualización de Build-in-Public: ¡NotebookLM Integrado!
 
 Hoy dimos un salto gigante en la infraestructura de nuestro agente de salud para el #AMDHackathon. Instalamos y configuramos el MCP de NotebookLM.

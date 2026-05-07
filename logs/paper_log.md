@@ -1,4 +1,67 @@
-# Paper Log - NotebookLM MCP Integration
+# Paper Log - OncoAgent Development
+
+## Milestone: SOTA Multi-Agent Architecture Redesign
+**Date:** 2026-05-07
+**Status:** Completed
+
+### The Problem
+The initial OncoAgent graph used a **linear pipeline** (Ingestion → RAG → Specialist → Validator → END). While functional, this architecture lacked production-grade capabilities: no self-correction, no model tiering, no graded retrieval, no clinician approval gates, and no per-patient memory. The system needed to evolve to match the sophistication of systems like Claude Code and Hermes Agent, adapted for clinical oncology.
+
+### Architectural Decision Justification
+We conducted a systematic review of four SOTA agentic patterns and synthesised them into a unified LangGraph topology:
+
+1. **Claude Code Pattern** → Deterministic safety harness separated from LLM reasoning. The Critic node and HITL gate operate as deterministic code, not LLM-controlled, ensuring safety cannot be bypassed by prompt injection.
+
+2. **Hermes Agent Pattern** → Structured tool calling via centralised `call_tier_model()` function. Per-patient memory isolation via `PatientMemoryStore` (each patient gets their own session profile).
+
+3. **Corrective RAG (CRAG)** → Documents are individually graded for relevance before being passed to the Specialist. If insufficient relevant documents are found, the query is automatically rewritten and re-retrieved (max 1 retry).
+
+4. **Reflexion Pattern** → Generator (Specialist) ↔ Critic loop with specific feedback. The Critic runs 3-layer validation (formatting check → safety check → LLM entailment). If FAIL, specific feedback is injected back into the Specialist prompt for retry (max 2 iterations).
+
+5. **Model Tiering** → Automatic complexity classification routes cases to Qwen 3.5 9B (Tier 1 - speed) or Qwen 3.6 27B (Tier 2 - deep reasoning). Users can also manually override the tier selection.
+
+### Mathematical/Logical Approach
+Complexity scoring uses a weighted additive model:
+```
+score = w_cancer(type) + w_stage(stage) + w_mutations(count) + w_treatment(prior)
+```
+Where:
+- Rare cancers: +0.4, Unknown: +0.3, Common: +0.0
+- Stage IV: +0.25, Stage III: +0.15
+- Multi-mutation (≥2): +0.3, Single: +0.15
+- Prior treatment keywords: +0.1
+
+Decision boundary: score ≥ 0.5 → Tier 2 (complex), else → Tier 1 (simple)
+
+### Graph Topology
+```
+Router → Ingestion → Corrective RAG → Specialist ↔ Critic → HITL Gate → Formatter → END
+                                                                  ↓
+                                                              Fallback → END
+```
+8 nodes, 5 conditional edges, 1 reflexion loop, 1 HITL interrupt.
+
+### Performance Metrics
+- Graph compilation: ✅ 8 nodes verified (`router`, `ingestion`, `corrective_rag`, `specialist`, `critic`, `hitl_gate`, `formatter`, `fallback`)
+- Module tests: All 6 module test suites passed
+- Router test: Stage IV Pancreatic + KRAS + BRCA2 → score=0.8 → Tier 2 ✅
+- Backward compatibility: re-exports from `nodes.py` verified ✅
+
+### Files Created/Modified
+- `agents/state.py` — Expanded AgentState (11 sections, ~30 keys)
+- `agents/tools.py` — Centralised vLLM client + tier calling (NEW)
+- `agents/memory.py` — Per-patient session profiles (NEW)
+- `agents/router.py` — Complexity classifier + manual override (NEW)
+- `agents/corrective_rag.py` — CRAG pipeline with doc grading (NEW)
+- `agents/specialist.py` — Tier-adaptive CoT reasoning (NEW)
+- `agents/critic.py` — 3-layer reflexion validation (NEW)
+- `agents/formatter.py` — Structured output + safe fallback (NEW)
+- `agents/graph.py` — Complete topology rewrite
+- `agents/nodes.py` — Refactored to ingestion + re-exports
+
+---
+
+## Milestone: NotebookLM MCP Integration
 
 ## Milestone: Installation of NotebookLM Model Context Protocol (MCP)
 **Date:** 2026-05-04

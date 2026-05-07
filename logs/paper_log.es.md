@@ -1,4 +1,67 @@
-# Registro del Paper - Integración de NotebookLM MCP
+# Registro del Paper - Desarrollo de OncoAgent
+
+## Hito: Rediseño Arquitectónico Multi-Agente SOTA
+**Fecha:** 2026-05-07
+**Estado:** Completado
+
+### El Problema
+El grafo inicial de OncoAgent utilizaba un **pipeline lineal** (Ingestion → RAG → Specialist → Validator → END). Aunque funcional, esta arquitectura carecía de capacidades de grado de producción: sin autocorrección, sin asignación de modelos por niveles (tiering), sin recuperación calificada, sin puertas de aprobación clínica y sin memoria por paciente. El sistema necesitaba evolucionar para igualar la sofisticación de sistemas como Claude Code y Hermes Agent, adaptados para oncología clínica.
+
+### Justificación de la Decisión Arquitectónica
+Llevamos a cabo una revisión sistemática de cuatro patrones agénticos SOTA y los sintetizamos en una topología unificada de LangGraph:
+
+1. **Patrón Claude Code** → Arnés de seguridad determinista separado del razonamiento del LLM. El nodo Critic y la puerta HITL operan como código determinista, no controlado por LLM, asegurando que la seguridad no pueda ser eludida mediante inyección de prompts.
+
+2. **Patrón Hermes Agent** → Llamada estructurada de herramientas a través de la función centralizada `call_tier_model()`. Aislamiento de memoria por paciente mediante `PatientMemoryStore` (cada paciente obtiene su propio perfil de sesión).
+
+3. **RAG Correctivo (CRAG)** → Los documentos se califican individualmente por su relevancia antes de ser pasados al Especialista. Si se encuentran documentos relevantes insuficientes, la consulta se reescribe y se vuelve a recuperar automáticamente (máx. 1 reintento).
+
+4. **Patrón Reflexion** → Bucle Generador (Especialista) ↔ Crítico con feedback específico. El Crítico ejecuta una validación en 3 capas (verificación de formato → verificación de seguridad → vinculación/entailment de LLM). Si FALLA (FAIL), el feedback específico se inyecta de nuevo en el prompt del Especialista para un reintento (máx. 2 iteraciones).
+
+5. **Asignación de Modelos por Niveles (Tiering)** → La clasificación automática de complejidad dirige los casos a Qwen 3.5 9B (Nivel 1 - velocidad) o Qwen 3.6 27B (Nivel 2 - razonamiento profundo). Los usuarios también pueden anular manualmente la selección de nivel.
+
+### Enfoque Matemático/Lógico
+La puntuación de complejidad utiliza un modelo aditivo ponderado:
+```
+score = w_cancer(type) + w_stage(stage) + w_mutations(count) + w_treatment(prior)
+```
+Donde:
+- Cánceres raros: +0.4, Desconocido: +0.3, Común: +0.0
+- Estadío IV: +0.25, Estadío III: +0.15
+- Multi-mutación (≥2): +0.3, Única: +0.15
+- Palabras clave de tratamiento previo: +0.1
+
+Límite de decisión: score ≥ 0.5 → Nivel 2 (complejo), en caso contrario → Nivel 1 (simple)
+
+### Topología del Grafo
+```
+Router → Ingestion → Corrective RAG → Specialist ↔ Critic → HITL Gate → Formatter → END
+                                                                  ↓
+                                                              Fallback → END
+```
+8 nodos, 5 aristas condicionales, 1 bucle de reflexión, 1 interrupción HITL.
+
+### Métricas de Rendimiento
+- Compilación del grafo: ✅ 8 nodos verificados (`router`, `ingestion`, `corrective_rag`, `specialist`, `critic`, `hitl_gate`, `formatter`, `fallback`)
+- Pruebas de módulos: Los 6 conjuntos de pruebas de módulos pasaron
+- Prueba del Router: Cáncer Pancreático Estadío IV + KRAS + BRCA2 → score=0.8 → Nivel 2 ✅
+- Compatibilidad hacia atrás: re-exportaciones desde `nodes.py` verificadas ✅
+
+### Archivos Creados/Modificados
+- `agents/state.py` — AgentState expandido (11 secciones, ~30 claves)
+- `agents/tools.py` — Cliente vLLM centralizado + llamadas por nivel (NUEVO)
+- `agents/memory.py` — Perfiles de sesión por paciente (NUEVO)
+- `agents/router.py` — Clasificador de complejidad + anulación manual (NUEVO)
+- `agents/corrective_rag.py` — Pipeline CRAG con calificación de documentos (NUEVO)
+- `agents/specialist.py` — Razonamiento CoT adaptativo por niveles (NUEVO)
+- `agents/critic.py` — Validación de reflexión en 3 capas (NUEVO)
+- `agents/formatter.py` — Salida estructurada + fallback seguro (NUEVO)
+- `agents/graph.py` — Reescritura completa de la topología
+- `agents/nodes.py` — Refactorizado para ingestión + re-exportaciones
+
+---
+
+## Hito: Instalación del Protocolo de Contexto de Modelo (MCP) de NotebookLM
 
 ## Hito: Instalación del Protocolo de Contexto de Modelo (MCP) de NotebookLM
 **Fecha:** 2026-05-04

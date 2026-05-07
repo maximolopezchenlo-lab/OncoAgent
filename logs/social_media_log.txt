@@ -1,3 +1,23 @@
+DATE: 2026-05-07
+
+🚀 Build-in-Public Update: SOTA Multi-Agent Architecture!
+
+Today we completely redesigned OncoAgent's LangGraph topology! We moved from a simple linear pipeline to a State-of-the-Art (SOTA) multi-agent architecture inspired by Claude Code and Hermes Agent. 🤯
+
+✅ What did we build?
+- **Corrective RAG (CRAG):** Documents are individually graded, and queries are rewritten if evidence is weak.
+- **Reflexion Loop:** The Specialist (Generator) and Critic validate every recommendation across 3 safety layers before outputting anything.
+- **Model Tiering:** An automatic complexity classifier routes standard cases to Qwen 9B (speed) and complex cases (e.g., Stage IV) to Qwen 27B (deep reasoning).
+- **HITL Gate:** High-acuity cases are automatically flagged for mandatory clinician review.
+
+🔧 Challenges of the day: Integrating the Reflexion loop and setting the right recursion limits in LangGraph to prevent infinite loops while still allowing the Critic to guide the Specialist. Solved with deterministic iteration caps!
+
+Our MI300X architecture is officially production-grade. Next up: integrating the UI to control these new capabilities! 💻
+
+#AMDHackathon #HealthTech #ROCm #AI #MultiAgent #LangGraph #Qwen #BuildInPublic
+
+---
+
 🚀 Build-in-Public Update: NotebookLM Integrated!
 
 Today we took a giant leap in the infrastructure of our health agent for the #AMDHackathon. We installed and configured the NotebookLM MCP.
