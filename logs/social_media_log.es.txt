@@ -504,3 +504,14 @@ Gracias a la inmensa VRAM de 192GB del AMD Instinct MI300X, consolidamos el uso 
 El hardware está hambriento. Los datos están listos. A entrenar. 🧠🏥
 
 #AMDHackathon #ROCm #MI300X #OncoAgent #FineTuning #BuildInPublic #AI #Qwen
+
+### POST 2: X/TWITTER (Tone: Casual / Blooper of the Day)
+🤦‍♂️ El "Fracaso del Día" es digno de un museo:
+
+En nuestra emoción por arrancar la Fase 3 (Fine-Tuning), accidentalmente lanzamos el script `train_specialist.py` en nuestra máquina local en lugar de conectarnos por SSH a la instancia de AMD MI300X que nos proveyeron. 
+
+La pobre máquina local (equipada con una prehistórica NVIDIA Quadro 4000) de repente recibió la orden de cargar un modelo Qwen de 9B de parámetros en precisión de 4 bits. Se quedó ahí, completamente congelada, contemplando el sentido de la vida. 🧊💻
+
+Un rápido `kill -9`, cambiamos al nodo real de la nube de AMD, y volvemos al ruedo. ¡El hardware target importa, gente!
+
+#AMDHackathon #BuildInPublic #MachineLearning #DevLife #Blooper
