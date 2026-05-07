@@ -885,3 +885,55 @@ What we achieved:
 We are ready for clinical deployment. 
 
 #AMDHackathon #HealthTech #AI #AMD #Gradio #ROCm #OpenSource #UIUX
+
+---
+---
+DATE: 2026-05-07 (Session 23)
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🏋️‍♂️ Time to hit the AI gym! OncoAgent is officially entering its Fine-Tuning phase. 🚀 
+
+We just unified a massive dataset of 266k+ oncology cases (real & synthetic) to train our dual-tier architecture on a new #AMD MI300X droplet. 
+
+#AMDHackathon #MachineLearning
+
+2/ 🛡️ The "Failure of the Day": Our dataset builder initially struggled because the synthetic JSONL files were huge! 
+
+Quick fix: Switched to streaming read/write deduplication and hashing. Data engineering is 80% of AI! 😅
+
+3/ 📊 Today's Metrics: 
+- 266,854 total samples (90% train, 10% eval).
+- Tier 1 (9B) and Tier 2 (27B) models queued for QLoRA fine-tuning.
+
+4/ 📸 Visual Suggestion: Screenshot of the terminal output showing the dataset split and sizes.
+
+#ROCm #AI #Qwen #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tone: Professional / Strategic)
+🚀 **OncoAgent: Initiating Dual-Tier Fine-Tuning on AMD MI300X**
+
+After successfully generating 96k+ synthetic oncology cases, we've merged them with verified real-world datasets to create a massive 266k+ sample training corpus. Today, we're kicking off the QLoRA fine-tuning process for our Tier 1 (9B) and Tier 2 (27B) Qwen models.
+
+By leveraging 4-bit NormalFloat4 quantization and the immense 192GB memory of the AMD Instinct MI300X, we're pushing the boundaries of what open-source models can achieve in specialized medical triage.
+
+Stay tuned for the training loss metrics!
+
+Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
+
+#AMDHackathon #HealthTech #MachineLearning #ROCm #AMDInstinct #OpenSource
+
+---
+
+### POST 3: INSTAGRAM/TIKTOK (Tone: Dynamic / Visual)
+**Hook:** It’s time for our AI to hit the gym! 🏋️‍♂️💻
+
+**Caption:**
+OncoAgent is officially entering its fine-tuning phase! We just compiled over 266,000 real and synthetic oncology cases to train our dual-tier models. 
+
+Running this massive QLoRA training pipeline on a fresh #AMD MI300X droplet. The goal? Teaching the AI to think exactly like a clinical oncologist using OncoCoT. Let’s go! 🚀
+
+Tagging the squad: @lablab.ai @amd @huggingface
+
+#AMDHackathon #BuildInPublic #AITraining #MachineLearning #AMD #CodingLife

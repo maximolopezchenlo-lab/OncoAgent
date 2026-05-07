@@ -419,3 +419,24 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
   - **Memory Persistence via Threading:** By auto-generating a `PT-XXXX` ID and passing it as the `configurable={"thread_id": pid}` parameter to `agent_graph.invoke()`, we effectively exposed LangGraph's native checkpointing directly to the end-user, ensuring conversation histories are maintained across consecutive queries.
   - **UX Heuristics:** Implemented a two-column layout separating "Controls & Telemetry" from "Agentic Reasoning & Output," reducing cognitive load for clinicians. Color theory was applied (Green for Safe, Red for HITL Required) to enforce instant visual recognition of case acuity.
 - **Performance Metrics:** Custom CSS maintains sub-100ms render times while supporting advanced blur filters. Hardware telemetry hooks into psutil (simulating `rocm-smi`) successfully broadcast MI300X memory utilization to the dashboard, providing necessary transparency for high-performance deployments.
+
+## Session 22: Synthetic Data Generation Completion & Hardware Decommissioning (2026-05-07)
+
+### Milestone: 100k-Case Synthetic Generation Run Completed
+**Date:** 2026-05-07
+**Status:** Completed
+
+- **Problem/Hypothesis:** After migrating the generation pipeline to the remote AMD MI300X droplet (to escape slow API bottlenecks), we needed to continuously run the generator until reaching our target of roughly 100,000 highly-detailed, synthetically diversified oncology cases.
+- **Architectural Justification:** Using vLLM locally with `Qwen3.6-27B`, the script ran asynchronously, saving checkpoints continuously to ensure that no generated cases were lost during potential interruptions.
+- **Logical/Technical Implementation:** The `synthetic_generator_gpu.py` successfully completed the run, outputting a massive `onco_synthetic_final.jsonl` file with 96,941 validated cases. After confirming the target corpus size was achieved, the data was securely pulled (`scp`) from the remote droplet to the local workspace.
+- **Performance Metrics:** 96,941 high-quality clinical cases generated in record time. The remote MI300X node achieved maximum utilization without memory exhaustion. The remote instance was safely cleared for decommissioning.
+
+## Milestone: Dual-Tier QLoRA Fine-Tuning Initiation
+**Date:** 2026-05-07
+**Status:** In Progress
+**Session:** 23
+
+- **Problem/Hypothesis:** The base Qwen models lack specialized oncology triage capabilities and fail to strictly adhere to the OncoCoT (Oncological Chain of Thought) format out-of-the-box.
+- **Architectural Justification:** We are executing a Dual-Tier QLoRA fine-tuning strategy (Tier 1: Qwen 3.5 9B for speed, Tier 2: Qwen 3.6 27B for deep reasoning) using 4-bit NormalFloat4 quantization (BitsAndBytes) and PEFT. This strictly aligns with our architectural rules and optimizes for the 192GB HBM3 memory of the AMD MI300X.
+- **Logical/Technical Implementation:** Unified ~266k real and synthetic oncology cases (90% Train / 10% Eval split). Initiated the fine-tuning process on a new remote AMD MI300X GPU droplet.
+- **Performance Metrics:** Prepared massive multi-source dataset (PMC-Patients, Asclepius, synthetic Qwen) with a combined 266,854 samples (hash: 9be1cc284e5e).

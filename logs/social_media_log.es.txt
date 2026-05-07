@@ -589,3 +589,55 @@ Lo que logramos:
 Estamos listos para el despliegue clínico. 
 
 #AMDHackathon #HealthTech #AI #AMD #Gradio #ROCm #OpenSource #UIUX
+
+---
+---
+FECHA: 2026-05-07 (Sesión 23)
+
+### POST 1: X/TWITTER THREAD (Tono: Build in Public / Técnico)
+1/ 🏋️‍♂️ ¡Hora de ir al gimnasio de IA! OncoAgent entra oficialmente en su fase de Fine-Tuning. 🚀
+
+Acabamos de unificar un dataset masivo de más de 266k casos de oncología (reales y sintéticos) para entrenar nuestra arquitectura de doble nivel en un nuevo droplet de #AMD MI300X.
+
+#AMDHackathon #MachineLearning
+
+2/ 🛡️ El "Fracaso del Día": ¡Nuestro constructor de datasets luchó inicialmente porque los archivos JSONL sintéticos eran enormes!
+
+Solución rápida: Cambiamos a deduplicación y hashing de lectura/escritura en streaming. ¡La ingeniería de datos es el 80% de la IA! 😅
+
+3/ 📊 Métricas de Hoy:
+- 266,854 muestras totales (90% entrenamiento, 10% evaluación).
+- Modelos de Nivel 1 (9B) y Nivel 2 (27B) en cola para fine-tuning QLoRA.
+
+4/ 📸 Sugerencia Visual: Captura de pantalla de la terminal mostrando la división y el tamaño del dataset.
+
+#ROCm #AI #Qwen #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
+🚀 **OncoAgent: Iniciando Fine-Tuning de Doble Nivel en AMD MI300X**
+
+Después de generar con éxito más de 96k casos oncológicos sintéticos, los hemos fusionado con datasets reales verificados para crear un corpus de entrenamiento masivo de más de 266k muestras. Hoy, iniciamos el proceso de fine-tuning QLoRA para nuestros modelos Qwen de Nivel 1 (9B) y Nivel 2 (27B).
+
+Al aprovechar la cuantización NormalFloat4 de 4 bits y la inmensa memoria de 192GB del AMD Instinct MI300X, estamos empujando los límites de lo que los modelos open-source pueden lograr en triaje médico especializado.
+
+¡Manténganse atentos a las métricas de pérdida de entrenamiento!
+
+Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
+
+#AMDHackathon #HealthTech #MachineLearning #ROCm #AMDInstinct #OpenSource
+
+---
+
+### POST 3: INSTAGRAM/TIKTOK (Tono: Dinámico / Visual)
+**Hook:** ¡Es hora de que nuestra IA vaya al gimnasio! 🏋️‍♂️💻
+
+**Caption:**
+¡OncoAgent entra oficialmente en su fase de fine-tuning! Acabamos de compilar más de 266,000 casos de oncología reales y sintéticos para entrenar nuestros modelos de doble nivel.
+
+Ejecutando este masivo pipeline de entrenamiento QLoRA en un nuevo droplet de #AMD MI300X. ¿El objetivo? Enseñar a la IA a pensar exactamente como un oncólogo clínico usando OncoCoT. ¡Vamos! 🚀
+
+Mencionando al equipo: @lablab.ai @amd @huggingface
+
+#AMDHackathon #BuildInPublic #AITraining #MachineLearning #AMD #CodingLife

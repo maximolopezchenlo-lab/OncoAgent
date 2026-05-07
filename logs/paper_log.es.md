@@ -360,3 +360,24 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
   - **Persistencia de Memoria vía Threading:** Al autogenerar un ID `PT-XXXX` y pasarlo como el parámetro `configurable={"thread_id": pid}` a `agent_graph.invoke()`, expusimos de manera efectiva el checkpointing nativo de LangGraph directamente al usuario final, asegurando que las historias de conversación se mantengan a lo largo de consultas consecutivas.
   - **Heurísticas UX:** Implementamos un diseño de dos columnas separando "Controles y Telemetría" de "Razonamiento Agéntico y Salida", reduciendo la carga cognitiva para los médicos clínicos. Se aplicó teoría del color (Verde para Seguro, Rojo para Requiere HITL) para forzar el reconocimiento visual instantáneo de la gravedad del caso.
 - **Métricas de Rendimiento:** El CSS personalizado mantiene tiempos de renderizado por debajo de 100ms mientras soporta filtros de desenfoque (blur) avanzados. La telemetría de hardware, enlazada a psutil (simulando `rocm-smi`), transmite con éxito la utilización de memoria MI300X al dashboard, proporcionando la transparencia necesaria para implementaciones de alto rendimiento.
+
+## Sesión 22: Finalización de la Generación de Datos Sintéticos y Apagado del Hardware (2026-05-07)
+
+### Hito: Ejecución de Generación Sintética de 100k Casos Completada
+**Fecha:** 2026-05-07
+**Estado:** Completado
+
+- **Problema/Hipótesis:** Después de migrar el pipeline de generación al droplet remoto AMD MI300X (para escapar de los lentos cuellos de botella de la API), necesitábamos ejecutar el generador continuamente hasta alcanzar nuestro objetivo de aproximadamente 100,000 casos oncológicos sintéticos altamente detallados y diversificados.
+- **Justificación Arquitectónica:** Utilizando vLLM localmente con `Qwen3.6-27B`, el script se ejecutó asincrónicamente, guardando checkpoints continuamente para asegurar que no se perdieran casos generados durante interrupciones potenciales.
+- **Implementación Lógica/Técnica:** El script `synthetic_generator_gpu.py` completó con éxito la ejecución, produciendo un archivo masivo `onco_synthetic_final.jsonl` con 96,941 casos validados. Después de confirmar que se alcanzó el tamaño del corpus objetivo, los datos se extrajeron de forma segura (`scp`) desde el droplet remoto al espacio de trabajo local.
+- **Métricas de Rendimiento:** 96,941 casos clínicos de alta calidad generados en tiempo récord. El nodo remoto MI300X logró la máxima utilización sin agotamiento de memoria. La instancia remota fue autorizada de manera segura para su apagado y desmantelamiento.
+
+## Hito: Inicio de Fine-Tuning QLoRA de Doble Nivel
+**Fecha:** 2026-05-07
+**Estado:** En Progreso
+**Sesión:** 23
+
+- **Problema/Hipótesis:** Los modelos base Qwen carecen de capacidades especializadas de triaje oncológico y no se adhieren estrictamente al formato OncoCoT (Cadena de Pensamiento Oncológico) por defecto.
+- **Justificación Arquitectónica:** Estamos ejecutando una estrategia de fine-tuning QLoRA de Doble Nivel (Nivel 1: Qwen 3.5 9B para velocidad, Nivel 2: Qwen 3.6 27B para razonamiento profundo) utilizando cuantización de 4 bits NormalFloat4 (BitsAndBytes) y PEFT. Esto se alinea estrictamente con nuestras reglas arquitectónicas y se optimiza para la memoria HBM3 de 192GB de la AMD MI300X.
+- **Implementación Lógica/Técnica:** Se unificaron ~266k casos oncológicos reales y sintéticos (división 90% Entrenamiento / 10% Evaluación). Se inició el proceso de fine-tuning en un nuevo droplet remoto de GPU AMD MI300X.
+- **Métricas de Rendimiento:** Se preparó un dataset masivo de múltiples fuentes (PMC-Patients, Asclepius, sintéticos de Qwen) con un total de 266,854 muestras combinadas (hash: 9be1cc284e5e).
