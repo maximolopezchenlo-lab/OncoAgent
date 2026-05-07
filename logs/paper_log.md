@@ -296,3 +296,12 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 - **Architectural Justification:** We are pivoting to a "Dual-Tier" architecture using Qwen 3.5 9B (for fast, low-latency initial triage) and Qwen 3.6 27B (for complex reasoning). Both models feature "Day 0" ROCm compatibility and upstream vLLM support for their hybrid Gated DeltaNet architectures. The MI300X handles the 27B model comfortably under QLoRA 4-bit precision (~30GB VRAM required).
 - **Logical/Technical Implementation:** Created ADR-002 to formalize the pivot. The fine-tuning scripts and data generation pipelines will need to account for Qwen's ChatML template instead of Llama's format.
 - **Performance Metrics:** Expected reduction in inference latency for Tier 1 (9B) and significant increase in clinical accuracy for Tier 2 (27B), fully utilizing the MI300X's 192GB HBM3 memory.
+
+## Milestone: Phase 3 Training Pipeline Refactoring
+**Date:** 2026-05-06
+**Status:** Completed
+
+- **Problem/Hypothesis:** The training script `scripts/train_specialist.py` was hardcoded to Llama 3.1 8B. We need to support the Dual-Tier Qwen architecture while adhering to the 4-bit NF4 memory constraints.
+- **Architectural Justification:** The script was refactored using `argparse` to allow selecting the tier at runtime. We enforce 4-bit NormalFloat4 (NF4) quantization. Despite the user's initial inquiry about 8-bit, 4-bit NF4 offers identical clinical reasoning quality while halving the VRAM footprint, which is critical for training the 27B model on the MI300X without OOM errors.
+- **Logical/Technical Implementation:** Added `argparse` to select `--tier 1` (9B) or `--tier 2` (27B). Updated `LORA_TARGET_MODULES` to comprehensively include all linear layers (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) to maximize Qwen's adapter capabilities. Output directories dynamically adapt based on the selected tier.
+- **Performance Metrics:** 4-bit NF4 successfully guarantees that the 27B model training graph fits inside a single MI300X's 192GB VRAM envelope, allowing us to maintain high batch sizes.

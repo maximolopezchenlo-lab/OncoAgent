@@ -1,14 +1,16 @@
 """
-OncoAgent — QLoRA Fine-Tuning Script for Llama 3.1 8B Instruct.
+OncoAgent — QLoRA Fine-Tuning Script for Dual-Tier Qwen Architecture.
 
 Trains a LoRA adapter on the combined real + synthetic oncology corpus
 using 4-bit NormalFloat4 quantization (bitsandbytes) on AMD MI300X (ROCm).
+Supports Dual-Tier: Tier 1 (Qwen 3.5 9B) and Tier 2 (Qwen 3.6 27B).
 
 Hardware Target: AMD Instinct MI300X via ROCm 7.2.
-Rule Compliance: #11 (Llama 3.1), #14 (QLoRA + bitsandbytes + PEFT),
+Rule Compliance: #3 (Qwen 3.5/3.6, format ChatML), #14 (QLoRA + bitsandbytes + PEFT),
                  #22 (reproducibility seeds), #24 (.env), #26 (type hints).
 """
 
+import argparse
 import json
 import os
 import logging
@@ -43,14 +45,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ── Configuration ───────────────────────────────────────────────────────────
-MODEL_ID: str = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+# Model ID is dynamically selected based on tier parameter.
+TIER_MODELS: Dict[int, str] = {
+    1: "Qwen/Qwen3.5-9B-Instruct",
+    2: "Qwen/Qwen3.6-27B-Instruct",
+}
+
 OUTPUT_DIR: str = os.path.join("models", "oncoagent_adapters")
 TRAIN_FILE: str = os.path.join("data", "final", "train_oncoagent.jsonl")
 
 LORA_R: int = 16
 LORA_ALPHA: int = 32
 LORA_DROPOUT: float = 0.05
-LORA_TARGET_MODULES: List[str] = ["q_proj", "v_proj"]
+LORA_TARGET_MODULES: List[str] = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
 
 MAX_SEQ_LENGTH: int = 2048
 LEARNING_RATE: float = 2e-4
@@ -135,8 +142,11 @@ def tokenize_dataset(
 
 # ── Model Setup ─────────────────────────────────────────────────────────────
 
-def setup_model_and_tokenizer() -> tuple:
+def setup_model_and_tokenizer(model_id: str) -> tuple:
     """Load the base model with 4-bit quantization and apply LoRA.
+
+    Args:
+        model_id: The HuggingFace ID of the model to load.
 
     Returns:
         Tuple of (model, tokenizer, peft_config).
@@ -151,12 +161,12 @@ def setup_model_and_tokenizer() -> tuple:
         bnb_4bit_use_double_quant=True,
     )
 
-    logger.info(f"📦 Loading base model: {MODEL_ID}")
+    logger.info(f"📦 Loading base model: {model_id}")
     logger.info(f"   Device: {os.getenv('DEVICE', 'cuda')} (ROCm maps cuda→hip)")
     logger.info(f"   Quantization: 4-bit NormalFloat4")
 
     tokenizer = AutoTokenizer.from_pretrained(
-        MODEL_ID,
+        model_id,
         token=hf_token,
         trust_remote_code=True,
     )
@@ -193,23 +203,34 @@ def setup_model_and_tokenizer() -> tuple:
 
 # ── Training ────────────────────────────────────────────────────────────────
 
-def train() -> str:
+def train(tier: int) -> str:
     """Execute the full QLoRA training pipeline.
+
+    Args:
+        tier: The architectural tier to train (1 for 9B, 2 for 27B).
 
     Returns:
         Path to the saved adapter directory.
     """
-    logger.info("🚀 Starting OncoAgent QLoRA Training Pipeline")
+    model_id = TIER_MODELS.get(tier)
+    if not model_id:
+        raise ValueError(f"Invalid tier: {tier}. Must be 1 or 2.")
+
+    logger.info(f"🚀 Starting OncoAgent QLoRA Training Pipeline (Tier {tier})")
     logger.info("=" * 60)
 
     # Setup
-    model, tokenizer, peft_config = setup_model_and_tokenizer()
+    model, tokenizer, peft_config = setup_model_and_tokenizer(model_id)
     dataset = load_training_data()
     tokenized_dataset = tokenize_dataset(dataset, tokenizer)
 
     # Training arguments
+    # Create specific output directory for the tier
+    tier_output_dir = os.path.join(OUTPUT_DIR, f"tier{tier}")
+    os.makedirs(tier_output_dir, exist_ok=True)
+
     training_args = TrainingArguments(
-        output_dir=OUTPUT_DIR,
+        output_dir=tier_output_dir,
         num_train_epochs=NUM_EPOCHS,
         per_device_train_batch_size=BATCH_SIZE,
         gradient_accumulation_steps=GRADIENT_ACCUMULATION,
@@ -244,12 +265,12 @@ def train() -> str:
     trainer.train()
 
     # Save final adapter
-    final_path = os.path.join(OUTPUT_DIR, "final")
+    final_path = os.path.join(tier_output_dir, "final")
     model.save_pretrained(final_path)
     tokenizer.save_pretrained(final_path)
 
     logger.info("=" * 60)
-    logger.info(f"🏁 TRAINING COMPLETE")
+    logger.info(f"🏁 TRAINING COMPLETE FOR TIER {tier} ({model_id})")
     logger.info(f"   Adapter saved to: {final_path}")
     logger.info(f"   Epochs: {NUM_EPOCHS}")
     logger.info(f"   Effective batch size: {BATCH_SIZE * GRADIENT_ACCUMULATION}")
@@ -259,4 +280,14 @@ def train() -> str:
 
 
 if __name__ == "__main__":
-    train()
+    parser = argparse.ArgumentParser(description="OncoAgent QLoRA Fine-Tuning")
+    parser.add_argument(
+        "--tier", 
+        type=int, 
+        choices=[1, 2], 
+        required=True, 
+        help="Select the architectural tier to train (1 = 9B Speed, 2 = 27B Reasoning)"
+    )
+    args = parser.parse_args()
+    
+    train(args.tier)

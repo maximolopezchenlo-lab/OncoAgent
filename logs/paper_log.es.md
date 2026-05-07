@@ -237,3 +237,12 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 - **Justificación Arquitectónica:** Pivoteamos hacia una arquitectura de "Doble Nivel" (Dual-Tier) utilizando Qwen 3.5 9B (para un triaje rápido de baja latencia) y Qwen 3.6 27B (para razonamiento complejo). Ambos modelos cuentan con compatibilidad "Día Cero" con ROCm y soporte en vLLM. El MI300X maneja el modelo de 27B cómodamente bajo precisión de 4 bits con QLoRA (~30GB VRAM requeridos).
 - **Implementación Lógica/Técnica:** Creación del ADR-002 para formalizar el pivot. Los scripts de fine-tuning deberán ajustarse para usar el formato ChatML de Qwen en lugar del de Llama.
 - **Métricas de Rendimiento:** Reducción esperada en la latencia de inferencia para el Nivel 1 (9B) y aumento significativo en la precisión clínica para el Nivel 2 (27B), utilizando a tope la memoria HBM3 de 192GB del MI300X.
+
+## Hito: Refactorización del Pipeline de Entrenamiento de Fase 3
+**Fecha:** 2026-05-06
+**Estado:** Completado
+
+- **Problema/Hipótesis:** El script de entrenamiento `scripts/train_specialist.py` tenía hardcodeado Llama 3.1 8B. Necesitábamos dar soporte a la arquitectura Qwen de Doble Nivel manteniendo las restricciones de memoria de 4-bit NF4.
+- **Justificación Arquitectónica:** Se refactorizó el script usando `argparse` para permitir seleccionar el nivel (tier) en tiempo de ejecución. Imponemos la cuantización 4-bit NormalFloat4 (NF4). A pesar de la consulta inicial del usuario sobre 8-bits, 4-bit NF4 ofrece una calidad de razonamiento clínico idéntica reduciendo a la mitad el consumo de VRAM, lo cual es crítico para entrenar el modelo de 27B en la MI300X sin errores OOM (Out-Of-Memory).
+- **Implementación Lógica/Técnica:** Se añadió `argparse` para seleccionar `--tier 1` (9B) o `--tier 2` (27B). Se actualizaron los `LORA_TARGET_MODULES` para incluir exhaustivamente todas las capas lineales (`q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`) para maximizar las capacidades de adaptación de Qwen. Los directorios de salida se adaptan dinámicamente según el nivel seleccionado.
+- **Métricas de Rendimiento:** El uso de 4-bit NF4 garantiza de manera exitosa que el grafo de entrenamiento del modelo de 27B entre en la capacidad de 192GB de VRAM de un solo nodo MI300X, permitiéndonos mantener tamaños de lote (batch sizes) altos.

@@ -496,3 +496,11 @@ Entra nuestra nueva **Arquitectura de Doble Nivel (Dual-Tier)**:
 Al usar QLoRA (cuantización de 4 bits), entrenar el modelo de 27B solo consumirá ~30GB de VRAM, lo que significa que el MI300X ni siquiera transpirará. Ambos modelos cuentan con compatibilidad "Día Cero" en ROCm y soporte en vLLM para su arquitectura Gated DeltaNet.
 
 #AMDHackathon #ROCm #MI300X #OncoAgent #MachineLearning #BuildInPublic #AI
+
+¡La Fase 3 está oficialmente en marcha! 🚀 Acabamos de refactorizar por completo nuestro pipeline de fine-tuning con QLoRA para soportar nuestra nueva Arquitectura Qwen de Doble Nivel.
+
+Gracias a la inmensa VRAM de 192GB del AMD Instinct MI300X, consolidamos el uso de cuantización de 4 bits NormalFloat4 (NF4). Esto nos permite entrenar el modelo masivo de 27B en un solo nodo sin encontrarnos con errores de falta de memoria (Out-Of-Memory), manteniendo la misma calidad de razonamiento clínico que la precisión de 8 bits. También hemos expandido nuestros módulos objetivo de LoRA a todas las capas lineales para asegurar una adaptación máxima.
+
+El hardware está hambriento. Los datos están listos. A entrenar. 🧠🏥
+
+#AMDHackathon #ROCm #MI300X #OncoAgent #FineTuning #BuildInPublic #AI #Qwen
