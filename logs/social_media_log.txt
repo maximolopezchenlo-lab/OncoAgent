@@ -811,3 +811,33 @@ Our solution? Bring the compute home. We deployed the massive Qwen3.6-27B model 
 
 #AMDHackathon #HealthTech #AI #AMD #SyntheticData #ROCm #OpenSource
 
+
+## SESSION 20 — Training Pipeline Hardening (2026-05-07)
+
+### POST 1: X/TWITTER (Tone: Technical / Engineering Pride)
+🔧 Production-Grade Training Pipeline for OncoAgent is LOCKED IN 🔒
+
+Just finished hardening our QLoRA fine-tuning script with:
+✅ Tier-adaptive hyperparams (9B gets bigger batches, 27B gets higher LoRA rank)
+✅ Automatic checkpoint resume (cloud GPUs crash — we're ready)
+✅ Train/Eval split with early stopping
+✅ Training metadata saved for reproducibility audits
+
+Meanwhile, our MI300X is STILL crunching synthetic cases in the background. 4,131 down, 95,869 to go. 🏗️
+
+#AMDHackathon #MI300X #ROCm #QLoRA #MachineLearning #BuildInPublic
+
+### POST 2: LINKEDIN (Tone: Strategic / Lessons Learned)
+🏗️ **OncoAgent: Why We Hardened Our Training Pipeline Before Training**
+
+It's tempting to rush to `python train.py` the moment you have data. But in a hackathon on cloud GPU instances, that's how you lose 8 hours of training to an instance restart.
+
+Here's what we built before pressing "go":
+• **Tier-Adaptive Hyperparameters** — Our 9B speed model and 27B reasoning model get completely different LoRA ranks, learning rates, and batch sizes. One size does NOT fit all.
+• **ChatML Format Alignment** — We caught a critical bug: our dataset was formatted in Llama 3.1 tokens, but we're training Qwen models that expect ChatML. Training on the wrong template = garbage output.
+• **Crash Recovery** — `--resume` flag auto-detects the latest checkpoint. Peace of mind.
+• **Eval Monitoring** — 90/10 split with early stopping prevents overfitting on our synthetic corpus.
+
+**The "Failure of the Day":** We almost trained on Llama 3.1 chat template data with a Qwen model. The model would have learned to generate `<|start_header_id|>` tokens that mean absolutely nothing to Qwen. Hours of GPU time saved by catching it early.
+
+#AMDHackathon #HealthTech #AI #AMD #FineTuning #ROCm #OpenSource #QLoRA

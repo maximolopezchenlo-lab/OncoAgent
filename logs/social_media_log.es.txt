@@ -515,3 +515,33 @@ La pobre máquina local (equipada con una prehistórica NVIDIA Quadro 4000) de r
 Un rápido `kill -9`, cambiamos al nodo real de la nube de AMD, y volvemos al ruedo. ¡El hardware target importa, gente!
 
 #AMDHackathon #BuildInPublic #MachineLearning #DevLife #Blooper
+
+## SESIÓN 20 — Endurecimiento del Pipeline de Entrenamiento (2026-05-07)
+
+### POST 1: X/TWITTER (Tono: Técnico / Orgullo de Ingeniería)
+🔧 ¡Pipeline de Entrenamiento de Grado Productivo para OncoAgent BLOQUEADO! 🔒
+
+Acabamos de endurecer nuestro script de fine-tuning QLoRA con:
+✅ Hiperparámetros adaptativos por nivel (9B obtiene lotes más grandes, 27B obtiene rango LoRA más alto)
+✅ Reanudación automática desde checkpoint (las GPUs cloud se caen — estamos preparados)
+✅ División Train/Eval con early stopping
+✅ Metadata de entrenamiento guardada para auditorías de reproducibilidad
+
+Mientras tanto, nuestra MI300X SIGUE generando casos sintéticos en segundo plano. 4,131 listos, 95,869 por delante. 🏗️
+
+#AMDHackathon #MI300X #ROCm #QLoRA #MachineLearning #BuildInPublic
+
+### POST 2: LINKEDIN (Tono: Estratégico / Lecciones Aprendidas)
+🏗️ **OncoAgent: Por Qué Endurecimos Nuestro Pipeline de Entrenamiento ANTES de Entrenar**
+
+Es tentador correr `python train.py` en el momento que tenés datos. Pero en un hackathon con instancias GPU en la nube, así es como perdés 8 horas de entrenamiento por un reinicio de instancia.
+
+Esto es lo que construimos antes de presionar "ejecutar":
+• **Hiperparámetros Adaptativos por Nivel** — Nuestro modelo de velocidad de 9B y nuestro modelo de razonamiento de 27B reciben rangos LoRA, tasas de aprendizaje y tamaños de lote completamente diferentes.
+• **Alineación de Formato ChatML** — Detectamos un bug crítico: nuestro dataset estaba formateado en tokens de Llama 3.1, pero estamos entrenando modelos Qwen que esperan ChatML. Entrenar con la plantilla equivocada = salida basura.
+• **Recuperación ante Caídas** — El flag `--resume` auto-detecta el último checkpoint. Tranquilidad total.
+• **Monitoreo de Evaluación** — División 90/10 con early stopping previene el sobreajuste en nuestro corpus sintético.
+
+**El "Fracaso del Día":** Casi entrenamos con datos en plantilla de chat Llama 3.1 sobre un modelo Qwen. El modelo habría aprendido a generar tokens `<|start_header_id|>` que no significan absolutamente nada para Qwen. ¡Horas de GPU salvadas por detectarlo a tiempo!
+
+#AMDHackathon #HealthTech #AI #AMD #FineTuning #ROCm #OpenSource #QLoRA

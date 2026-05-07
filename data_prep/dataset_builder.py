@@ -1,19 +1,20 @@
 """
 OncoAgent — Dataset Builder / Unifier.
 
-Combines real (HuggingFace-filtered) and synthetic (Qwen3.5-9B generated)
-oncology data into a single training-ready JSONL corpus in Llama 3.1
+Combines real (HuggingFace-filtered) and synthetic (Qwen generated)
+oncology data into a single training-ready JSONL corpus in ChatML
 chat template format.
 
 Hardware Target: CPU only.
-Rule Compliance: #12 (JSONL + Llama 3 format), #22 (seeds), #26 (type hints).
+Rule Compliance: #12 (JSONL + ChatML format), #22 (seeds), #26 (type hints).
 """
 
 import json
 import os
 import random
 import logging
-from typing import Dict, List
+import hashlib
+from typing import Dict, List, Tuple
 
 from dotenv import load_dotenv
 
@@ -41,14 +42,14 @@ SYSTEM_PROMPT: str = (
 )
 
 
-def format_synthetic_to_llama3(case: Dict[str, str]) -> str:
-    """Convert a synthetic case dict to Llama 3.1 chat template.
+def format_synthetic_to_chatml(case: Dict[str, str]) -> str:
+    """Convert a synthetic case dict to ChatML template.
 
     Args:
         case: Dict with 'history', 'reasoning', 'conclusion' keys.
 
     Returns:
-        Formatted Llama 3 chat template string.
+        Formatted ChatML template string.
     """
     history = case.get("history", "")
     reasoning = case.get("reasoning", "")
@@ -61,12 +62,12 @@ def format_synthetic_to_llama3(case: Dict[str, str]) -> str:
     )
 
     return (
-        f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
-        f"{SYSTEM_PROMPT}<|eot_id|>"
-        f"<|start_header_id|>user<|end_header_id|>\n\n"
-        f"{user_msg}<|eot_id|>"
-        f"<|start_header_id|>assistant<|end_header_id|>\n\n"
-        f"{assistant_msg}<|eot_id|>"
+        f"<|im_start|>system\n"
+        f"{SYSTEM_PROMPT}<|im_end|>\n"
+        f"<|im_start|>user\n"
+        f"{user_msg}<|im_end|>\n"
+        f"<|im_start|>assistant\n"
+        f"{assistant_msg}<|im_end|>"
     )
 
 
@@ -89,7 +90,7 @@ def load_real_data() -> List[Dict[str, str]]:
 
 
 def load_synthetic_data() -> List[Dict[str, str]]:
-    """Load all synthetic generated data and format to Llama 3."""
+    """Load all synthetic generated data and format to ChatML."""
     if not os.path.exists(SYNTHETIC_DIR):
         logger.warning(f"⚠️  Synthetic dir not found: {SYNTHETIC_DIR}")
         return []
@@ -113,10 +114,10 @@ def load_synthetic_data() -> List[Dict[str, str]]:
             for line in f:
                 try:
                     case = json.loads(line.strip())
-                    formatted = format_synthetic_to_llama3(case)
+                    formatted = format_synthetic_to_chatml(case)
                     entries.append({
                         "text": formatted,
-                        "source": "synthetic_qwen35",
+                        "source": "synthetic_qwen",
                     })
                 except (json.JSONDecodeError, KeyError):
                     continue
@@ -125,11 +126,31 @@ def load_synthetic_data() -> List[Dict[str, str]]:
     return entries
 
 
-def build_unified_corpus() -> str:
-    """Build the final unified training corpus.
+def _compute_corpus_hash(entries: List[Dict[str, str]]) -> str:
+    """Compute a deterministic hash of the corpus for reproducibility tracking.
+
+    Args:
+        entries: List of training entries.
 
     Returns:
-        Path to the output JSONL file.
+        SHA-256 hex digest (first 12 chars).
+    """
+    h = hashlib.sha256()
+    for e in entries:
+        h.update(e.get("text", "").encode("utf-8"))
+    return h.hexdigest()[:12]
+
+
+def build_unified_corpus(
+    eval_ratio: float = 0.10,
+) -> Tuple[str, str]:
+    """Build the final unified training corpus with a train/eval split.
+
+    Args:
+        eval_ratio: Fraction of samples reserved for evaluation (default 10%).
+
+    Returns:
+        Tuple of (train_path, eval_path).
     """
     logger.info("🚀 Building unified OncoAgent training corpus...")
     logger.info("=" * 60)
@@ -140,11 +161,30 @@ def build_unified_corpus() -> str:
     combined = real + synthetic
     random.shuffle(combined)
 
-    os.makedirs(os.path.dirname(FINAL_OUTPUT), exist_ok=True)
+    # Deduplicate by text content
+    seen_hashes: set = set()
+    deduped: List[Dict[str, str]] = []
+    for entry in combined:
+        text_hash = hashlib.sha256(entry.get("text", "").encode()).hexdigest()
+        if text_hash not in seen_hashes:
+            seen_hashes.add(text_hash)
+            deduped.append(entry)
+    if len(deduped) < len(combined):
+        logger.info(f"🧹 Deduplication: removed {len(combined) - len(deduped):,} duplicate samples")
+    combined = deduped
 
-    with open(FINAL_OUTPUT, "w", encoding="utf-8") as f:
-        for entry in combined:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    # Train/eval split
+    split_idx = max(1, int(len(combined) * (1.0 - eval_ratio)))
+    train_set = combined[:split_idx]
+    eval_set = combined[split_idx:]
+
+    os.makedirs(os.path.dirname(FINAL_OUTPUT), exist_ok=True)
+    eval_output = FINAL_OUTPUT.replace(".jsonl", "_eval.jsonl")
+
+    for path, entries in [(FINAL_OUTPUT, train_set), (eval_output, eval_set)]:
+        with open(path, "w", encoding="utf-8") as f:
+            for entry in entries:
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
     # Statistics
     source_counts: Dict[str, int] = {}
@@ -152,14 +192,19 @@ def build_unified_corpus() -> str:
         src = e.get("source", "unknown")
         source_counts[src] = source_counts.get(src, 0) + 1
 
+    corpus_hash = _compute_corpus_hash(combined)
     logger.info(f"📊 UNIFIED CORPUS BUILT — {len(combined):,} total samples")
+    logger.info(f"   ├── Train: {len(train_set):,} ({100*(1-eval_ratio):.0f}%)")
+    logger.info(f"   ├── Eval:  {len(eval_set):,} ({100*eval_ratio:.0f}%)")
     for src, cnt in sorted(source_counts.items(), key=lambda x: -x[1]):
         pct = (cnt / len(combined)) * 100
         logger.info(f"   ├── {src}: {cnt:,} ({pct:.1f}%)")
-    logger.info(f"   └── Output: {FINAL_OUTPUT}")
+    logger.info(f"   ├── Corpus hash: {corpus_hash}")
+    logger.info(f"   ├── Train output: {FINAL_OUTPUT}")
+    logger.info(f"   └── Eval output:  {eval_output}")
     logger.info("=" * 60)
 
-    return FINAL_OUTPUT
+    return FINAL_OUTPUT, eval_output
 
 
 if __name__ == "__main__":

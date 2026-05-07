@@ -316,3 +316,29 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 - **Architectural Justification:** Migrated the generation pipeline entirely to the local AMD Instinct MI300X droplet using vLLM (`rocm/vllm:latest`). Utilizing the immense memory capacity and compute of the MI300X, we deployed the much larger `Qwen/Qwen3.6-27B` model directly to the GPU for self-hosted generation.
 - **Logical/Technical Implementation:** Created `data_prep/synthetic_generator_gpu.py`. Fixed the Qwen 3.6 thinking bug by dynamically injecting `extra_body={"chat_template_kwargs": {"enable_thinking": False}}` into the OpenAI-compatible vLLM request. Implemented robust retry logic and checkpointing. 
 - **Performance Metrics:** Achieved a **~56x throughput acceleration**—from ~120 cases/hour via API to **~6,800 cases/hour** running locally on the MI300X. The server saturates the GPU at 100% utilization. At this rate, the target 100,000 cases will be fully generated in approximately 15 hours instead of the previously projected 18-22 hours (which required 8 parallel API workers).
+
+## Session 20: Training Pipeline Hardening & ChatML Alignment (2026-05-07)
+
+### Milestone: Tier-Adaptive QLoRA Pipeline with Crash Recovery
+**Date:** 2026-05-07
+**Status:** Completed
+
+- **Problem/Hypothesis:** The previous training script used a flat set of hyperparameters for both the 9B and 27B models, which is suboptimal. The 27B model requires lower learning rates and higher LoRA rank to leverage its deeper capacity, while the 9B model can sustain larger micro-batches. Additionally, the dataset builder was formatting data in Llama 3.1 chat template when the target models (Qwen 3.5/3.6) use ChatML. Finally, training on cloud GPU instances carries a real risk of instance restarts, which would lose all training progress without checkpoint resume support.
+
+- **Architectural Justification:**
+  1. **Tier-Adaptive Hyperparameters:** Introduced a `TierConfig` dataclass that encapsulates per-tier settings. Tier 1 (9B): batch=4, grad_accum=4, lr=2e-4, lora_r=16. Tier 2 (27B): batch=2, grad_accum=8, lr=1e-4, lora_r=32. This respects the different capacity ceilings and memory footprints of each model on the 192GB HBM3.
+  2. **ChatML Format Correction:** Replaced Llama 3.1 special tokens with standard ChatML tokens in `dataset_builder.py`. This is critical — training on the wrong chat template would produce a model that generates garbage at inference.
+  3. **Train/Eval Split:** The dataset builder now automatically creates a 90/10 train/eval split with deduplication. The training script monitors eval_loss every `save_steps` and supports `EarlyStoppingCallback` (patience=3) to prevent overfitting.
+  4. **Checkpoint Resume:** Added `--resume` flag that auto-detects the latest checkpoint in the output directory. This is the most critical resilience feature for hackathon cloud instances.
+  5. **Training Metadata:** Each completed training run saves a `training_metadata.json` alongside the adapter with model ID, hardware, duration, sample counts, and final metrics for reproducibility audits.
+
+- **Logical/Technical Implementation:**
+  - Rewrote `scripts/train_specialist.py` with `TierConfig` dataclass, `_save_training_metadata()`, and integrated eval pipeline.
+  - Updated `data_prep/dataset_builder.py` to use `format_synthetic_to_chatml()`, added SHA-256 corpus hashing for reproducibility tracking, and implemented deduplication.
+  - Added gradient clipping (`max_grad_norm=1.0`) to prevent training instability.
+  - Added VRAM cleanup (`torch.cuda.empty_cache()`) post-training.
+
+- **Performance Metrics:**
+  - Synthetic generation progress: **4,131 cases generated** (ongoing, target 100K).
+  - Rejection rate: 0.65% (27/4,131) — excellent data quality.
+  - Training pipeline: Ready for execution once corpus is complete.

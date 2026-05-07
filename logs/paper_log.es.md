@@ -257,3 +257,29 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 - **Justificación Arquitectónica:** Se migró el pipeline de generación por completo al droplet local AMD Instinct MI300X utilizando vLLM (`rocm/vllm:latest`). Aprovechando la inmensa capacidad de memoria y cómputo de la MI300X, desplegamos el modelo mucho más grande `Qwen/Qwen3.6-27B` directamente en la GPU para generación auto-alojada.
 - **Implementación Lógica/Técnica:** Se creó `data_prep/synthetic_generator_gpu.py`. Se corrigió el error de "thinking" de Qwen 3.6 inyectando dinámicamente `extra_body={"chat_template_kwargs": {"enable_thinking": False}}` en la solicitud de vLLM (compatible con OpenAI). Se implementó una lógica robusta de reintentos y puntos de control.
 - **Métricas de Rendimiento:** Se logró una **aceleración de ~56x en el rendimiento**: de ~120 casos/hora vía API a **~6,800 casos/hora** ejecutándose localmente en la MI300X. El servidor satura la GPU al 100% de utilización. A este ritmo, los 100,000 casos objetivo se generarán completamente en aproximadamente 15 horas en lugar de las 18-22 horas proyectadas anteriormente (que requerían 8 workers paralelos de API).
+
+## Sesión 20: Endurecimiento del Pipeline de Entrenamiento y Alineación ChatML (2026-05-07)
+
+### Hito: Pipeline QLoRA Adaptativo por Nivel con Recuperación ante Caídas
+**Fecha:** 2026-05-07
+**Estado:** Completado
+
+- **Problema/Hipótesis:** El script de entrenamiento anterior usaba un conjunto plano de hiperparámetros para ambos modelos (9B y 27B), lo cual es subóptimo. El modelo de 27B requiere tasas de aprendizaje más bajas y un rango LoRA más alto para aprovechar su capacidad más profunda, mientras que el modelo de 9B puede sostener micro-lotes más grandes. Además, el constructor de datasets estaba formateando los datos en la plantilla de chat de Llama 3.1 cuando los modelos objetivo (Qwen 3.5/3.6) usan ChatML. Finalmente, el entrenamiento en instancias GPU en la nube conlleva un riesgo real de reinicios de instancia, lo cual perdería todo el progreso de entrenamiento sin soporte de reanudación desde checkpoints.
+
+- **Justificación Arquitectónica:**
+  1. **Hiperparámetros Adaptativos por Nivel:** Se introdujo un dataclass `TierConfig` que encapsula configuraciones por nivel. Nivel 1 (9B): batch=4, grad_accum=4, lr=2e-4, lora_r=16. Nivel 2 (27B): batch=2, grad_accum=8, lr=1e-4, lora_r=32.
+  2. **Corrección de Formato ChatML:** Se reemplazaron los tokens especiales de Llama 3.1 con tokens ChatML estándar en `dataset_builder.py`. Entrenar con la plantilla de chat incorrecta produciría un modelo que genera basura en la inferencia.
+  3. **División Train/Eval:** El constructor de datasets ahora crea automáticamente una división 90/10 con deduplicación. El script de entrenamiento monitorea eval_loss y soporta `EarlyStoppingCallback` (paciencia=3) para prevenir sobreajuste.
+  4. **Reanudación desde Checkpoint:** Se agregó el flag `--resume` que auto-detecta el último checkpoint en el directorio de salida. Es la funcionalidad de resiliencia más crítica para instancias cloud de hackathon.
+  5. **Metadata de Entrenamiento:** Cada ejecución completada guarda un `training_metadata.json` junto al adaptador con ID del modelo, hardware, duración, conteos de muestras y métricas finales para auditorías de reproducibilidad.
+
+- **Implementación Lógica/Técnica:**
+  - Se reescribió `scripts/train_specialist.py` con dataclass `TierConfig`, `_save_training_metadata()` y pipeline de evaluación integrado.
+  - Se actualizó `data_prep/dataset_builder.py` para usar `format_synthetic_to_chatml()`, hash SHA-256 del corpus para trazabilidad de reproducibilidad, y deduplicación.
+  - Se agregó gradient clipping (`max_grad_norm=1.0`) para prevenir inestabilidad en el entrenamiento.
+  - Se agregó limpieza de VRAM (`torch.cuda.empty_cache()`) post-entrenamiento.
+
+- **Métricas de Rendimiento:**
+  - Progreso de generación sintética: **4,131 casos generados** (en curso, objetivo 100K).
+  - Tasa de rechazo: 0.65% (27/4,131) — excelente calidad de datos.
+  - Pipeline de entrenamiento: Listo para ejecutar una vez que el corpus esté completo.
