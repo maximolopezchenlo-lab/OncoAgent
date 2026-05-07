@@ -285,3 +285,5 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 4. `scripts/train_specialist.py` — QLoRA fine-tuning (4-bit NF4, LoRA r=16/alpha=32)
 
 **Performance:** Estimated ~18-22h for 100,000 synthetic samples using dual-key parallel generation.
+
+**Execution Status:** Resolved a memory-exhaustion/`len()` exception bug by implementing `streaming=True` correctly for massive HuggingFace datasets (e.g. PMC-Patients). Both Phase 1 (real data filtering) and Phase 2 (dual-key parallel synthetic generation) have been successfully launched and are currently executing concurrently in the background.

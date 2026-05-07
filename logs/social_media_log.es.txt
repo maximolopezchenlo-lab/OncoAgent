@@ -473,3 +473,10 @@ Nuestro enfoque:
 El insight clave: para generación estructurada de casos clínicos, prompt engineering + diversidad combinatoria > tamaño del modelo. 🧠
 
 #AMDHackathon #OncoAgent #DatosSintéticos #IA #HealthTech #BuildInPublic #OpenSource
+
+### POST 3: X/TWITTER (Tono: Casual / Solución de Problemas)
+😅 Acabamos de sobrevivir a una pesadilla de streaming con IterableDataset. Lección aprendida: `len(dataset)` romperá tu pipeline si estás haciendo streaming de datasets masivos de HuggingFace como PMC-Patients. 
+
+Cambiamos a contadores manuales y tanto la Fase 1 (datos reales) como la Fase 2 (generación sintética dual-key) están corriendo sin problemas en segundo plano. ¡La carrera por los 100K ha comenzado! 🏁
+
+#AMDHackathon #Debugging #Python #MachineLearning #BuildInPublic

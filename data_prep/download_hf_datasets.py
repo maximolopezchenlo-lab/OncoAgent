@@ -143,18 +143,19 @@ def process_pmc_patients(max_samples: Optional[int] = None) -> List[Dict[str, st
     Returns:
         List of formatted JSONL entries.
     """
-    logger.info("📥 Downloading PMC-Patients (zhengyun21/PMC-Patients)...")
+    logger.info("📥 Downloading PMC-Patients (zhengyun21/PMC-Patients) in streaming mode...")
     try:
-        dataset = load_dataset("zhengyun21/PMC-Patients", split="train")
+        dataset = load_dataset("zhengyun21/PMC-Patients", split="train", streaming=True)
     except Exception as e:
         logger.error(f"Failed to download PMC-Patients: {e}")
         return []
 
     results: List[Dict[str, str]] = []
-    total = len(dataset)
     filtered = 0
+    scanned = 0
 
-    for i, item in enumerate(dataset):
+    for item in dataset:
+        scanned += 1
         patient_text = item.get("patient", "")
         if not is_oncology_relevant(patient_text, min_matches=2):
             continue
@@ -176,7 +177,7 @@ def process_pmc_patients(max_samples: Optional[int] = None) -> List[Dict[str, st
         if max_samples and filtered >= max_samples:
             break
 
-    logger.info(f"✅ PMC-Patients: {filtered}/{total} oncology-relevant cases extracted.")
+    logger.info(f"✅ PMC-Patients: {filtered}/{scanned} oncology-relevant cases extracted.")
     return results
 
 

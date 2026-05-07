@@ -738,3 +738,10 @@ Our approach:
 The key insight: for structured clinical case generation, prompt engineering + combinatorial diversity > raw model size. 🧠
 
 #AMDHackathon #OncoAgent #SyntheticData #AI #HealthTech #BuildInPublic #OpenSource
+
+### POST 3: X/TWITTER (Tone: Casual / Troubleshooting)
+😅 Just survived an IterableDataset streaming nightmare. Lesson learned: `len(dataset)` will crash your pipeline if you're streaming massive HuggingFace datasets like PMC-Patients. 
+
+Swapped to manual counters and both Phase 1 (real data) and Phase 2 (dual-key synthetic generation) are now running smoothly in the background. The 100K race is ON! 🏁
+
+#AMDHackathon #Debugging #Python #MachineLearning #BuildInPublic

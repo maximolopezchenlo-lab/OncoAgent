@@ -226,3 +226,5 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 - 50 plantillas rotativas + few-shot dinámico + validación inline (schema, longitud, staging, dedup SHA-256)
 
 **Scripts:** `download_hf_datasets.py`, `synthetic_generator.py`, `dataset_builder.py`, `train_specialist.py`
+
+**Estado de Ejecución:** Se resolvió un bug de excepción `len()` y de agotamiento de memoria implementando `streaming=True` correctamente para iterar sobre datasets masivos de HuggingFace (ej. PMC-Patients). Tanto la Fase 1 (filtrado de datos reales) como la Fase 2 (generación sintética paralela multi-cuenta) han sido lanzadas exitosamente y se encuentran ejecutándose de forma concurrente en segundo plano.
