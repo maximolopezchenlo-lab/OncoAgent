@@ -103,6 +103,16 @@ button.secondary:hover, button[variant="secondary"]:hover {
     background: #334155 !important;
 }
 
+/* ── Dropdown / Form Options Fix ─────────────────────────────────────── */
+ul.options, .options, .options-wrap {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    z-index: 999 !important;
+}
+ul.options li.selected, ul.options li:hover, .options li.selected, .options li:hover {
+    background-color: #334155 !important;
+}
+
 /* ── Cards ───────────────────────────────────────────────────────────── */
 .card {
     background: #1e293b !important;
