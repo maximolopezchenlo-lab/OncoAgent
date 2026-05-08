@@ -11,3 +11,14 @@ Hoy logramos avances gigantes en dos frentes críticos para el #AMDHackathon:
 ¡Atentos que ahora iniciamos la fase de entrenamiento de 5 horas! 🛠️🔬
 
 #HealthTech #ROCm #AIinMedicine #BuildInPublic #OpenSource
+
+
+🚀 ¡Desbloqueando todo el poder de la MI300X! 🚀
+
+1️⃣ Rompiendo Límites: ¡Acabamos de lanzar nuestro modelo Qwen 3.5 9B sobre el dataset clínico completo de más de 240k registros! 🤯 Sin límites de pasos. Estamos dejando que el modelo absorba completamente las guías médicas durante 3 épocas.
+2️⃣ Matemáticas y Escala: Procesar tanta información toma tiempo (~62 horas por época), pero gracias a la potencia pura de la AMD MI300X y la optimización nativa de ROCm, mantenemos un ritmo estable de 14-16s por iteración con un batch size efectivo de 16. ⚡
+3️⃣ Checkpoints Inteligentes: Guardamos los pesos cada 2 horas, así podemos extraer la versión más capaz del modelo justo para el cierre del hackathon. ⏱️
+
+#FailOfTheDay: Al principio creímos que procesar 240k registros tomaría 2 horas... ¡las matemáticas fallan cuando hay emoción! En su lugar, ajustamos nuestra estrategia de checkpoints. 😅
+
+#AMDHackathon #HealthTech #ROCm #MachineLearning
