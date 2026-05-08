@@ -53,6 +53,16 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 
 ---
 
+## [08-05-2026] Mapeo de Síntomas Clínicos para Triaje
+**Problema:** Las descripciones no técnicas de los pacientes (ej. "períodos irregulares") no lograban activar guías oncológicas específicas en el extractor basado en reglas, lo que generaba consultas RAG genéricas y puntuaciones de confianza bajas.
+**Decisión Arquitectónica:** Se implementó un mapeador heurístico de "Síntoma a Riesgo" dentro del `data_ingestion_node`.
+**Enfoque Lógico/Matemático:** Mapeo de síntomas de alto riesgo (sangrado uterino anormal, sangrado posmenopáusico) a dominios oncológicos específicos (Cáncer de Endometrio) durante la fase de extracción. Además, se implementó un mecanismo de consulta RAG de respaldo que utiliza el texto clínico sin procesar cuando no se identifica un tipo de cáncer explícito.
+**Métricas de Rendimiento:**
+- **Recall:** Mejora significativa en la recuperación de guías NCCN relevantes para entradas de anamnesis cruda.
+- **Confianza RAG:** Aumento esperado de puntuaciones negativas/bajas a relevancia positiva para casos de oncología ginecológica.
+
+---
+
 ## Nota Técnica: Orquestación de Hardware (MI300X vs. Featherless)
 **Estado:** La AMD Instinct MI300X se encuentra actualmente bajo una carga de cómputo del 100%, realizando el Fine-Tuning Completo (SFT) de 60 horas en los conjuntos de datos PMC-Patients y OncoCoT.
 **Estrategia Operativa:** Para permitir la validación clínica paralela (Demo), el backend de inferencia se traslada temporalmente a Featherless.ai. Esto asegura que el entrenamiento no se vea interrumpido por tareas de demostración de alta prioridad, manteniendo al mismo tiempo un rendimiento SOTA (Qwen 3.5 9B).

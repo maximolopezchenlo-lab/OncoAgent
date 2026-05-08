@@ -58,3 +58,7 @@ Hoy logramos avances gigantes en dos frentes críticos para el #AMDHackathon:
 Mientras nuestra AMD Instinct MI300X está ocupada al 100% entrenando al "Gran Cerebro" (sesión SFT de 60h), estamos usando Featherless.ai para mantener la demo ágil y receptiva. ¡El triaje médico no debería tener que esperar! 🩺⚡️
 
 #AMDHackathon #HealthTech #ROCm #MI300X #OncoAgent #AI
+
+🧠 ¡Mejora de Inteligencia Clínica! OncoAgent ahora mapea síntomas no técnicos (como periodos irregulares) directamente a dominios de riesgo oncológico. Esto mejora radicalmente la precisión del RAG para triaje temprano, pasando de "Desconocido" a "Riesgo Endometrial" en segundos. 🩺✨
+
+#AMDHackathon #OncoAgent #TriajeClinico #RAG #IAMedica

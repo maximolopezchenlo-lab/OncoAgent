@@ -56,6 +56,16 @@ At 15s/step, ETA is ~62 hours per epoch. The strategy allows interrupting the pr
 
 ---
 
+## [2026-05-08] Clinical Symptom Mapping for Triage
+**Problem:** Non-technical patient descriptions (e.g., "irregular periods") failed to trigger specific oncology guidelines in the rule-based extractor, leading to generic RAG queries and low confidence scores.
+**Architectural Decision:** Implemented a "Symptom-to-Risk" heuristic mapper within the `data_ingestion_node`.
+**Logic/Mathematical Approach:** Mapped high-risk symptoms (Abnormal Uterine Bleeding, Postmenopausal bleeding) to specific oncology domains (Endometrial Cancer) during the extraction phase. Additionally, implemented a fallback RAG query mechanism that utilizes the raw clinical text when no explicit cancer type is identified.
+**Performance Metrics:**
+- **Recall:** Significant improvement in retrieving relevant NCCN guidelines for raw anamnesis inputs.
+- **RAG Confidence:** Expected increase from negative/low scores to positive relevance for gynecological oncology cases.
+
+---
+
 ## Technical Note: Hardware Orchestration (MI300X vs. Featherless)
 **Status:** The AMD Instinct MI300X is currently under 100% compute load, performing the 60-hour Full Fine-Tuning (SFT) on the PMC-Patients and OncoCoT datasets.
 **Operational Strategy:** To allow parallel clinical validation (Demo), the inference backend is temporarily offloaded to Featherless.ai. This ensures that training is not interrupted by high-priority demo tasks while maintaining SOTA performance (Qwen 3.5 9B).

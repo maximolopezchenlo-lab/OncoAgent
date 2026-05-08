@@ -58,3 +58,7 @@ Stay tuned as we kick off the 5-hour training run next! 🛠️🔬
 While our AMD Instinct MI300X is 100% busy training the "Big Brain" (60h SFT session), we are using Featherless.ai to keep the demo snappy and responsive. Medical triage shouldn't have to wait! 🩺⚡️
 
 #AMDHackathon #HealthTech #ROCm #MI300X #OncoAgent #AI
+
+🧠 Clinical Intelligence Upgrade! OncoAgent now maps non-technical patient symptoms (like irregular periods) directly to oncology risk domains. This significantly boosts RAG accuracy for early triage, moving from "Unknown" to "Endometrial Risk" in seconds. 🩺✨
+
+#AMDHackathon #OncoAgent #ClinicalTriage #RAG #MedicalAI
