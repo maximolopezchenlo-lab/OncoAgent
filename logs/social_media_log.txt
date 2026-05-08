@@ -1000,3 +1000,14 @@ Failure of the day: The original glassmorphism CSS looked more "gaming dashboard
 Design system generated with ui-ux-pro-max and validated with Playwright screenshots.
 
 #AMDHackathon #HealthTech #OncoAgent #BuildInPublic #UIDesign #WCAG #Accessibility
+
+---
+
+Fixed a sneaky tokenization bug that crashed our MI300X training run today. 
+
+What happened: DataCollatorForLanguageModeling threw a dimension mismatch on nested `labels`.
+The Fix: Never copy `input_ids` to `labels` manually if you aren't padding them yourself. Let HuggingFace's DataCollator handle the -100 padding automatically!
+
+Also finally hard-rebooted the Gradio UI server to deploy the latest clinical dashboard design.
+
+#AMDHackathon #HealthTech #MachineLearning #Debugging #ROCm

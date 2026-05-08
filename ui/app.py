@@ -44,16 +44,64 @@ ICONS: Dict[str, str] = {
 # Custom CSS — Clinical Dark Theme
 # Design System: Figtree/Inter, Slate-900 bg, Sky-500 accent, WCAG AA+
 # ---------------------------------------------------------------------------
-CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+# Google Fonts loaded via HTML <link> tag (Gradio 6 blocks @import in CSS)
+FONTS_LINK = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">' 
 
+CSS = """
 /* ── Base ────────────────────────────────────────────────────────────── */
-body, .gradio-container {
+:root {
+    --shadow-drop: none !important;
+    --shadow-drop-lg: none !important;
+    --shadow-inset: none !important;
+    --block-shadow: none !important;
+    --container-shadow: none !important;
+    --body-background-fill: #0f172a !important;
+    --background-fill-primary: #0f172a !important;
+}
+
+html, body, gradio-app { 
+    background-color: #0f172a !important; 
+    background-image: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.gradio-container, .main, .wrap, .contain,
+.gradio-container > div, footer, #__next, #app, main {
     background: #0f172a !important;
+    background-color: #0f172a !important;
+    background-image: none !important;
     color: #e2e8f0 !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    box-shadow: none !important;
 }
-.gradio-container { max-width: 1440px !important; }
+.gradio-container {
+    max-width: 1440px !important;
+    overflow-x: hidden !important;
+    margin: 0 auto !important;
+    border: none !important;
+}
+/* Kill any white bleed outside container */
+* { box-sizing: border-box; }
+
+/* Force dark on ALL Gradio internal wrappers */
+.gr-group, .gr-block, .gr-box, .gr-panel, .gr-form,
+.block, .wrap, .panel, form, .gap, .gr-padded,
+[class*="svelte-"], .tabitem, .tab-content {
+    background: transparent !important;
+    border-color: #334155 !important;
+}
+
+/* Secondary / default buttons */
+button.secondary, button[variant="secondary"],
+.gr-button-secondary, button:not(.btn-primary):not(.selected) {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+}
+button.secondary:hover, button[variant="secondary"]:hover {
+    background: #334155 !important;
+}
 
 /* ── Cards ───────────────────────────────────────────────────────────── */
 .card {
@@ -201,16 +249,29 @@ body, .gradio-container {
 .telemetry-status { font-size: 0.65rem; color: #10b981; }
 
 /* ── Tabs ────────────────────────────────────────────────────────────── */
-.tab-nav button {
+.tab-nav button, .tabs button, button[role="tab"],
+[class*="tab"] button {
     font-family: 'Inter', sans-serif !important;
     font-weight: 500 !important;
     color: #94a3b8 !important;
+    background: transparent !important;
     border: none !important;
+    border-bottom: 2px solid transparent !important;
     transition: color 0.15s ease-out !important;
+    cursor: pointer !important;
 }
-.tab-nav button.selected {
+.tab-nav button.selected, .tabs button.selected,
+button[role="tab"][aria-selected="true"],
+button[role="tab"].selected {
     color: #0ea5e9 !important;
     border-bottom: 2px solid #0ea5e9 !important;
+    background: transparent !important;
+}
+.tabitem, .tab-content, [class*="tabitem"] {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    border-top: none !important;
+    border-radius: 0 0 12px 12px !important;
 }
 
 /* ── Input Fields ────────────────────────────────────────────────────── */
@@ -403,9 +464,10 @@ theme = gr.themes.Soft(
 # ---------------------------------------------------------------------------
 # UI Layout
 # ---------------------------------------------------------------------------
-with gr.Blocks(theme=theme, css=CSS, title="OncoAgent — Clinical Triage") as demo:
+with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
 
-    # ── Header ───────────────────────────────────────────────────────
+    # ── Font Loader + Header ────────────────────────────────────────
+    gr.HTML(FONTS_LINK)
     gr.HTML(
         "<div class='header-bar'>"
         "<span class='brand-name'>OncoAgent</span>"
@@ -419,7 +481,7 @@ with gr.Blocks(theme=theme, css=CSS, title="OncoAgent — Clinical Triage") as d
 
             # Session Controls
             with gr.Column(elem_classes="card"):
-                gr.HTML(f"<div class='section-title'>{ICONS['patient']} Session</div>")
+                gr.HTML("<div class='section-title'>Session</div>")
                 patient_id_input = gr.Textbox(
                     label="Patient ID",
                     value=generate_patient_id,
@@ -435,7 +497,7 @@ with gr.Blocks(theme=theme, css=CSS, title="OncoAgent — Clinical Triage") as d
 
             # Clinical Input
             with gr.Column(elem_classes="card"):
-                gr.HTML(f"<div class='section-title'>{ICONS['edit']} Clinical Case</div>")
+                gr.HTML("<div class='section-title'>Clinical Case</div>")
                 case_input = gr.Textbox(
                     placeholder="Enter clinical notes, pathology reports, or genomic variants...",
                     lines=8,
@@ -445,14 +507,14 @@ with gr.Blocks(theme=theme, css=CSS, title="OncoAgent — Clinical Triage") as d
                 with gr.Row():
                     clear_btn = gr.Button("Clear", variant="secondary")
                     triage_btn = gr.Button(
-                        "Run Triage",
+                        "Send to OncoAgent",
                         elem_classes="btn-primary",
                         variant="primary",
                     )
 
             # Telemetry
             with gr.Column(elem_classes="card"):
-                gr.HTML(f"<div class='section-title'>{ICONS['cpu']} System Telemetry</div>")
+                gr.HTML("<div class='section-title'>System Telemetry</div>")
                 monitor_html = gr.HTML(get_system_stats())
                 refresh_btn = gr.Button(
                     "Refresh",
@@ -487,10 +549,9 @@ with gr.Blocks(theme=theme, css=CSS, title="OncoAgent — Clinical Triage") as d
 
             # Results
             with gr.Column(elem_classes="card"):
-                gr.HTML(f"<div class='section-title'>{ICONS['shield']} Analysis Results</div>")
+                gr.HTML("<div class='section-title'>Analysis Results</div>")
                 output_summary = gr.Markdown(
-                    "Waiting for clinical input. The system will process through "
-                    "Router, Retrieval, Specialist, and Safety Audit stages."
+                    "Awaiting clinical input. System will process through triage stages."
                 )
                 status_box = gr.Markdown(
                     "<div class='status-bar'>System ready.</div>",
@@ -501,15 +562,15 @@ with gr.Blocks(theme=theme, css=CSS, title="OncoAgent — Clinical Triage") as d
             with gr.Tabs(elem_classes="card"):
                 with gr.Tab(f"Guidelines"):
                     output_sources = gr.Markdown(
-                        "Evidence from NCCN and ESMO clinical guidelines will appear here."
+                        "NCCN and ESMO guideline evidence will appear here."
                     )
                 with gr.Tab("Knowledge Graph"):
                     output_graph = gr.Markdown(
-                        "Clinical knowledge graph connections will appear here."
+                        "Knowledge graph connections will appear here."
                     )
                 with gr.Tab("API Evidence"):
                     output_api = gr.Markdown(
-                        "Live data from CIViC and ClinicalTrials.gov will appear here."
+                        "Real-time data from CIViC and ClinicalTrials.gov will appear here."
                     )
 
     # ── Interaction Logic ─────────────────────────────────────────────
@@ -581,4 +642,6 @@ if __name__ == "__main__":
         server_name="0.0.0.0",
         server_port=7860,
         share=False,
+        theme=theme,
+        css=CSS,
     )

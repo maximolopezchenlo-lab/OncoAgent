@@ -176,8 +176,8 @@ def tokenize_dataset(
             max_length=max_length,
             padding=False,
         )
-        # Labels = input_ids for causal LM (Trainer handles shifting internally)
-        tokenized["labels"] = tokenized["input_ids"].copy()
+        # DataCollatorForLanguageModeling automatically handles creating labels
+        # padded with -100, so we don't need to manually copy input_ids here.
         return tokenized
 
     result = dataset.map(

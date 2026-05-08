@@ -405,3 +405,9 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 *   **Decisión Arquitectónica:** Reescritura completa de la UI usando un sistema de diseño generado por `ui-ux-pro-max` (perfil healthcare/dashboard). Se adoptó el estilo "Accessible & Ethical" (WCAG AA+), se reemplazaron todos los emojis por SVG inline (estilo Lucide) y se impuso un estilo de copy clínico limpio.
 *   **Enfoque Lógico:** Se aplicó la combinación tipográfica Figtree/Inter para legibilidad médica. Se introdujo un tema oscuro estructurado (Slate-900 base, Sky-500 acento) con clases CSS semánticas (`card`, `kpi-tile`, `telemetry-grid`). La telemetría de hardware se movió de tabla Markdown a un grid HTML responsive. Transiciones limitadas a 200ms según las guías de animación de `ui-ux-pro-max`. Se incluyó media query `prefers-reduced-motion`.
 *   **Métricas:** Cero uso de emojis. Ratios de contraste WCAG AA en todos los textos (4.5:1+ para cuerpo, 3:1+ para texto grande). Focus-visible en todos los elementos interactivos.
+
+### [Hito Hardware/Entrenamiento: Corrección de QLoRA Data Collation] - 2026-05-08
+*   **Problema:** El `DataCollatorForLanguageModeling` abortó el entrenamiento en el droplet MI300X con un error `ValueError: Unable to create tensor`, provocado al intentar proporcionar manualmente `labels` anidadas durante la tokenización sin un padding explícito.
+*   **Decisión Arquitectónica:** Se eliminó la copia manual de `labels` en `tokenize_dataset`.
+*   **Enfoque Lógico:** `DataCollatorForLanguageModeling` maneja el padding dinámico de `input_ids` y automáticamente crea `labels` con padding `-100` para Causal LM si no se proporcionan. Al delegar esto, evitamos discrepancias de dimensiones y errores de anidamiento excesivo.
+*   **Métricas de Rendimiento:** El script fue parcheado, sincronizado y reiniciado exitosamente en el droplet. El trainer ahora construye tensores en lotes uniformes correctamente.
