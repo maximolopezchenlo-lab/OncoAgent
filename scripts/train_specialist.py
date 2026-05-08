@@ -79,7 +79,7 @@ TIER_CONFIGS: Dict[int, TierConfig] = {
         batch_size=8,               # Proven ~16s/step throughput on MI300X with Unsloth
         gradient_accumulation=2,    # Effective batch = 16
         learning_rate=2e-4,
-        num_epochs=1,               # Will use max_steps=1125 for ~5h target
+        num_epochs=3,               # Maximize clinical knowledge retention within ~2.5h on MI300X
         save_steps=500,
     ),
     2: TierConfig(
