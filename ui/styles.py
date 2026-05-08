@@ -132,44 +132,47 @@ html, body, gradio-app {
 }
 .card:hover { border-color: #475569 !important; }
 
-/* ── Chat Input Row & Buttons ────────────────────────────────────────── */
-.chat-input-row {
+/* ── Chat Input Integrated ────────────────────────────────────────── */
+.chat-input-integrated {
     background: #1e293b !important;
     border: 1px solid #334155 !important;
-    border-radius: 24px !important;
-    padding: 8px 12px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
+    border-radius: 28px !important;
+    padding: 4px 6px !important;
     margin-top: 10px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
 }
-.chat-input-row .gr-box, .chat-input-row textarea, .chat-input-row input {
+.chat-input-integrated textarea, .chat-input-integrated input {
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
+    padding: 12px 16px !important;
 }
 
-.btn-send {
+/* Internal Textbox Button (Gradio 6 'submit_btn' param) */
+.gr-textbox button {
     background: #0ea5e9 !important;
     color: #ffffff !important;
-    border-radius: 12px !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
     padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    font-size: 1.1rem !important;
+    font-size: 1.2rem !important;
+    font-weight: bold !important;
     border: none !important;
     cursor: pointer !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3) !important;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4) !important;
+    margin-right: 8px !important;
+    align-self: center !important;
 }
-.btn-send:hover {
-    transform: translateY(-2px) !important;
+.gr-textbox button:hover {
+    transform: scale(1.1) !important;
     background: #38bdf8 !important;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4) !important;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.6) !important;
 }
 
 
@@ -388,25 +391,29 @@ textarea:focus, input[type="text"]:focus {
     box-shadow: none !important;
 }
 .message {
-    padding: 14px 18px !important;
-    border-radius: 14px !important;
-    margin-bottom: 10px !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
-    background: rgba(30, 41, 59, 0.55) !important;
+    padding: 16px 20px !important;
+    border-radius: 18px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background: rgba(30, 41, 59, 0.45) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    line-height: 1.6 !important;
-    font-size: 0.92rem !important;
+    line-height: 1.7 !important;
+    font-size: 0.94rem !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
 }
 .message.user {
-    background: rgba(14, 165, 233, 0.08) !important;
-    border-color: rgba(14, 165, 233, 0.18) !important;
+    background: rgba(14, 165, 233, 0.06) !important;
+    border-color: rgba(14, 165, 233, 0.15) !important;
     border-bottom-right-radius: 4px !important;
+    margin-left: 20% !important;
 }
 .message.bot {
-    background: rgba(30, 41, 59, 0.55) !important;
-    border-color: rgba(51, 65, 85, 0.4) !important;
+    background: rgba(30, 41, 59, 0.45) !important;
+    border-color: rgba(51, 65, 85, 0.3) !important;
     border-bottom-left-radius: 4px !important;
+    margin-right: 15% !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* ── Status Bar ──────────────────────────────────────────────────────── */

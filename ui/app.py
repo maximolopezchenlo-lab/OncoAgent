@@ -251,22 +251,18 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
                     show_label=False,
                     elem_classes="gr-chatbot",
                     height=620,
-                    type="tuples",
                 )
-                with gr.Row(elem_classes="chat-input-row"):
-                    case_input = gr.Textbox(
-                        placeholder="Describe the clinical case or ask a follow-up question...",
-                        show_label=False,
-                        container=False,
-                        scale=8,
-                    )
-                    triage_btn = gr.Button(
-                        "↑", variant="primary", elem_classes="btn-send", min_width=44, scale=1
-                    )
+                case_input = gr.Textbox(
+                    placeholder="Describe the clinical case or ask a follow-up question...",
+                    show_label=False,
+                    container=False,
+                    submit_btn="↑",
+                    elem_classes="chat-input-integrated"
+                )
 
     # ── Interaction Logic (Streaming) ─────────────────────────────────
     def process_and_stream(
-        history: List[List[str]], text: str, pid: str, tier: str,
+        history: List[Dict[str, str]], text: str, pid: str, tier: str,
     ):
         """Stream triage results to UI, updating step-by-step."""
         if not text.strip():
@@ -276,7 +272,10 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
             )
             return
 
-        history = history + [[text, None]]
+        history = history + [
+            {"role": "user", "content": text},
+            {"role": "assistant", "content": ""},
+        ]
 
         # Show immediate loading state
         yield (
@@ -295,7 +294,7 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
             if node_name == "done":
                 break
             if node_name == "error":
-                history[-1][1] = f"**Error:** {progress}"
+                history[-1]["content"] = f"**Error:** {progress}"
                 yield (
                     history, "", "—", "—", "", "", "",
                     f"<div class='status-bar'>{progress}</div>",
@@ -304,7 +303,7 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
 
             label = NODE_LABELS.get(node_name, node_name)
             status_html = f"<div class='status-bar'><span class='node-step active'>{label}</span></div>"
-            history[-1][1] = f"*Processing: {label}...*"
+            history[-1]["content"] = f"*Processing: {label}...*"
             yield (
                 history, "", "—", "—",
                 "Retrieving NCCN/ESMO guidelines...",
@@ -315,7 +314,7 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
 
         # Final render
         final_md = format_final_response(accumulated)
-        history[-1][1] = final_md
+        history[-1]["content"] = final_md
 
         sources_md, graph_md, api_md = extract_evidence(accumulated)
 
@@ -339,7 +338,6 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
     ]
     inputs = [chatbot, case_input, patient_id_input, tier_override_input]
 
-    triage_btn.click(fn=process_and_stream, inputs=inputs, outputs=outputs)
     case_input.submit(fn=process_and_stream, inputs=inputs, outputs=outputs)
 
     new_session_btn.click(

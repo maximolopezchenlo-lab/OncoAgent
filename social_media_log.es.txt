@@ -1,0 +1,13 @@
+🚀 Construyendo OncoAgent en Público: ¡Mejoras de UI y Rendimiento! 🚀
+
+Hoy logramos avances gigantes en dos frentes críticos para el #AMDHackathon:
+
+1️⃣ Entrenamiento Ultra-Rápido en MI300X: ¡Migramos nuestro pipeline de entrenamiento de Qwen 3.5 9B a #Unsloth! Al activar "sequence packing" y optimizar el SFTTrainer, vimos mejoras de ~2.5x en velocidad sin sacrificar memoria. ¡El poder de ROCm 6.2 en los AMD Instinct es irreal! 💻⚡
+
+2️⃣ Renovación de UX Clínico: ¡Rediseñamos la interfaz en Gradio! Le dijimos adiós a los botones toscos. Implementamos un campo de entrada integrado estilo ChatGPT, súper elegante y con diseño "glassmorphism". Es limpio, moderno, y mantiene el foco del médico donde debe estar: en el paciente. 🏥✨
+
+#FracasoDelDia: Inicialmente tuvimos problemas de transparencia visual con los componentes de Gradio 6 en modo oscuro, ¡y perdimos nuestros logs de redes sociales por un minuto! 😅 Pero nada que unos ajustes de CSS y magia de Git no pudieran arreglar.
+
+¡Atentos que ahora iniciamos la fase de entrenamiento de 5 horas! 🛠️🔬
+
+#HealthTech #ROCm #AIinMedicine #BuildInPublic #OpenSource

@@ -1,17 +1,17 @@
 """
-OncoAgent — QLoRA Fine-Tuning Script for Dual-Tier Qwen Architecture.
+OncoAgent — QLoRA Fine-Tuning Script (Unsloth-Accelerated).
 
-Trains a LoRA adapter on the combined real + synthetic oncology corpus
-using 4-bit NormalFloat4 quantization (bitsandbytes) on AMD MI300X (ROCm).
-Supports Dual-Tier: Tier 1 (Qwen 3.5 9B) and Tier 2 (Qwen 3.6 27B).
+Uses Unsloth's FastLanguageModel for 2x faster training with 60% less VRAM
+on AMD Instinct MI300X (ROCm). 4-bit NF4 quantization via bitsandbytes.
 
 Key features:
+  - Unsloth-optimized kernels for Attention + Loss computation
   - Tier-adaptive hyperparameters (batch size, LoRA rank, seq length)
   - Automatic checkpoint resume on crash recovery
   - Eval split monitoring to detect overfitting
   - Training metadata saved for reproducibility audits
 
-Hardware Target: AMD Instinct MI300X via ROCm 7.2.
+Hardware Target: AMD Instinct MI300X (gfx942) via ROCm 7.0 + HIP.
 Rule Compliance: #3 (Qwen 3.5/3.6, format ChatML), #14 (QLoRA + bitsandbytes + PEFT),
                  #22 (reproducibility seeds), #24 (.env), #26 (type hints).
 """
@@ -21,24 +21,23 @@ import json
 import os
 import time
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
+
+# ── Critical AMD MI300X Environment ─────────────────────────────────────────
+# Must be set BEFORE any ROCm/HIP library is invoked.
+os.environ["HSA_OVERRIDE_GFX_VERSION"] = "9.4.2"
+os.environ["HF_HUB_DISABLE_XET"] = "1"
+
+from dotenv import load_dotenv
+load_dotenv()
 
 import torch
 from datasets import Dataset
-from dotenv import load_dotenv
-from peft import LoraConfig, get_peft_model, TaskType
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    BitsAndBytesConfig,
-    TrainingArguments,
-    Trainer,
-    DataCollatorForLanguageModeling,
-    EarlyStoppingCallback,
-)
 
-load_dotenv()
+# Unsloth MUST be imported before trl to apply monkey-patches correctly
+from unsloth import FastLanguageModel
+from trl import SFTTrainer, SFTConfig
 
 # ── Reproducibility (Rule #22) ──────────────────────────────────────────────
 SEED: int = 42
@@ -77,10 +76,10 @@ TIER_CONFIGS: Dict[int, TierConfig] = {
         lora_r=16,
         lora_alpha=32,
         max_seq_length=2048,
-        batch_size=4,               # 9B fits larger batches in 192GB
-        gradient_accumulation=4,    # Effective batch = 16
+        batch_size=8,               # Proven ~16s/step throughput on MI300X with Unsloth
+        gradient_accumulation=2,    # Effective batch = 16
         learning_rate=2e-4,
-        num_epochs=3,
+        num_epochs=1,               # Will use max_steps=1125 for ~5h target
         save_steps=500,
     ),
     2: TierConfig(
@@ -88,10 +87,10 @@ TIER_CONFIGS: Dict[int, TierConfig] = {
         lora_r=32,                  # Higher rank for 27B capacity
         lora_alpha=64,
         max_seq_length=2048,
-        batch_size=2,               # 27B needs smaller micro-batch
-        gradient_accumulation=8,    # Effective batch = 16
+        batch_size=4,               # 27B needs smaller micro-batch
+        gradient_accumulation=4,    # Effective batch = 16
         learning_rate=1e-4,         # Lower LR for larger model stability
-        num_epochs=3,
+        num_epochs=1,
         save_steps=250,             # More frequent checkpoints for 27B
     ),
 }
@@ -101,7 +100,7 @@ OUTPUT_DIR: str = os.path.join("models", "oncoagent_adapters")
 TRAIN_FILE: str = os.path.join("data", "final", "train_oncoagent.jsonl")
 EVAL_FILE: str = os.path.join("data", "final", "train_oncoagent_eval.jsonl")
 
-LORA_DROPOUT: float = 0.05
+LORA_DROPOUT: float = 0.0  # Unsloth optimized: 0 dropout for speed
 LORA_TARGET_MODULES: List[str] = [
     "q_proj", "k_proj", "v_proj", "o_proj",
     "gate_proj", "up_proj", "down_proj",
@@ -152,116 +151,65 @@ def load_jsonl_dataset(path: str, label: str = "data") -> Dataset:
     return Dataset.from_dict({"text": texts})
 
 
-# ── Tokenization ────────────────────────────────────────────────────────────
-
-def tokenize_dataset(
-    dataset: Dataset,
-    tokenizer: AutoTokenizer,
-    max_length: int,
-) -> Dataset:
-    """Tokenize the dataset for causal language modeling.
-
-    Args:
-        dataset: Raw text dataset.
-        tokenizer: The model tokenizer.
-        max_length: Maximum sequence length.
-
-    Returns:
-        Tokenized dataset with input_ids, attention_mask, and labels.
-    """
-    def _tokenize(examples: Dict) -> Dict:
-        tokenized = tokenizer(
-            examples["text"],
-            truncation=True,
-            max_length=max_length,
-            padding="max_length",
-        )
-        # DataCollatorForLanguageModeling automatically handles creating labels
-        # padded with -100, so we don't need to manually copy input_ids here.
-        return tokenized
-
-    result = dataset.map(
-        _tokenize,
-        batched=True,
-        remove_columns=dataset.column_names,
-        desc="Tokenizing",
-    )
-
-    # Log token length distribution
-    lengths = [len(ids) for ids in result["input_ids"]]
-    avg_len = sum(lengths) / len(lengths) if lengths else 0
-    max_len = max(lengths) if lengths else 0
-    logger.info(
-        f"✅ Tokenized {len(result):,} samples "
-        f"(avg={avg_len:.0f}, max={max_len}, cap={max_length})"
-    )
-    return result
-
-
-# ── Model Setup ─────────────────────────────────────────────────────────────
+# ── Model Setup (Unsloth) ──────────────────────────────────────────────────
 
 def setup_model_and_tokenizer(
     config: TierConfig,
 ) -> tuple:
-    """Load the base model with 4-bit quantization and apply LoRA.
+    """Load model with Unsloth's FastLanguageModel (4-bit, LoRA-ready).
 
     Args:
         config: The tier-specific configuration.
 
     Returns:
-        Tuple of (model, tokenizer, peft_config).
+        Tuple of (model, tokenizer).
     """
+    # FastLanguageModel imported at module level
+
     hf_token: Optional[str] = os.getenv("HF_TOKEN")
 
-    # 4-bit quantization config (Rule #14)
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.bfloat16,
-        bnb_4bit_use_double_quant=True,
-    )
-
-    logger.info(f"📦 Loading base model: {config.model_id}")
-    logger.info(f"   Device: {os.getenv('DEVICE', 'cuda')} (ROCm maps cuda→hip)")
-    logger.info(f"   Quantization: 4-bit NormalFloat4 (double quant)")
+    logger.info(f"📦 Loading model via Unsloth: {config.model_id}")
+    logger.info(f"   Device: cuda (ROCm maps cuda→hip, gfx942 via HSA_OVERRIDE)")
+    logger.info(f"   Quantization: 4-bit NF4 (Unsloth managed)")
     logger.info(f"   LoRA rank: {config.lora_r}, alpha: {config.lora_alpha}")
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        config.model_id,
+    # Unsloth handles quantization, model loading, and optimization in one call
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=config.model_id,
+        max_seq_length=config.max_seq_length,
+        load_in_4bit=True,
         token=hf_token,
-        trust_remote_code=True,
     )
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(
-        config.model_id,
-        quantization_config=bnb_config,
-        device_map="auto",
-        token=hf_token,
-        trust_remote_code=True,
-        torch_dtype=torch.bfloat16,
-    )
-    model.config.use_cache = False
+    # Extract the actual tokenizer for pad_token setup
+    # Qwen3.5 returns a Qwen3VLProcessor wrapper
+    actual_tokenizer = tokenizer.tokenizer if hasattr(tokenizer, "tokenizer") else tokenizer
+    logger.info(f"   Tokenizer type: {type(tokenizer).__name__} → inner: {type(actual_tokenizer).__name__}")
+    logger.info(f"   EOS token: {actual_tokenizer.eos_token!r}")
 
-    # LoRA config — tier-adaptive rank
-    peft_config = LoraConfig(
-        task_type=TaskType.CAUSAL_LM,
+    if actual_tokenizer.pad_token is None:
+        actual_tokenizer.pad_token = actual_tokenizer.eos_token
+
+    # Apply LoRA via Unsloth's optimized path
+    model = FastLanguageModel.get_peft_model(
+        model,
         r=config.lora_r,
         lora_alpha=config.lora_alpha,
         lora_dropout=LORA_DROPOUT,
         target_modules=LORA_TARGET_MODULES,
         bias="none",
+        use_gradient_checkpointing="unsloth",  # Unsloth's 2x speedup
+        random_state=SEED,
     )
-    model = get_peft_model(model, peft_config)
 
-    trainable, total = model.get_nb_trainable_parameters()
+    trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total = sum(p.numel() for p in model.parameters())
     logger.info(
         f"🧠 LoRA applied: {trainable:,} trainable / {total:,} total "
         f"({100 * trainable / total:.2f}%)"
     )
 
-    return model, tokenizer, peft_config
+    return model, actual_tokenizer  # Return inner tokenizer for SFTTrainer compatibility
 
 
 # ── Training Metadata ───────────────────────────────────────────────────────
@@ -299,7 +247,7 @@ def _save_training_metadata(
         "duration_seconds": round(duration_seconds, 1),
         "duration_human": time.strftime("%Hh %Mm %Ss", time.gmtime(duration_seconds)),
         "hardware": "AMD Instinct MI300X (192GB HBM3)",
-        "framework": "ROCm 7.2 + bitsandbytes (NF4) + PEFT/LoRA",
+        "framework": "Unsloth 2026.5.2 + ROCm 7.0 + bitsandbytes (NF4) + PEFT/LoRA",
         "seed": SEED,
     }
     if final_metrics:
@@ -321,7 +269,7 @@ def train(
     max_steps: int = -1,
     resume: bool = False,
 ) -> str:
-    """Execute the full QLoRA training pipeline.
+    """Execute the Unsloth-accelerated QLoRA training pipeline.
 
     Args:
         tier: The architectural tier to train (1 for 9B, 2 for 27B).
@@ -331,32 +279,34 @@ def train(
     Returns:
         Path to the saved adapter directory.
     """
+    # SFTTrainer, SFTConfig imported at module level
+
     config = TIER_CONFIGS.get(tier)
     if not config:
         raise ValueError(f"Invalid tier: {tier}. Must be 1 or 2.")
 
-    logger.info(f"🚀 Starting OncoAgent QLoRA Training Pipeline (Tier {tier})")
+    logger.info(f"🚀 Starting OncoAgent Unsloth Training Pipeline (Tier {tier})")
     logger.info("=" * 60)
     logger.info(f"   Model:          {config.model_id}")
+    logger.info(f"   Engine:         Unsloth FastLanguageModel (2x speedup)")
     logger.info(f"   LoRA rank:      {config.lora_r}")
     logger.info(f"   Batch size:     {config.batch_size} × {config.gradient_accumulation} = {config.batch_size * config.gradient_accumulation}")
     logger.info(f"   Learning rate:  {config.learning_rate}")
     logger.info(f"   Epochs:         {config.num_epochs}")
     logger.info(f"   Seq length:     {config.max_seq_length}")
+    logger.info(f"   HSA_GFX:        {os.environ.get('HSA_OVERRIDE_GFX_VERSION', 'NOT SET')}")
     logger.info("=" * 60)
 
     # Setup
-    model, tokenizer, peft_config = setup_model_and_tokenizer(config)
+    model, tokenizer = setup_model_and_tokenizer(config)
     train_dataset = load_jsonl_dataset(TRAIN_FILE, "training")
-    tokenized_train = tokenize_dataset(train_dataset, tokenizer, config.max_seq_length)
 
     # Eval dataset (optional — graceful degradation if missing)
-    tokenized_eval: Optional[Dataset] = None
+    eval_dataset: Optional[Dataset] = None
     eval_samples: int = 0
     try:
         eval_dataset = load_jsonl_dataset(EVAL_FILE, "evaluation")
-        tokenized_eval = tokenize_dataset(eval_dataset, tokenizer, config.max_seq_length)
-        eval_samples = len(tokenized_eval)
+        eval_samples = len(eval_dataset)
     except FileNotFoundError:
         logger.warning("⚠️  Eval file not found — training without evaluation metrics")
 
@@ -378,52 +328,43 @@ def train(
         else:
             logger.warning("⚠️  --resume requested but no checkpoint found, starting fresh")
 
-    # Training arguments
-    training_args = TrainingArguments(
+    # SFTConfig = TrainingArguments + SFT-specific fields (trl >=0.14)
+    sft_config = SFTConfig(
         output_dir=tier_output_dir,
         num_train_epochs=config.num_epochs,
         per_device_train_batch_size=config.batch_size,
         gradient_accumulation_steps=config.gradient_accumulation,
         learning_rate=config.learning_rate,
         weight_decay=WEIGHT_DECAY,
-        warmup_ratio=WARMUP_RATIO,
+        warmup_steps=int(WARMUP_RATIO * (len(train_dataset) // (config.batch_size * config.gradient_accumulation))),
         lr_scheduler_type="cosine",
         logging_steps=10,
         max_steps=max_steps,
         save_steps=config.save_steps,
         save_total_limit=3,
-        fp16=True,
+        fp16=not torch.cuda.is_bf16_supported(),
+        bf16=torch.cuda.is_bf16_supported(),
         gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         max_grad_norm=MAX_GRAD_NORM,
         seed=SEED,
         report_to="none",
-        remove_unused_columns=False,
-        optim="paged_adamw_8bit",
-        # Eval integration
-        eval_strategy="steps" if tokenized_eval else "no",
-        eval_steps=config.save_steps if tokenized_eval else None,
-        load_best_model_at_end=True if tokenized_eval else False,
-        metric_for_best_model="eval_loss" if tokenized_eval else None,
-        greater_is_better=False if tokenized_eval else None,
+        optim="adamw_8bit",
+        # SFT-specific fields
+        max_length=config.max_seq_length,
+        packing=True,  # Pack multiple short samples into one sequence for ~2.5x throughput
+        dataset_text_field="text",
+        eos_token=None,  # Prevent EOS_TOKEN mismatch with Qwen3 tokenizers
+        # No eval during training — too slow for 5h target. Eval post-training.
+        eval_strategy="no",
     )
 
-    data_collator = DataCollatorForLanguageModeling(
-        tokenizer=tokenizer,
-        mlm=False,
-    )
-
-    # Callbacks
-    callbacks = []
-    if tokenized_eval:
-        callbacks.append(EarlyStoppingCallback(early_stopping_patience=3))
-
-    trainer = Trainer(
+    # SFTTrainer from trl — Unsloth patches this for 2x speed
+    trainer = SFTTrainer(
         model=model,
-        args=training_args,
-        train_dataset=tokenized_train,
-        eval_dataset=tokenized_eval,
-        data_collator=data_collator,
-        callbacks=callbacks,
+        processing_class=tokenizer,  # Inner tokenizer (not VLM processor) for packing compat
+        train_dataset=train_dataset,
+        args=sft_config,
     )
 
     # Train
@@ -441,7 +382,7 @@ def train(
     _save_training_metadata(
         output_dir=final_path,
         config=config,
-        train_samples=len(tokenized_train),
+        train_samples=len(train_dataset),
         eval_samples=eval_samples,
         duration_seconds=duration,
         final_metrics=train_result.metrics if train_result else None,
@@ -451,11 +392,11 @@ def train(
     logger.info("=" * 60)
     logger.info(f"🏁 TRAINING COMPLETE FOR TIER {tier} ({config.model_id})")
     logger.info(f"   Adapter saved to: {final_path}")
-    logger.info(f"   Train samples:    {len(tokenized_train):,}")
+    logger.info(f"   Train samples:    {len(train_dataset):,}")
     logger.info(f"   Eval samples:     {eval_samples:,}")
     logger.info(f"   Duration:         {time.strftime('%Hh %Mm %Ss', time.gmtime(duration))}")
     logger.info(f"   Final train loss: {train_result.metrics.get('train_loss', 'N/A')}")
-    if tokenized_eval:
+    if eval_dataset:
         eval_results = trainer.evaluate()
         logger.info(f"   Final eval loss:  {eval_results.get('eval_loss', 'N/A')}")
     logger.info("=" * 60)
@@ -470,7 +411,7 @@ def train(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="OncoAgent QLoRA Fine-Tuning (Dual-Tier Qwen Architecture)"
+        description="OncoAgent Unsloth QLoRA Fine-Tuning (Dual-Tier Qwen Architecture)"
     )
     parser.add_argument(
         "--tier",
