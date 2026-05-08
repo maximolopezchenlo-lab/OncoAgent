@@ -399,3 +399,9 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 *   **Decisión Arquitectónica:** Se implementó una interfaz de Gradio unificada con monitoreo telemétrico dinámico (estado MI300X) y retroalimentación de razonamiento agentico en tiempo real.
 *   **Enfoque Lógico:** Se realizó una prueba visual inyectando un caso clínico de cáncer de mama. Se verificó que el botón de triaje activa el grafo multi-agente (Router -> CRAG -> Specialist) y muestra el estado de procesamiento correctamente.
 *   **Métricas de Rendimiento:** Latencia de renderizado de la UI < 200ms. Se inició con éxito el flujo agéntico con actualizaciones de estado en tiempo real en el panel de "Agentic Reasoning & Output".
+
+### [Hito UI: Rediseño del Dashboard Clínico] - 2026-05-08
+*   **Problema:** La interfaz Gradio anterior usaba CSS Glassmorphism genérico, íconos emoji e inconsistencias en el copy (uso excesivo de "SOTA"). La calidad visual no reflejaba la sofisticación del backend multi-agente.
+*   **Decisión Arquitectónica:** Reescritura completa de la UI usando un sistema de diseño generado por `ui-ux-pro-max` (perfil healthcare/dashboard). Se adoptó el estilo "Accessible & Ethical" (WCAG AA+), se reemplazaron todos los emojis por SVG inline (estilo Lucide) y se impuso un estilo de copy clínico limpio.
+*   **Enfoque Lógico:** Se aplicó la combinación tipográfica Figtree/Inter para legibilidad médica. Se introdujo un tema oscuro estructurado (Slate-900 base, Sky-500 acento) con clases CSS semánticas (`card`, `kpi-tile`, `telemetry-grid`). La telemetría de hardware se movió de tabla Markdown a un grid HTML responsive. Transiciones limitadas a 200ms según las guías de animación de `ui-ux-pro-max`. Se incluyó media query `prefers-reduced-motion`.
+*   **Métricas:** Cero uso de emojis. Ratios de contraste WCAG AA en todos los textos (4.5:1+ para cuerpo, 3:1+ para texto grande). Focus-visible en todos los elementos interactivos.

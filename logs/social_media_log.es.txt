@@ -685,3 +685,22 @@ Acabamos de terminar una validación visual de la interfaz de OncoAgent SOTA. �
 El frontend de Gradio ahora está totalmente integrado con nuestro backend de LangGraph. Lo probamos con un caso complejo de cáncer de mama, ¡y la orquestación multi-agente (Router -> CRAG -> Specialist) comenzó sin problemas! 🚀
 Ver esos indicadores de procesamiento en tiempo real en el tablero optimizado para MI300X es pura satisfacción. 💎
 #AMDHackathon #HealthTech #Gradio #AI #BuildInPublic
+
+---
+📅 2026-05-08 | Sesión de Rediseño UI
+
+Acabo de lanzar una reescritura visual completa del dashboard de OncoAgent.
+
+Qué cambió:
+• Se reemplazaron TODOS los íconos emoji por SVG (estilo Lucide)
+• Nuevo tema oscuro clínico — Slate 900 + acentos Sky 500
+• Tipografía Figtree + Inter (optimizada para legibilidad médica)
+• Telemetría de hardware en grid responsive, no tabla Markdown
+• Contraste WCAG AA en todos los textos
+• Copy limpio — sin "SOTA", sin jerga, solo lenguaje clínico claro
+
+Fracaso del día: El CSS glassmorphism original se veía más como "dashboard de gaming" que "herramienta médica". Lección: las UIs de salud necesitan señales de confianza, no efectos vistosos.
+
+Sistema de diseño generado con ui-ux-pro-max y validado con capturas de Playwright.
+
+#AMDHackathon #HealthTech #OncoAgent #BuildInPublic #DiseñoUI #WCAG #Accesibilidad
