@@ -442,3 +442,15 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 - **Performance Metrics:** 
   - Prepared massive multi-source dataset (PMC-Patients, Asclepius, synthetic Qwen) with a combined 266,854 samples (hash: 9be1cc284e5e).
   - Verified concurrent execution: Both 9B and 27B models are actively loading into VRAM on a single MI300X GPU, validating the hypothesis that 4-bit NF4 quantization keeps total memory footprint well within the 192GB HBM3 limit.
+
+### [Hardware Issue Resolution: ROCm bf16 Detection] - 2026-05-07
+*   **Problem:** The dual-tier QLoRA fine-tuning process crashed immediately upon execution on the AMD Instinct MI300X instance. The error reported was .
+*   **Architectural Decision:** Despite MI300X hardware supporting bfloat16, the underlying PyTorch build in the provided ROCm environment evaluated  as False, causing HuggingFace Transformers to abort training.
+*   **Logical Approach:** We modified the  in  to use  instead of . This gracefully bypasses the framework's strict hardware capability check while maintaining high precision for the QLoRA weights.
+*   **Performance Metrics:** The script was patched, synced to the remote droplet, and both Tier 1 and Tier 2 training processes were successfully restarted in the background. The models are currently loading into memory.
+
+### [Hardware Issue Resolution: ROCm bf16 Detection] - 2026-05-07
+*   **Problem:** The dual-tier QLoRA fine-tuning process crashed immediately upon execution on the AMD Instinct MI300X instance. The error reported was `ValueError: Your setup doesn't support bf16/gpu`.
+*   **Architectural Decision:** Despite MI300X hardware supporting bfloat16, the underlying PyTorch build in the provided ROCm environment evaluated `torch.cuda.is_bf16_supported()` as False, causing HuggingFace Transformers to abort training.
+*   **Logical Approach:** We modified the `TrainingArguments` in `scripts/train_specialist.py` to use `fp16=True` instead of `bf16=True`. This gracefully bypasses the framework's strict hardware capability check while maintaining high precision for the QLoRA weights.
+*   **Performance Metrics:** The script was patched, synced to the remote droplet, and both Tier 1 and Tier 2 training processes were successfully restarted in the background. The models are currently loading into memory.

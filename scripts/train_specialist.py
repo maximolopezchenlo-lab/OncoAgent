@@ -392,7 +392,7 @@ def train(
         max_steps=max_steps,
         save_steps=config.save_steps,
         save_total_limit=3,
-        bf16=True,
+        fp16=True,
         gradient_checkpointing=True,
         max_grad_norm=MAX_GRAD_NORM,
         seed=SEED,

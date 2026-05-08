@@ -381,3 +381,15 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 - **Justificación Arquitectónica:** Estamos ejecutando una estrategia de fine-tuning QLoRA de Doble Nivel (Nivel 1: Qwen 3.5 9B para velocidad, Nivel 2: Qwen 3.6 27B para razonamiento profundo) utilizando cuantización de 4 bits NormalFloat4 (BitsAndBytes) y PEFT. Esto se alinea estrictamente con nuestras reglas arquitectónicas y se optimiza para la memoria HBM3 de 192GB de la AMD MI300X.
 - **Implementación Lógica/Técnica:** Se unificaron ~266k casos oncológicos reales y sintéticos (división 90% Entrenamiento / 10% Evaluación). Se inició el proceso de fine-tuning en un nuevo droplet remoto de GPU AMD MI300X.
 - **Métricas de Rendimiento:** Se preparó un dataset masivo de múltiples fuentes (PMC-Patients, Asclepius, sintéticos de Qwen) con un total de 266,854 muestras combinadas (hash: 9be1cc284e5e).
+
+### [Resolución de Error de Hardware: Detección bf16 en ROCm] - 2026-05-07
+*   **Problema:** El proceso de fine-tuning QLoRA de doble nivel falló inmediatamente al ejecutarse en la instancia AMD Instinct MI300X. El error reportado fue .
+*   **Decisión Arquitectónica:** A pesar de que el hardware MI300X soporta bfloat16, la compilación de PyTorch subyacente en el entorno ROCm evaluó  como False, causando que HuggingFace Transformers abortara el entrenamiento.
+*   **Enfoque Lógico:** Modificamos los  en  para usar  en lugar de . Esto elude elegantemente la verificación estricta de capacidad de hardware del framework mientras mantiene una alta precisión para los pesos de QLoRA.
+*   **Métricas de Rendimiento:** El script fue parcheado, sincronizado con el droplet remoto, y los procesos de entrenamiento del Nivel 1 y Nivel 2 fueron reiniciados con éxito en segundo plano. Los modelos se están cargando actualmente en memoria.
+
+### [Resolución de Error de Hardware: Detección bf16 en ROCm] - 2026-05-07
+*   **Problema:** El proceso de fine-tuning QLoRA de doble nivel falló inmediatamente al ejecutarse en la instancia AMD Instinct MI300X. El error reportado fue `ValueError: Your setup doesn't support bf16/gpu`.
+*   **Decisión Arquitectónica:** A pesar de que el hardware MI300X soporta bfloat16, la compilación de PyTorch subyacente en el entorno ROCm evaluó `torch.cuda.is_bf16_supported()` como False, causando que HuggingFace Transformers abortara el entrenamiento.
+*   **Enfoque Lógico:** Modificamos los `TrainingArguments` en `scripts/train_specialist.py` para usar `fp16=True` en lugar de `bf16=True`. Esto elude elegantemente la verificación estricta de capacidad de hardware del framework mientras mantiene una alta precisión para los pesos de QLoRA.
+*   **Métricas de Rendimiento:** El script fue parcheado, sincronizado con el droplet remoto, y los procesos de entrenamiento del Nivel 1 y Nivel 2 fueron reiniciados con éxito en segundo plano. Los modelos se están cargando actualmente en memoria.

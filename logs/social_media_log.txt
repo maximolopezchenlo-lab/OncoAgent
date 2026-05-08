@@ -963,3 +963,15 @@ Quick fix: We had to do a fast hunt for the exact `amd_hackathon_key` generated 
 4/ 📸 Visual Suggestion: A screenshot of the terminal showing the SSH `rsync` command executing flawlessly into the remote droplet.
 
 #ROCm #AI #Qwen #BuildInPublic
+
+🚨 Quick update from the trenches!
+Our dual-tier QLoRA training on the MI300X hit a minor bump: a PyTorch/ROCm bf16 capability detection quirk caused the script to crash immediately. 💥
+🔧 How we fixed it: Switched the TrainingArguments from bf16 to fp16, bypassing the strict framework check without losing precision!
+Both Tier 1 (9B) and Tier 2 (27B) are now successfully running and loading into memory. Time to let the GPUs cook! 🔥
+#AMDHackathon #HealthTech #ROCm #Debugging #BuildInPublic
+
+🚨 Quick update from the trenches!
+Our dual-tier QLoRA training on the MI300X hit a minor bump: a PyTorch/ROCm bf16 capability detection quirk caused the script to crash immediately. 💥
+🔧 How we fixed it: Switched the TrainingArguments from bf16 to fp16, bypassing the strict framework check without losing precision!
+Both Tier 1 (9B) and Tier 2 (27B) are now successfully running and loading into memory. Time to let the GPUs cook! 🔥
+#AMDHackathon #HealthTech #ROCm #Debugging #BuildInPublic

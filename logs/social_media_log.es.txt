@@ -667,3 +667,15 @@ Solución rápida: Tuvimos que hacer una búsqueda rápida de la `amd_hackathon_
 4/ 📸 Sugerencia Visual: Una captura de pantalla de la terminal mostrando el comando `rsync` por SSH ejecutándose sin problemas hacia el droplet remoto.
 
 #ROCm #AI #Qwen #BuildInPublic
+
+🚨 ¡Actualización rápida desde las trincheras!
+Nuestro entrenamiento QLoRA de doble nivel en el MI300X tuvo un pequeño obstáculo: una peculiaridad de detección de capacidad bf16 de PyTorch/ROCm hizo que el script fallara inmediatamente. 💥
+🔧 Cómo lo solucionamos: ¡Cambiamos los TrainingArguments de bf16 a fp16, eludiendo la estricta verificación del framework sin perder precisión!
+Tanto el Nivel 1 (9B) como el Nivel 2 (27B) ahora se están ejecutando con éxito y cargándose en memoria. ¡Es hora de dejar que las GPUs cocinen! 🔥
+#AMDHackathon #HealthTech #ROCm #Debugging #BuildInPublic
+
+🚨 ¡Actualización rápida desde las trincheras!
+Nuestro entrenamiento QLoRA de doble nivel en el MI300X tuvo un pequeño obstáculo: una peculiaridad de detección de capacidad bf16 de PyTorch/ROCm hizo que el script fallara inmediatamente. 💥
+🔧 Cómo lo solucionamos: ¡Cambiamos los TrainingArguments de bf16 a fp16, eludiendo la estricta verificación del framework sin perder precisión!
+Tanto el Nivel 1 (9B) como el Nivel 2 (27B) ahora se están ejecutando con éxito y cargándose en memoria. ¡Es hora de dejar que las GPUs cocinen! 🔥
+#AMDHackathon #HealthTech #ROCm #Debugging #BuildInPublic
