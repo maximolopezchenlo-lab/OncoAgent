@@ -164,24 +164,68 @@ button.secondary:hover, button[variant="secondary"]:hover {
     background: #334155 !important;
 }
 
-/* ── Dropdown / Selector Fix (CRITICAL: transparency bug) ────────────── */
-ul.options, .options, .options-wrap,
-[data-testid="dropdown"], .dropdown-content,
-.gr-dropdown, select, .single-select,
-[class*="dropdown"] ul, [class*="dropdown"] li {
+/* ── Dropdown / Selector Fix (CRITICAL: Gradio 6 transparency) ───────── */
+/* The select element itself */
+select, .gr-dropdown select,
+[data-testid="dropdown"] select,
+.single-select, .multiselect {
     background: #1e293b !important;
     background-color: #1e293b !important;
     color: #e2e8f0 !important;
-    z-index: 999 !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.9rem !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
 }
-ul.options li, .options li {
+select:focus, .gr-dropdown select:focus {
+    border-color: #0ea5e9 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15) !important;
+}
+/* The dropdown popup/list */
+ul.options, .options, .options-wrap,
+[data-testid="dropdown"] ul,
+.dropdown-content, .gr-dropdown ul,
+[class*="dropdown"] ul, [class*="dropdown"] li,
+[class*="listbox"], [role="listbox"],
+[class*="dropdown-menu"], [class*="select-dropdown"] {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #475569 !important;
+    border-radius: 8px !important;
+    z-index: 9999 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+ul.options li, .options li,
+[role="option"], [class*="dropdown"] li {
     background: #1e293b !important;
     color: #e2e8f0 !important;
+    padding: 8px 12px !important;
 }
 ul.options li.selected, ul.options li:hover,
-.options li.selected, .options li:hover {
+.options li.selected, .options li:hover,
+[role="option"]:hover, [role="option"][aria-selected="true"] {
     background-color: #334155 !important;
     color: #f1f5f9 !important;
+}
+
+/* ── Labels (Gradio 6 uses sky color by default, fix for dark) ────────── */
+label, .gr-input-label, .label-wrap,
+label span, .gr-group label {
+    color: #94a3b8 !important;
+}
+.gr-input-label .text-lg, .label-wrap span {
+    color: #cbd5e1 !important;
+    font-weight: 500 !important;
+}
+/* Info text under inputs */
+.gr-input-label .text-xs, [class*="info"], .info-text {
+    color: #64748b !important;
+    font-size: 0.75rem !important;
 }
 
 /* ── Safety Badges ───────────────────────────────────────────────────── */
@@ -215,6 +259,10 @@ ul.options li.selected, ul.options li:hover,
 .critic-card strong { color: #fbbf24; }
 
 /* ── Tabs ────────────────────────────────────────────────────────────── */
+.tab-nav, .tabs, [role="tablist"] {
+    background: transparent !important;
+    border-bottom: 1px solid #334155 !important;
+}
 .tab-nav button, .tabs button, button[role="tab"],
 [class*="tab"] button {
     font-family: 'Inter', sans-serif !important;
@@ -233,11 +281,19 @@ button[role="tab"].selected {
     border-bottom: 2px solid #0ea5e9 !important;
     background: transparent !important;
 }
-.tabitem, .tab-content, [class*="tabitem"] {
-    background: rgba(30, 41, 59, 0.5) !important;
+/* Tab content panels — force dark */
+.tabitem, .tab-content, [class*="tabitem"],
+[role="tabpanel"], .tab-content > div {
+    background: #1e293b !important;
     border: 1px solid #334155 !important;
     border-top: none !important;
     border-radius: 0 0 12px 12px !important;
+    color: #e2e8f0 !important;
+}
+/* Markdown inside tabs */
+.tabitem .markdown-text, .tabitem .prose,
+[role="tabpanel"] p, [role="tabpanel"] .markdown-text {
+    color: #cbd5e1 !important;
 }
 
 /* ── Input Fields ────────────────────────────────────────────────────── */

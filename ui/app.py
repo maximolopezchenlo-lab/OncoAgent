@@ -248,7 +248,6 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
                 chatbot = gr.Chatbot(
                     label="OncoAgent",
                     show_label=False,
-                    bubble_full_width=False,
                     elem_classes="gr-chatbot",
                     height=620,
                 )
