@@ -1,0 +1,329 @@
+"""
+OncoAgent — CSS Design System Module.
+
+Centralizes all styling for the Gradio UI. Implements a ChatGPT-style
+dark theme with glassmorphism, WCAG AA accessibility, and fixes for
+Gradio component transparency bugs.
+"""
+
+# Google Fonts loaded via HTML <link> tag (Gradio 6 blocks @import in CSS)
+FONTS_LINK: str = (
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
+    'family=Figtree:wght@400;500;600;700&'
+    'family=Inter:wght@300;400;500;600&display=swap">'
+)
+
+CSS: str = """
+/* ══════════════════════════════════════════════════════════════════════
+   OncoAgent — Clinical Dark Theme (ChatGPT-style PROMAX)
+   Design: Figtree/Inter, Slate-900 bg, Sky-500 accent, WCAG AA+
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Reset & Base ────────────────────────────────────────────────────── */
+:root {
+    --shadow-drop: none !important;
+    --shadow-drop-lg: none !important;
+    --shadow-inset: none !important;
+    --block-shadow: none !important;
+    --container-shadow: none !important;
+    --body-background-fill: #0f172a !important;
+    --background-fill-primary: #0f172a !important;
+}
+html, body, gradio-app {
+    background-color: #0f172a !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.gradio-container, .main, .wrap, .contain,
+.gradio-container > div, footer, #__next, #app, main {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    box-shadow: none !important;
+}
+.gradio-container {
+    max-width: 1440px !important;
+    overflow-x: hidden !important;
+    margin: 0 auto !important;
+    border: none !important;
+}
+* { box-sizing: border-box; }
+
+/* Force dark on ALL Gradio wrappers */
+.gr-group, .gr-block, .gr-box, .gr-panel, .gr-form,
+.block, .wrap, .panel, form, .gap, .gr-padded,
+[class*="svelte-"], .tabitem, .tab-content {
+    background: transparent !important;
+    border-color: #334155 !important;
+}
+
+/* ── Header Bar ──────────────────────────────────────────────────────── */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 14px;
+    margin-bottom: 16px;
+}
+.brand-name {
+    font-family: 'Figtree', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: -0.025em;
+}
+.hw-badge {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
+.card {
+    background: rgba(30, 41, 59, 0.55) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(51, 65, 85, 0.5) !important;
+    border-radius: 14px !important;
+    padding: 18px !important;
+    transition: border-color 0.2s ease-out !important;
+}
+.card:hover { border-color: #475569 !important; }
+
+/* ── Section Titles ──────────────────────────────────────────────────── */
+.section-title {
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ── KPI Tiles ───────────────────────────────────────────────────────── */
+.kpi-tile {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    transition: border-color 0.2s ease-out;
+}
+.kpi-tile:hover { border-color: #0ea5e9; }
+.kpi-label {
+    font-size: 0.68rem; font-weight: 500; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
+}
+.kpi-value {
+    font-family: 'Figtree', sans-serif;
+    font-size: 1.4rem; font-weight: 700; color: #f1f5f9;
+}
+
+/* ── Primary Button ──────────────────────────────────────────────────── */
+.btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out !important;
+}
+.btn-primary:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.4) !important;
+}
+.btn-primary:active { transform: translateY(0) !important; }
+
+/* ── Secondary Button ────────────────────────────────────────────────── */
+button.secondary, button[variant="secondary"],
+.gr-button-secondary, button:not(.btn-primary):not(.selected) {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #334155 !important;
+}
+button.secondary:hover, button[variant="secondary"]:hover {
+    background: #334155 !important;
+}
+
+/* ── Dropdown / Selector Fix (CRITICAL: transparency bug) ────────────── */
+ul.options, .options, .options-wrap,
+[data-testid="dropdown"], .dropdown-content,
+.gr-dropdown, select, .single-select,
+[class*="dropdown"] ul, [class*="dropdown"] li {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    z-index: 999 !important;
+}
+ul.options li, .options li {
+    background: #1e293b !important;
+    color: #e2e8f0 !important;
+}
+ul.options li.selected, ul.options li:hover,
+.options li.selected, .options li:hover {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+/* ── Safety Badges ───────────────────────────────────────────────────── */
+.badge-safe {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 4px 12px; border-radius: 6px;
+    font-weight: 600; font-size: 0.8rem;
+}
+.badge-unsafe {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 4px 12px; border-radius: 6px;
+    font-weight: 600; font-size: 0.8rem;
+}
+
+/* ── Critic Feedback Card ────────────────────────────────────────────── */
+.critic-card {
+    background: rgba(245, 158, 11, 0.06);
+    border-left: 3px solid #f59e0b;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+}
+.critic-card strong { color: #fbbf24; }
+
+/* ── Tabs ────────────────────────────────────────────────────────────── */
+.tab-nav button, .tabs button, button[role="tab"],
+[class*="tab"] button {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    color: #94a3b8 !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    transition: color 0.15s ease-out !important;
+    cursor: pointer !important;
+}
+.tab-nav button.selected, .tabs button.selected,
+button[role="tab"][aria-selected="true"],
+button[role="tab"].selected {
+    color: #0ea5e9 !important;
+    border-bottom: 2px solid #0ea5e9 !important;
+    background: transparent !important;
+}
+.tabitem, .tab-content, [class*="tabitem"] {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border: 1px solid #334155 !important;
+    border-top: none !important;
+    border-radius: 0 0 12px 12px !important;
+}
+
+/* ── Input Fields ────────────────────────────────────────────────────── */
+textarea, input[type="text"], .gr-text-input {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+    border-radius: 10px !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: border-color 0.2s ease-out !important;
+}
+textarea:focus, input[type="text"]:focus {
+    border-color: #0ea5e9 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15) !important;
+}
+
+/* ── Chatbot ─────────────────────────────────────────────────────────── */
+.gr-chatbot, [class*="chatbot"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.message {
+    padding: 14px 18px !important;
+    border-radius: 14px !important;
+    margin-bottom: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    background: rgba(30, 41, 59, 0.55) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    line-height: 1.6 !important;
+    font-size: 0.92rem !important;
+}
+.message.user {
+    background: rgba(14, 165, 233, 0.08) !important;
+    border-color: rgba(14, 165, 233, 0.18) !important;
+    border-bottom-right-radius: 4px !important;
+}
+.message.bot {
+    background: rgba(30, 41, 59, 0.55) !important;
+    border-color: rgba(51, 65, 85, 0.4) !important;
+    border-bottom-left-radius: 4px !important;
+}
+
+/* ── Status Bar ──────────────────────────────────────────────────────── */
+.status-bar {
+    font-size: 0.75rem;
+    color: #64748b;
+    padding: 8px 0;
+    border-top: 1px solid #1e293b;
+    margin-top: 8px;
+}
+
+/* ── Node Progress Indicator ─────────────────────────────────────────── */
+.node-step {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: #94a3b8;
+    padding: 4px 10px; border-radius: 6px;
+    background: rgba(14, 165, 233, 0.08);
+    border: 1px solid rgba(14, 165, 233, 0.15);
+    margin-right: 6px; margin-bottom: 4px;
+}
+.node-step.active {
+    color: #38bdf8;
+    border-color: rgba(14, 165, 233, 0.4);
+    animation: pulse-node 1.5s ease-in-out infinite;
+}
+.node-step.done { color: #34d399; border-color: rgba(16,185,129,0.3); }
+
+@keyframes pulse-node {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ── Accessibility: Focus Rings ──────────────────────────────────────── */
+*:focus-visible {
+    outline: 2px solid #0ea5e9 !important;
+    outline-offset: 2px !important;
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+"""

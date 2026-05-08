@@ -1029,3 +1029,22 @@ When running heavy multi-agent triage via LangGraph on an AMD MI300X, the backen
 We just optimized the OncoAgent dashboard by implementing generator streaming (`yield`) in Gradio. Now, the moment a doctor clicks "Send", the UI instantly acknowledges the request and streams loading states across the knowledge graph, NCCN evidence tabs, and the clinical report. Small code change, MASSIVE UX improvement! 🚀
 
 #AMDHackathon #HealthTech #Python #Gradio #BuildInPublic
+
+---
+
+Just shipped the biggest UI transformation for OncoAgent yet 🎨🏥
+
+We went from a static one-shot dashboard to a full ChatGPT-style conversational copilot for oncologists. Now doctors can:
+• Chat iteratively with the agent (follow-up questions!)
+• See real-time streaming as each LangGraph node completes (Router → RAG → Specialist → Critic → Formatter)
+• Review NCCN/ESMO evidence in a sidebar while chatting
+
+Key technical wins:
+✅ LangGraph .stream() replaces blocking .invoke() — zero perceived latency
+✅ CSS extracted to dedicated module with glassmorphism dark theme
+✅ Fixed Gradio dropdown transparency bug that broke the model selector
+✅ Conversational memory persists per patient via MemorySaver
+
+The failure of the day? Gradio dropdowns render with transparent backgrounds by default in dark themes. Took 30+ CSS selectors to finally nail it down. 😅
+
+#AMDHackathon #HealthTech #AI #OncoAgent #LangGraph #BuildInPublic
