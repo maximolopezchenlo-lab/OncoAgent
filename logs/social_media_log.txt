@@ -1060,6 +1060,14 @@ Solution: Pure "Solid Dark Mode" approach in CSS. UX matters just as much as the
 
 #AMDHackathon #HealthTech #ROCm #UIUX #Gradio
 
+Today we completely eradicated the visual transparency bugs in our Gradio UI and took the clinical experience to the next level! 👩‍⚕️✨
+We replaced the boring text buttons with sleek circular icon buttons ("↑" to send, "↻" to clear) and solidified the backgrounds for maximum readability.
+
+Failure of the day: Glassmorphism (`backdrop-filter`) in Gradio 6 was glitching on some OS/Browser environments.
+Solution: Pure "Solid Dark Mode" approach in CSS. UX matters just as much as the RAG!
+
+#AMDHackathon #HealthTech #ROCm #UIUX #Gradio
+
 ---
 OncoAgent Build-in-Public Log - 2026-05-08
 

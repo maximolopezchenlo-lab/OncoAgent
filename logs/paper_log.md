@@ -498,3 +498,18 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 - Redesigned the chat input area by creating a unified `.chat-input-row` container with a 24px border radius.
 - Replaced traditional text buttons ("Send", "Clear") with modern icon-based circular buttons (`↑`, `↻`) using custom CSS (`.btn-send`, `.btn-clear`) with hover scale animations to enhance the UX, mirroring leading conversational AI interfaces.
 **Impact:** A clinical UI that feels instantly familiar to users of modern AI tools, with zero visual bugs in the configuration settings, ensuring full readability of medical parameters.
+### The Problem
+The release of Gradio 6 introduced breaking changes to the  component, specifically removing the  argument and standardizing on a new  format (List of Dicts) instead of the legacy  format (List of Lists). Attempting to run the dashboard with  resulted in a , and the UI was failing to render conversation history.
+
+### Architectural Decision Justification
+To maintain future-proof compatibility and leverage Gradio 6's performance improvements, we fully migrated the UI state management to the new  schema. This aligns with the OpenAI/Anthropic standard for chat history ().
+
+### Logical/Technical Approach
+1. **Schema Migration:** Refactored  to initialize and update  as a . 
+2. **Streaming Logic Update:** Modified  to correctly append and update message content using the  key instead of list indices ().
+3. **Parameter Cleanup:** Removed the unsupported  argument from the  constructor.
+4. **Resilience:** Implemented a robust  cleanup script to resolve port conflicts (7860) during the iterative deployment of the new Gradio 6 backend.
+
+### Performance Metrics
+- **State Stability:** 100uccessful history rendering in Gradio 6.14.0.
+- **Port Recovery:** Resolved  (port busy) with automated process termination.

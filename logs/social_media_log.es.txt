@@ -764,6 +764,14 @@ Solución: Enfoque "Solid Dark Mode" puro en CSS. ¡La UX importa tanto como el 
 
 #AMDHackathon #HealthTech #ROCm #UIUX #Gradio
 
+¡Hoy eliminamos por completo los bugs visuales de transparencia en nuestra UI de Gradio y llevamos la experiencia clínica al siguiente nivel! 👩‍⚕️✨
+Reemplazamos los aburridos botones de texto por botones de iconos circulares ("↑" para enviar, "↻" para limpiar) y solidificamos los fondos para máxima legibilidad.
+
+Fracaso del día: Los filtros de desenfoque (`backdrop-filter`) en Gradio 6 fallaban en algunos entornos OS/Browser.
+Solución: Enfoque "Solid Dark Mode" puro en CSS. ¡La UX importa tanto como el RAG!
+
+#AMDHackathon #HealthTech #ROCm #UIUX #Gradio
+
 ---
 Registro de Construcción Pública OncoAgent - 2026-05-08
 
@@ -773,5 +781,30 @@ Registro de Construcción Pública OncoAgent - 2026-05-08
 - Corregimos esos molestos errores de transparencia de Gradio 6. ¡El Modo Oscuro ahora es sólido como una roca! 🌑
 
 El fallo de hoy: Tuvimos conflictos de puertos (7860) durante las pruebas. ¡Resulta que la aplicación estaba demasiado ansiosa por ejecutarse! Se solucionó revisando los procesos activos.
+
+#AMDHackathon #HealthTech #ROCm #MI300X #BuildInPublic #AIOncology
+
+---
+FECHA: 2026-05-07 (Sesión 24)
+
+### POST 1: HILO DE X/TWITTER (Tono: Build in Public / Técnico)
+1/ 🔄 ¡Hora de pivotar! Entrenar modelos masivos de oncología requiere una coordinación seria de hardware. 
+
+Hoy levantamos una instancia fresca de #AMD MI300X para el entrenamiento final de QLoRA. Sincronizamos más de 266k casos vía SSH seguro e iniciamos el entrenamiento de doble nivel (Dual-Tier) para OncoAgent. 🚀
+
+cc: @lablabai @AIatAMD
+
+#AMDHackathon #ROCm #MI300X #BuildInPublic
+
+---
+FECHA: 2026-05-08
+
+### POST 1: ACTUALIZACIÓN DE X/TWITTER
+🚀 ¡Actualización del progreso de la UI!
+- Reemplazamos los antiguos botones de enviar/limpiar con un diseño elegante de flecha "↑" para esa sensación conversacional premium.
+- El flujo de nueva sesión se movió a la barra lateral: Chat limpio, mente limpia. 🩺
+- Corregimos esos molestos errores de transparencia de Gradio 6. ¡El modo oscuro ahora es sólido como una roca! 🌑
+
+El fallo de hoy: Encontramos conflictos de puertos (7860) durante las pruebas. ¡Parece que la app estaba demasiado emocionada por correr! Solucionado verificando los procesos activos.
 
 #AMDHackathon #HealthTech #ROCm #MI300X #BuildInPublic #AIOncology

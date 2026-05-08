@@ -444,3 +444,18 @@ El panel de configuración de Gradio mostraba errores de transparencia visual, d
 
 ### Impacto
 Una interfaz clínica nativa que se percibe instantáneamente familiar y profesional, con cero errores visuales en la configuración.
+### El Problema
+El lanzamiento de Gradio 6 introdujo cambios disruptivos en el componente , específicamente eliminando el argumento  y estandarizando un nuevo formato de  (Lista de Diccionarios) en lugar del formato heredado de  (Lista de Listas). Intentar ejecutar el dashboard con  resultó en un , y la interfaz no lograba renderizar el historial de conversación.
+
+### Justificación de Decisión Arquitectónica
+Para mantener la compatibilidad futura y aprovechar las mejoras de rendimiento de Gradio 6, migramos completamente la gestión del estado de la UI al nuevo esquema de . Esto se alinea con el estándar de OpenAI/Anthropic para el historial de chat ().
+
+### Enfoque Lógico/Técnico
+1. **Migración de Esquema:** Se refactorizó  para inicializar y actualizar  como una . 
+2. **Actualización de Lógica de Streaming:** Se modificó  para añadir y actualizar correctamente el contenido del mensaje usando la clave  en lugar de índices de lista ().
+3. **Limpieza de Parámetros:** Se eliminó el argumento no soportado  del constructor de .
+4. **Resiliencia:** Se implementó un script de limpieza robusto con  para resolver conflictos de puertos (7860) durante el despliegue iterativo del nuevo backend de Gradio 6.
+
+### Métricas de Rendimiento Observadas
+- **Estabilidad de Estado:** Renderizado de historial 100% exitoso en Gradio 6.14.0.
+- **Recuperación de Puertos:** Se resolvió el  (puerto ocupado) con terminación de procesos automatizada.
