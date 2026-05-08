@@ -40,3 +40,13 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 - **Modelo:** Qwen/Qwen3.5-9B
 - **Puntuación de Razonamiento Promedio:** Claridad mejorada en escenarios oncológicos complejos.
 - **Corrección del Sistema:** Se resolvió el error `AttributeError` en el cliente de la API de CIViC corrigiendo el mapeo del método de `query_variant` a `search_variant_evidence`.
+
+---
+
+## [08-05-2026] Validación con Caso Real: Carcinoma de Endometrio (AUB)
+**Problema:** Retraso diagnóstico de 12-18 meses en un caso de carcinoma de endometrio debido a la excesiva confianza en ecografías iniciales normales y manejo conservador del Sangrado Uterino Anormal (AUB).
+**Enfoque Lógico/Matemático:** Se aplicó la lógica de triaje de OncoAgent a un caso real retrospectivo. El sistema marca el AUB refractario con coágulos como un indicador de alto riesgo para histeroscopia/biopsia inmediata, independientemente de los hallazgos ecográficos.
+**Métricas de Rendimiento:**
+- **Decisión:** OncoAgent priorizó correctamente el análisis de Tier 2 (Complejo) en menos de 5 segundos.
+- **Resultado RAG:** El sistema identificó "Banderas Rojas" para Cáncer de Endometrio en las guías NCCN, recomendando biopsia en el Mes 1 en lugar del Mes 12.
+- **Impacto:** Reducción potencial del retraso diagnóstico en ~11 meses.

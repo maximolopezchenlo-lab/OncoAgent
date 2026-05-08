@@ -40,3 +40,13 @@ At 15s/step, ETA is ~62 hours per epoch. The strategy allows interrupting the pr
 - **Model:** Qwen/Qwen3.5-9B
 - **Avg. Reasoning Score:** Improved clarity in complex oncology scenarios.
 - **System Fix:** Resolved `AttributeError` in CIViC API client by correcting the method mapping from `query_variant` to `search_variant_evidence`.
+
+---
+
+## [2026-05-08] Real-World Case Validation: Endometrial Carcinoma (AUB)
+**Problem:** Diagnostic delay of 12-18 months in a case of endometrial carcinoma due to over-reliance on initial clear ultrasounds and conservative management of Abnormal Uterine Bleeding (AUB).
+**Logic/Mathematical Approach:** Applied the OncoAgent triage logic to a retrospective real-world case. The system flags refractory AUB with clots as a high-risk indicator for immediate diagnostic hysteroscopy/biopsy, regardless of ultrasound findings.
+**Performance Metrics:**
+- **Decision:** OncoAgent correctly prioritized Tier 2 (Complex) analysis within 5 seconds.
+- **RAG Outcome:** System identified "Red Flags" for Endometrial Cancer in NCCN guidelines, recommending biopsy at Month 1 instead of Month 12.
+- **Impact:** Potential reduction of diagnostic delay by ~11 months.

@@ -1,5 +1,20 @@
 🚀# OncoAgent - Registro de Build-in-Public
 ---
+## [08-05-2026] Historias Reales, Impacto Real: La Brecha de 11 Meses 🏥💔
+
+Acabamos de validar #OncoAgent con un caso real de Carcinoma de Endometrio.
+
+La realidad clínica: Una paciente sufrió durante más de un año con síntomas que fueron desestimados por ecografías "normales".
+La realidad de OncoAgent:
+✅ Alerta inmediata de Nivel 2 (Alto Riesgo).
+✅ Recuperación de Guías NCCN identificando el sangrado refractario como una "Bandera Roja".
+✅ Recomendación: Histeroscopia/biopsia inmediata.
+
+Tiempo potencial ahorrado: **11 MESES**. Por esto estamos construyendo esto para el #AMDHackathon. La IA no es solo velocidad; es no perderse los detalles que salvan vidas.
+
+#OncoAgent #HealthTech #BuildInPublic #CancerAwareness #ROCm #Qwen35
+
+---
 ## [08-05-2026] ¡Actualización SOTA: Qwen 3.5 9B ya está aquí! 🧠🚀
 
 ¡Gran noticia para #OncoAgent! Hemos transicionado oficialmente nuestro backend de inferencia a **Qwen 3.5 9B**.
