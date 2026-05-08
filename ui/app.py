@@ -541,10 +541,22 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
     # ── Interaction Logic ─────────────────────────────────────────────
     def process_and_update(
         text: str, pid: str, tier: str
-    ) -> Tuple[str, str, str, str, str, str, str, str]:
-        """Run triage and fan out results to all UI components."""
+    ):
+        """Run triage and fan out results to all UI components using a generator to prevent UI freezing."""
+        # Yield initial loading state to keep UI responsive
+        yield (
+            "### ⏳ Analizando caso clínico...\nPor favor espere mientras el agente consulta las guías médicas.",
+            "—",
+            "—",
+            "⏳ Recuperando guías de NCCN/ESMO...",
+            "⏳ Construyendo grafo de conocimiento...",
+            "⏳ Consultando evidencia en tiempo real...",
+            "<div class='status-bar'>Procesando triaje a través de LangGraph...</div>",
+        )
+        
         summary, stats, sources, graph, api, status = run_triage(text, pid, tier)
-        return (
+        
+        yield (
             summary,
             stats.get("Confidence", "—") if isinstance(stats, dict) else "—",
             str(stats.get("Sources", "—")) if isinstance(stats, dict) else "—",

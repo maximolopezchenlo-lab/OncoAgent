@@ -417,3 +417,9 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 *   **Decisión Arquitectónica:** Se eliminó el bloque `get_system_stats`, el grid HTML de "System Telemetry" y todas las referencias a la latencia de inferencia de la interfaz de Gradio y de la cadena de formato del backend.
 *   **Enfoque Lógico:** Se enfocó el espacio visual puramente en la confianza clínica, las guías médicas (NCCN/ESMO) y el rastreo del knowledge graph, adhiriendo al principio de "Relevancia Clínica Primero".
 *   **Métricas de Rendimiento:** El renderizado de la UI es ligeramente más rápido y la jerarquía visual es más limpia para los médicos.
+
+### [Hito UI: Optimización de Streaming Asíncrono] - 2026-05-08
+*   **Problema:** El dashboard clínico se bloqueaba y daba timeout frecuentemente durante el procesamiento del RAG con LangGraph, generando una mala experiencia ("página trabada").
+*   **Decisión Arquitectónica:** Se convirtió el handler `process_and_update` de Gradio en un generador sincrónico (`yield`).
+*   **Enfoque Lógico:** Al hacer `yield` de un estado inicial de "Cargando" en todos los componentes de salida antes de ejecutar la función pesada `run_triage`, Gradio mantiene viva la conexión HTTP y proporciona feedback visual inmediato.
+*   **Métricas de Rendimiento:** Cero timeouts del navegador durante el triaje. La latencia percibida bajó drásticamente gracias al feedback instantáneo en la UI al hacer clic en "Send".

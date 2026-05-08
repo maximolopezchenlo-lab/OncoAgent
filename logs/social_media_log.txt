@@ -1019,3 +1019,13 @@ Taking a step back: Just because we have an AMD MI300X powerhouse under the hood
 We just pushed an update to completely strip out technical telemetry and latency metrics from the UI. The focus is now 100% on the patient, clinical confidence scores, and NCCN/ESMO guideline evidence. Build for the end-user, not for the engineers!
 
 #AMDHackathon #HealthTech #UXDesign #OncoAgent #BuildInPublic
+
+---
+
+Nobody likes a frozen screen! 🥶
+
+When running heavy multi-agent triage via LangGraph on an AMD MI300X, the backend crunches a LOT of data. Previously, our UI would just "freeze" while waiting for the LLM to process medical guidelines, leading to timeouts.
+
+We just optimized the OncoAgent dashboard by implementing generator streaming (`yield`) in Gradio. Now, the moment a doctor clicks "Send", the UI instantly acknowledges the request and streams loading states across the knowledge graph, NCCN evidence tabs, and the clinical report. Small code change, MASSIVE UX improvement! 🚀
+
+#AMDHackathon #HealthTech #Python #Gradio #BuildInPublic
