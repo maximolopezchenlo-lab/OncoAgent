@@ -478,3 +478,11 @@ Implementamos un script de evaluación cuantitativa dedicado (`evaluate_speciali
 ### Métricas de Rendimiento
 - El script `evaluate_specialist.py` se ejecutó exitosamente sobre el corpus de evaluación.
 - El entrenamiento del Nivel 1 (Tier 1) está completamente validado. Estamos listos para comenzar el fine-tuning del Nivel 2 (Qwen 3.6 27B) o desplegar el modelo de Nivel 1 localmente en LangGraph.
+
+## Descubrimiento de Hardware: Throughput Extremo vía Sequence Packing
+**Fecha:** 2026-05-08
+**Contexto:** Fine-tuning con el dataset completo del Tier 1 (Qwen 3.5 9B).
+**Observación:** El entrenamiento con los 266k casos clínicos sintéticos se completó en aproximadamente 50 minutos, muy por debajo de la estimación de 5 horas.
+**Razón Arquitectónica:** La combinación de los kernels de `unsloth` en el AMD Instinct MI300X y el "sequence packing" (`packing=True` en SFTTrainer) permitió concatenar múltiples casos médicos cortos en secuencias únicas de 2048 tokens. Esto minimizó la sobrecarga de tokens de relleno (padding) y redujo drásticamente la cantidad de pasos de entrenamiento sin perder puntos de datos.
+**Impacto:** Ahora podemos iterar sobre entrenamientos con el dataset completo múltiples veces al día, o incrementar la cantidad de épocas a 3+ manteniéndonos dentro de los límites de tiempo del hackathon.
+

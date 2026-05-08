@@ -1115,3 +1115,23 @@ Now we move towards deploying this local, privacy-first model for real-time clin
 Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
 
 #AMDHackathon #HealthTech #AMDInstinct #OpenSource #AI #ROCm #MachineLearning
+
+---
+DATE: 2026-05-08 (Session 25)
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🤯 We over-estimated how long AI training takes when you use the right hardware. 
+
+We budgeted 5 hours to fine-tune our 9B medical model on 266,000 clinical cases. The AMD Instinct MI300X chewed through it in ~50 MINUTES. ⏱️🔥
+
+#AMDHackathon #ROCm #Unsloth
+
+2/ 🛠️ The secret? Sequence Packing + Unsloth.
+Instead of feeding short medical texts one by one and wasting compute on padding tokens, we packed them perfectly into 2048-token sequences. The MI300X memory bandwidth handled the dense tensors flawlessly.
+
+3/ 🚀 This changes our entire iteration speed. We can now run multi-epoch training on massive datasets multiple times a day. Next up: pushing the Tier 2 27B model to see how hard we can stress this GPU!
+
+#OpenSource #AI #HealthTech #MachineLearning #BuildInPublic
+
+---
+

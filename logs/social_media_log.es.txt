@@ -844,3 +844,23 @@ Tras finalizar el fine-tuning de nuestro modelo Tier 1 (Qwen 3.5 9B) en el AMD I
 Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
 
 #AMDHackathon #HealthTech #AMDInstinct #OpenSource #AI #ROCm #MachineLearning
+
+---
+FECHA: 2026-05-08 (Sesión 25)
+
+### POST 1: HILO EN X/TWITTER (Tono: Build in Public / Técnico)
+1/ 🤯 Sobreestimamos cuánto tarda el entrenamiento de IA cuando usas el hardware correcto.
+
+Presupuestamos 5 horas para hacer fine-tuning a nuestro modelo médico de 9B con 266,000 casos clínicos. La AMD Instinct MI300X lo devoró en ~50 MINUTOS. ⏱️🔥
+
+#AMDHackathon #ROCm #Unsloth
+
+2/ 🛠️ ¿El secreto? Sequence Packing + Unsloth.
+En lugar de procesar textos médicos cortos uno a uno y desperdiciar cómputo en tokens de relleno (padding), los empaquetamos perfectamente en secuencias de 2048 tokens. El ancho de banda de memoria de la MI300X manejó los tensores densos de forma impecable.
+
+3/ 🚀 Esto cambia toda nuestra velocidad de iteración. Ahora podemos correr entrenamientos de múltiples épocas en datasets masivos varias veces al día. Siguiente paso: ¡probar el modelo Tier 2 de 27B para ver cuánto podemos estresar esta GPU!
+
+#OpenSource #AI #HealthTech #MachineLearning #BuildInPublic
+
+---
+
