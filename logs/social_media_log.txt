@@ -1048,3 +1048,14 @@ Key technical wins:
 The failure of the day? Gradio dropdowns render with transparent backgrounds by default in dark themes. Took 30+ CSS selectors to finally nail it down. 😅
 
 #AMDHackathon #HealthTech #AI #OncoAgent #LangGraph #BuildInPublic
+
+
+🚀 OncoAgent Milestone: ChatGPT-style Interface & UI Promax 🛠️
+
+Today we completely eradicated the visual transparency bugs in our Gradio UI and took the clinical experience to the next level! 👩‍⚕️✨
+We replaced the boring text buttons with sleek circular icon buttons ("↑" to send, "↻" to clear) and solidified the backgrounds for maximum readability.
+
+Failure of the day: Glassmorphism (`backdrop-filter`) in Gradio 6 was glitching on some OS/Browser environments.
+Solution: Pure "Solid Dark Mode" approach in CSS. UX matters just as much as the RAG!
+
+#AMDHackathon #HealthTech #ROCm #UIUX #Gradio

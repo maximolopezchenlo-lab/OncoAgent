@@ -490,3 +490,11 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 *   **Architectural Decision:** Complete rewrite of `ui/app.py` into a ChatGPT-style layout with a sidebar (session controls, KPIs, evidence tabs) and a main chat area. CSS was extracted into a dedicated `ui/styles.py` module. The blocking `agent_graph.invoke()` was replaced with `agent_graph.stream(stream_mode="updates")`, yielding real-time node-by-node progress to the Gradio UI.
 *   **Logical Approach:** LangGraph's `.stream()` API emits `{node_name: node_output}` dictionaries as each node completes. By mapping each node to a human-readable label (e.g., `corrective_rag` → "Retrieving NCCN/ESMO guidelines"), the UI provides a transparent, live view of the multi-agent pipeline — a critical feature for clinical trust. The Gradio dropdown transparency bug was resolved by adding explicit solid-background CSS overrides for all dropdown-related Gradio class selectors.
 *   **Performance Metrics:** Streaming eliminates perceived latency entirely — the UI updates as each of the 8 graph nodes completes rather than blocking for the full pipeline duration. CSS module separation improves maintainability.
+
+## Step 9: UI Modernization & Transparency Bug Fix
+**Goal:** Resolve transparency issues in the Gradio configuration sidebar and implement a modern, ChatGPT-like chat input experience.
+**Approach:** 
+- Modified CSS to enforce solid `#1e293b` background colors for all `.card` container elements, removing `rgba` and `backdrop-filter` rules that caused transparency bugs on some OS/Browser combinations.
+- Redesigned the chat input area by creating a unified `.chat-input-row` container with a 24px border radius.
+- Replaced traditional text buttons ("Send", "Clear") with modern icon-based circular buttons (`↑`, `↻`) using custom CSS (`.btn-send`, `.btn-clear`) with hover scale animations to enhance the UX, mirroring leading conversational AI interfaces.
+**Impact:** A clinical UI that feels instantly familiar to users of modern AI tools, with zero visual bugs in the configuration settings, ensuring full readability of medical parameters.

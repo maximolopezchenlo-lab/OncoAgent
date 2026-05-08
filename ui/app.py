@@ -251,18 +251,18 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
                     elem_classes="gr-chatbot",
                     height=620,
                 )
-                with gr.Row():
+                with gr.Row(elem_classes="chat-input-row"):
                     case_input = gr.Textbox(
                         placeholder="Describe the clinical case or ask a follow-up question...",
                         show_label=False,
+                        container=False,
                         scale=8,
                     )
-                    triage_btn = gr.Button(
-                        "Send", variant="primary", scale=1,
-                        elem_classes="btn-primary",
-                    )
                     clear_btn = gr.Button(
-                        "Clear", variant="secondary", scale=1,
+                        "↻", variant="secondary", elem_classes="btn-clear", min_width=40, scale=0
+                    )
+                    triage_btn = gr.Button(
+                        "↑", variant="primary", elem_classes="btn-send", min_width=40, scale=0
                     )
 
     # ── Interaction Logic (Streaming) ─────────────────────────────────

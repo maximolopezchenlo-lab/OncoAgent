@@ -429,3 +429,18 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 *   **Decisión Arquitectónica:** Reescritura completa de `ui/app.py` a un layout estilo ChatGPT con una barra lateral (controles de sesión, KPIs, pestañas de evidencia) y un área de chat principal. El CSS fue extraído a un módulo dedicado `ui/styles.py`. El bloqueo con `agent_graph.invoke()` fue reemplazado por `agent_graph.stream(stream_mode="updates")`, emitiendo progreso en tiempo real nodo por nodo a la UI de Gradio.
 *   **Enfoque Lógico:** La API `.stream()` de LangGraph emite diccionarios `{node_name: node_output}` a medida que cada nodo se completa. Al mapear cada nodo a una etiqueta legible (ej. `corrective_rag` → "Recuperando guías NCCN/ESMO"), la UI proporciona una vista transparente y en vivo del pipeline multi-agente — una funcionalidad crítica para la confianza clínica. El bug de transparencia del dropdown de Gradio fue resuelto añadiendo overrides CSS de fondo sólido explícitos.
 *   **Métricas de Rendimiento:** El streaming elimina la latencia percibida por completo — la UI se actualiza a medida que cada uno de los 8 nodos del grafo se completa en lugar de bloquearse por la duración completa del pipeline.
+
+## Hito 9: Modernización de UI y Corrección de Transparencia
+**Fecha:** 2026-05-08
+**Estado:** Completado
+
+### El Problema
+El panel de configuración de Gradio mostraba errores de transparencia visual, dificultando la lectura de parámetros médicos. Además, la interacción de chat se basaba en botones de texto ("Send", "Clear") que restaban fluidez a la experiencia de usuario (UX) clínica.
+
+### Justificación de la Decisión Arquitectónica
+- Se modificó el CSS para forzar fondos sólidos `#1e293b` en todos los contenedores `.card`, eliminando reglas `rgba` y `backdrop-filter` que generaban bugs visuales.
+- Se rediseñó el área de entrada de texto consolidando un contenedor `.chat-input-row`.
+- Se reemplazaron los botones clásicos por botones circulares minimalistas con iconos (`↑`, `↻`), emulando la fluidez de plataformas modernas de IA conversacional (estilo ChatGPT).
+
+### Impacto
+Una interfaz clínica nativa que se percibe instantáneamente familiar y profesional, con cero errores visuales en la configuración.

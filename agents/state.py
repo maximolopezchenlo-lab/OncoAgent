@@ -11,6 +11,8 @@ Design principles (inspired by Claude Code + Hermes Agent):
 
 from typing import TypedDict, Annotated, List, Dict, Any, Optional
 import operator
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
 
 
 class AgentState(TypedDict):
@@ -27,6 +29,7 @@ class AgentState(TypedDict):
     patient_id: str                  # Unique patient profile ID
     session_id: str                  # Current session identifier
     user_tier_override: Optional[int]  # Manual tier override (1 or 2, None = auto)
+    messages: Annotated[List[BaseMessage], add_messages]  # Chat history
 
     # ------------------------------------------------------------------ #
     # 1. Input (Immutable — set once at invocation)                      #

@@ -51,12 +51,31 @@ html, body, gradio-app {
 }
 * { box-sizing: border-box; }
 
-/* Force dark on ALL Gradio wrappers */
-.gr-group, .gr-block, .gr-box, .gr-panel, .gr-form,
-.block, .wrap, .panel, form, .gap, .gr-padded,
-[class*="svelte-"], .tabitem, .tab-content {
+/* Force transparent on layout wrappers, but NOT on inputs/tabs */
+.gr-group, .gr-block, .gr-box, .gr-panel,
+.block, .wrap, .panel, .gap, .gr-padded {
     background: transparent !important;
     border-color: #334155 !important;
+}
+
+/* Base background for inputs/forms to fix transparency */
+.gr-form, .gr-dropdown {
+    background: #0f172a !important;
+    border-radius: 10px !important;
+}
+
+/* Chat Action Buttons */
+.chat-action-btn {
+    border-radius: 10px !important;
+    font-size: 1.2rem !important;
+    padding: 10px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-width: 50px !important;
+}
+.chat-action-btn:hover {
+    transform: translateY(-2px) !important;
 }
 
 /* ── Header Bar ──────────────────────────────────────────────────────── */
@@ -65,10 +84,8 @@ html, body, gradio-app {
     justify-content: space-between;
     align-items: center;
     padding: 14px 24px;
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(51, 65, 85, 0.5);
+    background: #1e293b; /* Solid background to fix transparency */
+    border: 1px solid #334155;
     border-radius: 14px;
     margin-bottom: 16px;
 }
@@ -92,15 +109,72 @@ html, body, gradio-app {
 
 /* ── Cards ────────────────────────────────────────────────────────────── */
 .card {
-    background: rgba(30, 41, 59, 0.55) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(51, 65, 85, 0.5) !important;
+    background: #1e293b !important; /* Solid background */
+    border: 1px solid #334155 !important;
     border-radius: 14px !important;
     padding: 18px !important;
     transition: border-color 0.2s ease-out !important;
 }
 .card:hover { border-color: #475569 !important; }
+
+/* ── Chat Input Row & Buttons ────────────────────────────────────────── */
+.chat-input-row {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    border-radius: 24px !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-top: 10px !important;
+}
+.chat-input-row .gr-box, .chat-input-row textarea, .chat-input-row input {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.btn-send {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 1.2rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: transform 0.1s ease !important;
+}
+.btn-send:hover {
+    transform: scale(1.05) !important;
+    background: #ffffff !important;
+}
+
+.btn-clear {
+    background: transparent !important;
+    color: #94a3b8 !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 1.2rem !important;
+    border: 1px solid #334155 !important;
+    cursor: pointer !important;
+    transition: background 0.1s ease !important;
+}
+.btn-clear:hover {
+    background: #334155 !important;
+    color: #f1f5f9 !important;
+}
 
 /* ── Section Titles ──────────────────────────────────────────────────── */
 .section-title {
