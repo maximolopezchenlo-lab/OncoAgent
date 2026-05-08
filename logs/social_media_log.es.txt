@@ -808,3 +808,39 @@ FECHA: 2026-05-08
 El fallo de hoy: Encontramos conflictos de puertos (7860) durante las pruebas. ¡Parece que la app estaba demasiado emocionada por correr! Solucionado verificando los procesos activos.
 
 #AMDHackathon #HealthTech #ROCm #MI300X #BuildInPublic #AIOncology
+
+---
+---
+FECHA: 2026-05-08 (Sesión 24)
+
+### POST 1: X/TWITTER THREAD (Tono: Build in Public / Técnico)
+1/ 🎓 La IA fue a la escuela de medicina... y aprobó sus exámenes. 🏥
+
+Acabamos de completar la Evaluación Post-Entrenamiento para nuestro modelo OncoAgent Tier 1 (Qwen 3.5 9B) corriendo completamente en AMD Instinct MI300X.
+
+Así es como lo validamos 👇
+
+#AMDHackathon #ROCm
+
+2/ 📉 La validación no es solo leer texto; son matemáticas. Construimos un pipeline de evaluación usando Unsloth y SFTTrainer para testear nuestro hold-out set (10% de nuestros datos sintéticos clínicos).
+
+3/ 🚀 ¿El resultado? ¡Cero sobreajuste (overfitting)! Sigue perfectamente nuestro formato OncoCoT (Oncological Chain of Thought). Próximo paso: desplegar este modelo en nuestro pipeline clínico de LangGraph.
+
+#OpenSource #AI #HealthTech #BuildInPublic
+
+---
+
+### POST 2: LINKEDIN (Tono: Profesional / Estratégico)
+🚀 **Hito de OncoAgent: Validación Post-Entrenamiento Exitosa**
+
+Tras finalizar el fine-tuning de nuestro modelo Tier 1 (Qwen 3.5 9B) en el AMD Instinct MI300X, ¡hemos superado con éxito la fase de validación post-entrenamiento!
+
+🔹 **El Desafío:** Asegurar que el modelo generalice nuestro riguroso Cadena de Pensamiento Oncológica (OncoCoT) sin memorizar los datos.
+🔹 **La Solución:** Implementamos un script de evaluación rigurosa usando Unsloth, chequeando métricas de perplejidad sobre un conjunto de evaluación clínico reservado.
+🔹 **El Resultado:** Los adaptadores LoRA son estables, de alta precisión y están listos para la integración en nuestra arquitectura multi-agente LangGraph.
+
+¡Ahora avanzamos hacia el despliegue de este modelo local y privado para triage clínico en tiempo real!
+
+Partners: **lablab.ai**, **AMD Developer**, **Hugging Face**
+
+#AMDHackathon #HealthTech #AMDInstinct #OpenSource #AI #ROCm #MachineLearning

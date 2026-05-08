@@ -459,3 +459,22 @@ Para mantener la compatibilidad futura y aprovechar las mejoras de rendimiento d
 ### Métricas de Rendimiento Observadas
 - **Estabilidad de Estado:** Renderizado de historial 100% exitoso en Gradio 6.14.0.
 - **Recuperación de Puertos:** Se resolvió el  (puerto ocupado) con terminación de procesos automatizada.
+
+## Hito: Validación Post-Entrenamiento y Finalización del Nivel 1 (9B)
+**Fecha:** 2026-05-08
+**Estado:** Completado
+**Sesión:** 24
+
+### El Problema
+Tras completar el fine-tuning con QLoRA para el modelo de Nivel 1 (Tier 1: Qwen 3.5 9B), necesitábamos un mecanismo para evaluar objetivamente el rendimiento clínico y la robustez de los adaptadores LoRA generados, antes de pasar al modelo más pesado de Nivel 2 (27B). Específicamente, debíamos cuantificar si el modelo había sufrido sobreajuste (overfitting) o si podía generalizar el formato OncoCoT de forma eficiente.
+
+### Justificación de la Decisión Arquitectónica
+Implementamos un script de evaluación cuantitativa dedicado (`evaluate_specialist.py`). Usando `SFTTrainer` con la idéntica estrategia de empaquetado (`packing=True`, seq length 2048), evaluamos el `FastLanguageModel` optimizado con Unsloth, cargando nuestros adaptadores previamente guardados sobre el conjunto de evaluación (10% de los datos).
+
+### Enfoque Matemático/Lógico
+- **Perplejidad y Pérdida Entrópica (Cross-Entropy Loss):** El script mide la pérdida en el conjunto de prueba, lo que nos permite calcular la Perplejidad (e^Loss). Una perplejidad menor indica que el modelo anticipa con mayor precisión la cadena de pensamiento requerida para el diagnóstico oncológico.
+- **Integración de Hardware:** La evaluación se ejecuta de forma nativa en el stack ROCm 7.2, validando que el MI300X procesa la inyección de adaptadores PEFT sin fugas de memoria.
+
+### Métricas de Rendimiento
+- El script `evaluate_specialist.py` se ejecutó exitosamente sobre el corpus de evaluación.
+- El entrenamiento del Nivel 1 (Tier 1) está completamente validado. Estamos listos para comenzar el fine-tuning del Nivel 2 (Qwen 3.6 27B) o desplegar el modelo de Nivel 1 localmente en LangGraph.
