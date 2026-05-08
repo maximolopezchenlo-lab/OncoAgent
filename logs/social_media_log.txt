@@ -937,3 +937,29 @@ Running this massive QLoRA training pipeline on a fresh #AMD MI300X droplet. The
 Tagging the squad: @lablab.ai @amd @huggingface
 
 #AMDHackathon #BuildInPublic #AITraining #MachineLearning #AMD #CodingLife
+
+---
+DATE: 2026-05-07 (Session 24)
+
+### POST 1: X/TWITTER THREAD (Tone: Build in Public / Technical)
+1/ 🔄 Pivot time! Training massive oncology models requires serious hardware coordination. 
+
+Today we spun up a fresh #AMD MI300X instance for the final QLoRA fine-tuning run. Synced 266k+ cases via secure SSH and initiated Dual-Tier training for OncoAgent. 🚀
+
+cc: @lablabai @AIatAMD
+
+#AMDHackathon #HealthTech #MachineLearning
+
+2/ 🛡️ The "Failure of the Day": SSH Key authentication headaches! 🤦‍♂️
+
+When setting up the new droplet, our default SSH keys were rejected. 
+Quick fix: We had to do a fast hunt for the exact `amd_hackathon_key` generated earlier, remap our connections to the root user, and re-establish the pipeline. DevOps under pressure! 😅
+
+3/ 📊 Today's Metrics:
+- 1 fresh AMD MI300X Droplet configured from scratch.
+- Environment deployed (`.venv` & ROCm dependencies synced).
+- 2 Concurrent Trainings (Tier 1 9B & Tier 2 27B) actively running via `nohup`!
+
+4/ 📸 Visual Suggestion: A screenshot of the terminal showing the SSH `rsync` command executing flawlessly into the remote droplet.
+
+#ROCm #AI #Qwen #BuildInPublic

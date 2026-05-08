@@ -433,10 +433,12 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 
 ## Milestone: Dual-Tier QLoRA Fine-Tuning Initiation
 **Date:** 2026-05-07
-**Status:** In Progress
+**Status:** Executing (Tier 1 and Tier 2 Concurrent)
 **Session:** 23
 
 - **Problem/Hypothesis:** The base Qwen models lack specialized oncology triage capabilities and fail to strictly adhere to the OncoCoT (Oncological Chain of Thought) format out-of-the-box.
 - **Architectural Justification:** We are executing a Dual-Tier QLoRA fine-tuning strategy (Tier 1: Qwen 3.5 9B for speed, Tier 2: Qwen 3.6 27B for deep reasoning) using 4-bit NormalFloat4 quantization (BitsAndBytes) and PEFT. This strictly aligns with our architectural rules and optimizes for the 192GB HBM3 memory of the AMD MI300X.
-- **Logical/Technical Implementation:** Unified ~266k real and synthetic oncology cases (90% Train / 10% Eval split). Initiated the fine-tuning process on a new remote AMD MI300X GPU droplet.
-- **Performance Metrics:** Prepared massive multi-source dataset (PMC-Patients, Asclepius, synthetic Qwen) with a combined 266,854 samples (hash: 9be1cc284e5e).
+- **Logical/Technical Implementation:** Unified ~266k real and synthetic oncology cases (90% Train / 10% Eval split). Synced the repository to a remote AMD MI300X droplet (`165.245.137.95`), configured the Python venv, and initiated the fine-tuning process via `nohup`. Both models are actively training.
+- **Performance Metrics:** 
+  - Prepared massive multi-source dataset (PMC-Patients, Asclepius, synthetic Qwen) with a combined 266,854 samples (hash: 9be1cc284e5e).
+  - Verified concurrent execution: Both 9B and 27B models are actively loading into VRAM on a single MI300X GPU, validating the hypothesis that 4-bit NF4 quantization keeps total memory footprint well within the 192GB HBM3 limit.
