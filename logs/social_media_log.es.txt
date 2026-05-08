@@ -715,3 +715,11 @@ La Solución: Nunca copiar `input_ids` a `labels` manualmente si no se hace el p
 También reiniciamos en frío el servidor de Gradio para desplegar el nuevo diseño del dashboard clínico.
 
 #AMDHackathon #HealthTech #MachineLearning #Debugging #ROCm
+
+---
+
+Dando un paso atrás: Solo porque tenemos un monstruo AMD MI300X bajo el capó no significa que los médicos quieran ver las temperaturas de la RAM y la GPU en su dashboard de triaje.
+
+Acabamos de lanzar una actualización para eliminar por completo la telemetría técnica y las métricas de latencia de la UI. El enfoque ahora es 100% en el paciente, los puntajes de confianza clínica y la evidencia de las guías NCCN/ESMO. ¡Construye para el usuario final, no para los ingenieros!
+
+#AMDHackathon #HealthTech #UXDesign #OncoAgent #BuildInPublic

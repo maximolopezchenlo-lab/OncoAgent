@@ -472,3 +472,9 @@ Qwen3.5-9B (March 2026) scores 81.7 on GPQA Diamond — outperforming the older 
 *   **Architectural Decision:** Removed manual `labels` copying in `tokenize_dataset`.
 *   **Logical Approach:** `DataCollatorForLanguageModeling` handles dynamic padding of `input_ids` and automatically creates `labels` padded with `-100` for Causal LM if not provided. By delegating this, we avoid dimension mismatches and excessive nesting errors.
 *   **Performance Metrics:** Script patched, synced, and successfully restarted on the droplet. The trainer now builds uniform batched tensors correctly.
+
+### [UI Milestone: Clinical Simplification] - 2026-05-08
+*   **Problem:** The UI displayed backend technical metrics (system telemetry for MI300X, RAG latency) which are irrelevant and potentially distracting for clinical end-users.
+*   **Architectural Decision:** Removed `get_system_stats` block, the "System Telemetry" HTML grid, and all references to inference latency from the Gradio interface and backend formatting string.
+*   **Logical Approach:** Focused the visual real estate purely on clinical confidence, medical guidelines (NCCN/ESMO), and knowledge graph sourcing, adhering to the principle of "Clinical Relevance First".
+*   **Performance Metrics:** UI rendering is slightly faster and the visual hierarchy is cleaner for doctors.

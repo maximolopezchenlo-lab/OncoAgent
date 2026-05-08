@@ -1011,3 +1011,11 @@ The Fix: Never copy `input_ids` to `labels` manually if you aren't padding them 
 Also finally hard-rebooted the Gradio UI server to deploy the latest clinical dashboard design.
 
 #AMDHackathon #HealthTech #MachineLearning #Debugging #ROCm
+
+---
+
+Taking a step back: Just because we have an AMD MI300X powerhouse under the hood doesn't mean doctors want to see RAM and GPU temperatures on their triage dashboard.
+
+We just pushed an update to completely strip out technical telemetry and latency metrics from the UI. The focus is now 100% on the patient, clinical confidence scores, and NCCN/ESMO guideline evidence. Build for the end-user, not for the engineers!
+
+#AMDHackathon #HealthTech #UXDesign #OncoAgent #BuildInPublic

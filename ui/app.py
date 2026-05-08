@@ -412,43 +412,13 @@ def run_triage(
     )
 
     stats: Dict[str, str] = {
-        "Latency": f"{latency:.2f}s",
         "Confidence": f"{confidence * 100:.1f}%",
         "Sources": str(len(sources)),
     }
 
-    status_msg = f"Triage completed for {patient_id} in {latency:.2f}s"
+    status_msg = f"Triage completed for {patient_id}"
     return summary_md, stats, sources_md, graph_md, api_md, status_msg
 
-
-# ---------------------------------------------------------------------------
-# Hardware Telemetry
-# ---------------------------------------------------------------------------
-def get_system_stats() -> str:
-    """Return hardware telemetry as a styled HTML grid."""
-    cpu_usage: float = psutil.cpu_percent()
-    ram: float = psutil.virtual_memory().percent
-    gpu_temp: float = 45 + (time.time() % 10)
-    gpu_mem: float = 128 - (time.time() % 20)
-
-    def _tile(label: str, value: str, status: str = "Active") -> str:
-        return (
-            f"<div class='telemetry-item'>"
-            f"<div class='telemetry-label'>{label}</div>"
-            f"<div class='telemetry-value'>{value}</div>"
-            f"<div class='telemetry-status'>{status}</div>"
-            f"</div>"
-        )
-
-    html = "<div class='telemetry-grid'>"
-    html += _tile("GPU", "MI300X", "Active")
-    html += _tile("ROCm", "v7.2", "Synced")
-    html += _tile("HBM3", f"{gpu_mem:.0f} / 128 GB", "Optimal")
-    html += _tile("Temp", f"{gpu_temp:.0f} °C", "Stable")
-    html += _tile("CPU", f"{cpu_usage:.0f}%", "Normal")
-    html += _tile("RAM", f"{ram:.0f}%", "Normal")
-    html += "</div>"
-    return html
 
 
 # ---------------------------------------------------------------------------
@@ -512,28 +482,13 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
                         variant="primary",
                     )
 
-            # Telemetry
-            with gr.Column(elem_classes="card"):
-                gr.HTML("<div class='section-title'>System Telemetry</div>")
-                monitor_html = gr.HTML(get_system_stats())
-                refresh_btn = gr.Button(
-                    "Refresh",
-                    size="sm",
-                    variant="secondary",
-                )
-                refresh_btn.click(get_system_stats, outputs=monitor_html)
 
         # ── RIGHT MAIN PANEL ──────────────────────────────────────────
         with gr.Column(scale=2):
 
             # KPI Row
             with gr.Row():
-                with gr.Column(elem_classes="kpi-tile", min_width=120):
-                    gr.HTML(
-                        "<div class='kpi-label'>Latency</div>"
-                        "<div class='kpi-value' id='kpi-latency'>—</div>"
-                    )
-                    latency_val = gr.Label(label="Latency", visible=False)
+
                 with gr.Column(elem_classes="kpi-tile", min_width=120):
                     gr.HTML(
                         "<div class='kpi-label'>Confidence</div>"
@@ -581,7 +536,6 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
         summary, stats, sources, graph, api, status = run_triage(text, pid, tier)
         return (
             summary,
-            stats.get("Latency", "—") if isinstance(stats, dict) else "—",
             stats.get("Confidence", "—") if isinstance(stats, dict) else "—",
             str(stats.get("Sources", "—")) if isinstance(stats, dict) else "—",
             sources,
@@ -595,7 +549,6 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
         inputs=[case_input, patient_id_input, tier_override_input],
         outputs=[
             output_summary,
-            latency_val,
             confidence_val,
             sources_val,
             output_sources,
@@ -613,7 +566,6 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
             "",
             "—",
             "—",
-            "—",
             "",
             "",
             "",
@@ -624,7 +576,6 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
             patient_id_input,
             tier_override_input,
             output_summary,
-            latency_val,
             confidence_val,
             sources_val,
             output_sources,
