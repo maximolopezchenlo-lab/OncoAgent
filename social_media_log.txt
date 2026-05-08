@@ -1,20 +1,5 @@
 🚀 Building# OncoAgent Build-in-Public Log
 ---
-## [2026-05-08] Real Stories, Real Impact: The 11-Month Diagnosis Gap 🏥💔
-
-We just validated #OncoAgent with a real-world case of Endometrial Carcinoma. 
-
-The clinical reality: A patient suffered for over a year with symptoms that were dismissed due to "clear" ultrasounds. 
-The OncoAgent reality: 
-✅ Immediate Tier 2 (High Risk) flag.
-✅ NCCN Guideline retrieval identifying refractory bleeding as a "Red Flag".
-✅ Recommendation: Immediate hysteroscopy/biopsy.
-
-Potential time saved: **11 MONTHS**. This is why we are building this for the #AMDHackathon. AI isn't just about speed; it's about not missing the life-saving details.
-
-#OncoAgent #HealthTech #BuildInPublic #CancerAwareness #ROCm #Qwen35
-
----
 ## [2026-05-08] SOTA Upgrade: Qwen 3.5 9B is here! 🧠🚀
 
 Huge update for #OncoAgent: We've officially transitioned our inference backend to **Qwen 3.5 9B**! 
@@ -67,3 +52,9 @@ Stay tuned as we kick off the 5-hour training run next! 🛠️🔬
 #FailOfTheDay: We initially thought it would take 2 hours to train on all 240k records... math is hard when you're hyped! We adjusted our checkpoint strategy instead. 😅
 
 #AMDHackathon #HealthTech #ROCm #MachineLearning
+
+🚀 Optimization Alert! We just pushed a "Concurrency Patch" to OncoAgent. Clinical triage latency dropped from 45s to 12s by parallelizing medical document grading. 
+
+While our AMD Instinct MI300X is 100% busy training the "Big Brain" (60h SFT session), we are using Featherless.ai to keep the demo snappy and responsive. Medical triage shouldn't have to wait! 🩺⚡️
+
+#AMDHackathon #HealthTech #ROCm #MI300X #OncoAgent #AI

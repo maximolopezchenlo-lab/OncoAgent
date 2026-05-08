@@ -257,16 +257,21 @@ def corrective_rag_node(state: AgentState) -> Dict[str, Any]:
             # Retrieve candidates
             raw_results = retriever.query(query, n_results=8)
 
-            # Grade each document
-            graded = []
-            for r in raw_results:
+            # Grade documents in parallel for MI300X/API efficiency
+            from concurrent.futures import ThreadPoolExecutor
+            
+            def _grade_doc_wrapper(r):
                 doc_text = r.get("text", "")
                 is_relevant = _grade_document(doc_text, query, tier=1)
-                if is_relevant:
-                    graded.append(r)
+                return r if is_relevant else None
+
+            with ThreadPoolExecutor(max_workers=8) as executor:
+                results = list(executor.map(_grade_doc_wrapper, raw_results))
+            
+            graded = [r for r in results if r is not None]
 
             logger.info(
-                "CRAG attempt %d: %d/%d documents graded RELEVANT.",
+                "CRAG attempt %d: %d/%d documents graded RELEVANT (Parallel).",
                 attempt + 1, len(graded), len(raw_results),
             )
 

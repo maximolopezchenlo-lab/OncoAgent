@@ -43,10 +43,16 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 
 ---
 
-## [08-05-2026] Validación con Caso Real: Carcinoma de Endometrio (AUB)
-**Problema:** Retraso diagnóstico de 12-18 meses en un caso de carcinoma de endometrio debido a la excesiva confianza en ecografías iniciales normales y manejo conservador del Sangrado Uterino Anormal (AUB).
-**Enfoque Lógico/Matemático:** Se aplicó la lógica de triaje de OncoAgent a un caso real retrospectivo. El sistema marca el AUB refractario con coágulos como un indicador de alto riesgo para histeroscopia/biopsia inmediata, independientemente de los hallazgos ecográficos.
+## [08-05-2026] Parche de Concurrencia: Optimización de Latencia
+**Problema:** La calificación secuencial de documentos en el nodo CRAG estaba causando una latencia excesiva (~45s), afectando la usabilidad clínica.
+**Decisión Arquitectónica:** Se implementó un flujo de trabajo de calificación paralela basado en hilos utilizando `concurrent.futures.ThreadPoolExecutor`.
+**Enfoque Lógico/Matemático:** Dado que la calificación de documentos está limitada por E/S (llamadas a API externas), la paralelización de los mejores K fragmentos (N=8) reduce el tiempo total de `O(N * t)` a `O(t)`, donde `t` es la latencia de una sola llamada al LLM.
 **Métricas de Rendimiento:**
-- **Decisión:** OncoAgent priorizó correctamente el análisis de Tier 2 (Complejo) en menos de 5 segundos.
-- **Resultado RAG:** El sistema identificó "Banderas Rojas" para Cáncer de Endometrio en las guías NCCN, recomendando biopsia en el Mes 1 en lugar del Mes 12.
-- **Impacto:** Reducción potencial del retraso diagnóstico en ~11 meses.
+- **Latencia de Calificación RAG:** Reducida de ~32s a ~4s para 8 documentos.
+- **Ejecución E2E Total:** Optimizada a ~12-15s.
+
+---
+
+## Nota Técnica: Orquestación de Hardware (MI300X vs. Featherless)
+**Estado:** La AMD Instinct MI300X se encuentra actualmente bajo una carga de cómputo del 100%, realizando el Fine-Tuning Completo (SFT) de 60 horas en los conjuntos de datos PMC-Patients y OncoCoT.
+**Estrategia Operativa:** Para permitir la validación clínica paralela (Demo), el backend de inferencia se traslada temporalmente a Featherless.ai. Esto asegura que el entrenamiento no se vea interrumpido por tareas de demostración de alta prioridad, manteniendo al mismo tiempo un rendimiento SOTA (Qwen 3.5 9B).

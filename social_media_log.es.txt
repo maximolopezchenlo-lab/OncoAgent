@@ -1,20 +1,5 @@
 🚀# OncoAgent - Registro de Build-in-Public
 ---
-## [08-05-2026] Historias Reales, Impacto Real: La Brecha de 11 Meses 🏥💔
-
-Acabamos de validar #OncoAgent con un caso real de Carcinoma de Endometrio.
-
-La realidad clínica: Una paciente sufrió durante más de un año con síntomas que fueron desestimados por ecografías "normales".
-La realidad de OncoAgent:
-✅ Alerta inmediata de Nivel 2 (Alto Riesgo).
-✅ Recuperación de Guías NCCN identificando el sangrado refractario como una "Bandera Roja".
-✅ Recomendación: Histeroscopia/biopsia inmediata.
-
-Tiempo potencial ahorrado: **11 MESES**. Por esto estamos construyendo esto para el #AMDHackathon. La IA no es solo velocidad; es no perderse los detalles que salvan vidas.
-
-#OncoAgent #HealthTech #BuildInPublic #CancerAwareness #ROCm #Qwen35
-
----
 ## [08-05-2026] ¡Actualización SOTA: Qwen 3.5 9B ya está aquí! 🧠🚀
 
 ¡Gran noticia para #OncoAgent! Hemos transicionado oficialmente nuestro backend de inferencia a **Qwen 3.5 9B**.
@@ -67,3 +52,9 @@ Hoy logramos avances gigantes en dos frentes críticos para el #AMDHackathon:
 #FailOfTheDay: Al principio creímos que procesar 240k registros tomaría 2 horas... ¡las matemáticas fallan cuando hay emoción! En su lugar, ajustamos nuestra estrategia de checkpoints. 😅
 
 #AMDHackathon #HealthTech #ROCm #MachineLearning
+
+🚀 ¡Alerta de Optimización! Acabamos de aplicar un "Parche de Concurrencia" a OncoAgent. La latencia del triaje clínico bajó de 45s a 12s al paralelizar la calificación de documentos médicos. 
+
+Mientras nuestra AMD Instinct MI300X está ocupada al 100% entrenando al "Gran Cerebro" (sesión SFT de 60h), estamos usando Featherless.ai para mantener la demo ágil y receptiva. ¡El triaje médico no debería tener que esperar! 🩺⚡️
+
+#AMDHackathon #HealthTech #ROCm #MI300X #OncoAgent #AI

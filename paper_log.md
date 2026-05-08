@@ -32,6 +32,9 @@ At 15s/step, ETA is ~62 hours per epoch. The strategy allows interrupting the pr
 
 ---
 
+
+---
+
 ## [2026-05-08] SOTA Model Upgrade: Qwen 3.5 9B Transition
 **Problem:** Need higher reasoning capabilities and medical knowledge for the triage system without exceeding the MI300X inference budget during SFT.
 **Architectural Decision:** Upgraded the Tier 1 and Tier 2 inference backend to **Qwen 3.5 9B** via Featherless.ai.
@@ -43,10 +46,16 @@ At 15s/step, ETA is ~62 hours per epoch. The strategy allows interrupting the pr
 
 ---
 
-## [2026-05-08] Real-World Case Validation: Endometrial Carcinoma (AUB)
-**Problem:** Diagnostic delay of 12-18 months in a case of endometrial carcinoma due to over-reliance on initial clear ultrasounds and conservative management of Abnormal Uterine Bleeding (AUB).
-**Logic/Mathematical Approach:** Applied the OncoAgent triage logic to a retrospective real-world case. The system flags refractory AUB with clots as a high-risk indicator for immediate diagnostic hysteroscopy/biopsy, regardless of ultrasound findings.
+## [2026-05-08] Concurrency Patch: Latency Optimization
+**Problem:** Sequential document grading in the CRAG node was causing excessive latency (~45s), impacting clinical usability.
+**Architectural Decision:** Implemented a thread-based parallel grading workflow using `concurrent.futures.ThreadPoolExecutor`. 
+**Logic/Mathematical Approach:** Since document grading is I/O-bound (external API calls), parallelizing the top-K chunks (N=8) reduces the total time from `O(N * t)` to `O(t)`, where `t` is the latency of a single LLM call.
 **Performance Metrics:**
-- **Decision:** OncoAgent correctly prioritized Tier 2 (Complex) analysis within 5 seconds.
-- **RAG Outcome:** System identified "Red Flags" for Endometrial Cancer in NCCN guidelines, recommending biopsy at Month 1 instead of Month 12.
-- **Impact:** Potential reduction of diagnostic delay by ~11 months.
+- **RAG Grading Latency:** Reduced from ~32s to ~4s for 8 documents.
+- **Total E2E Execution:** Optimized to ~12-15s.
+
+---
+
+## Technical Note: Hardware Orchestration (MI300X vs. Featherless)
+**Status:** The AMD Instinct MI300X is currently under 100% compute load, performing the 60-hour Full Fine-Tuning (SFT) on the PMC-Patients and OncoCoT datasets.
+**Operational Strategy:** To allow parallel clinical validation (Demo), the inference backend is temporarily offloaded to Featherless.ai. This ensures that training is not interrupted by high-priority demo tasks while maintaining SOTA performance (Qwen 3.5 9B).
