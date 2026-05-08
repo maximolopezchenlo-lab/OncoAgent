@@ -77,7 +77,7 @@ def data_ingestion_node(state: AgentState) -> Dict[str, Any]:
 
     text_lower = text.lower()
 
-    # Cancer type heuristic
+    # Cancer type heuristic (Explicit + Symptom-based risk)
     cancer_keywords = {
         "breast": "Breast Cancer",
         "lung": "Lung Cancer",
@@ -105,6 +105,12 @@ def data_ingestion_node(state: AgentState) -> Dict[str, Any]:
         "gastric": "Gastric Cancer",
         "cholangiocarcinoma": "Cholangiocarcinoma",
         "mesothelioma": "Mesothelioma",
+        # Symptom-based risk mapping (Triage mode)
+        "menstrual": "Endometrial Cancer",
+        "vaginal bleeding": "Uterine Cancer",
+        "abnormal bleeding": "Endometrial Cancer",
+        "irregular periods": "Endometrial Cancer",
+        "postmenopausal": "Endometrial Cancer",
     }
     for keyword, label in cancer_keywords.items():
         if keyword in text_lower:

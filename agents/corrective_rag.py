@@ -235,11 +235,15 @@ def corrective_rag_node(state: AgentState) -> Dict[str, Any]:
     query_parts = []
     if cancer != "Unknown":
         query_parts.append(cancer)
+    else:
+        # Fallback: use first 100 chars of clinical text for vector search
+        query_parts.append(clinical_text[:100].replace("\n", " "))
+    
     if stage != "Unknown":
         query_parts.append(stage)
     if mutations:
         query_parts.append(f"mutations: {mutations}")
-    query_parts.append("treatment recommendation guidelines")
+    query_parts.append("treatment recommendation guidelines triage")
     query = " ".join(query_parts)
 
     rewrite_count = 0
