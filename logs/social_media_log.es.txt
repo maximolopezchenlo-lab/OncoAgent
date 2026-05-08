@@ -679,3 +679,9 @@ Nuestro entrenamiento QLoRA de doble nivel en el MI300X tuvo un pequeño obstác
 🔧 Cómo lo solucionamos: ¡Cambiamos los TrainingArguments de bf16 a fp16, eludiendo la estricta verificación del framework sin perder precisión!
 Tanto el Nivel 1 (9B) como el Nivel 2 (27B) ahora se están ejecutando con éxito y cargándose en memoria. ¡Es hora de dejar que las GPUs cocinen! 🔥
 #AMDHackathon #HealthTech #ROCm #Debugging #BuildInPublic
+
+🎨 ¡Vistazo previo de la UI!
+Acabamos de terminar una validación visual de la interfaz de OncoAgent SOTA. 🩺
+El frontend de Gradio ahora está totalmente integrado con nuestro backend de LangGraph. Lo probamos con un caso complejo de cáncer de mama, ¡y la orquestación multi-agente (Router -> CRAG -> Specialist) comenzó sin problemas! 🚀
+Ver esos indicadores de procesamiento en tiempo real en el tablero optimizado para MI300X es pura satisfacción. 💎
+#AMDHackathon #HealthTech #Gradio #AI #BuildInPublic

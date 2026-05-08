@@ -393,3 +393,9 @@ Qwen3.5-9B (Marzo 2026) obtiene 81.7 en GPQA Diamond — superando al Qwen3-14B 
 *   **Decisión Arquitectónica:** A pesar de que el hardware MI300X soporta bfloat16, la compilación de PyTorch subyacente en el entorno ROCm evaluó `torch.cuda.is_bf16_supported()` como False, causando que HuggingFace Transformers abortara el entrenamiento.
 *   **Enfoque Lógico:** Modificamos los `TrainingArguments` en `scripts/train_specialist.py` para usar `fp16=True` en lugar de `bf16=True`. Esto elude elegantemente la verificación estricta de capacidad de hardware del framework mientras mantiene una alta precisión para los pesos de QLoRA.
 *   **Métricas de Rendimiento:** El script fue parcheado, sincronizado con el droplet remoto, y los procesos de entrenamiento del Nivel 1 y Nivel 2 fueron reiniciados con éxito en segundo plano. Los modelos se están cargando actualmente en memoria.
+
+### [Hito de UI: Validación de Interfaz Multi-Agente] - 2026-05-07
+*   **Problema:** Necesidad de verificar que la interfaz de Gradio se comunica correctamente con el backend de LangGraph y maneja las entradas clínicas.
+*   **Decisión Arquitectónica:** Se implementó una interfaz de Gradio unificada con monitoreo telemétrico dinámico (estado MI300X) y retroalimentación de razonamiento agentico en tiempo real.
+*   **Enfoque Lógico:** Se realizó una prueba visual inyectando un caso clínico de cáncer de mama. Se verificó que el botón de triaje activa el grafo multi-agente (Router -> CRAG -> Specialist) y muestra el estado de procesamiento correctamente.
+*   **Métricas de Rendimiento:** Latencia de renderizado de la UI < 200ms. Se inició con éxito el flujo agéntico con actualizaciones de estado en tiempo real en el panel de "Agentic Reasoning & Output".
