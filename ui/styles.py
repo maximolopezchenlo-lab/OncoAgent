@@ -59,8 +59,9 @@ html, body, gradio-app {
 }
 
 /* Base background for inputs/forms to fix transparency */
-.gr-form, .gr-dropdown {
-    background: #0f172a !important;
+.gr-form, .gr-dropdown, .gr-input, .gr-textbox, .gr-padded, .gr-group {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
     border-radius: 10px !important;
 }
 
@@ -105,15 +106,29 @@ html, body, gradio-app {
     font-weight: 600;
     letter-spacing: 0.05em;
     border: 1px solid rgba(239, 68, 68, 0.25);
+}/* ── Sidebar Column ──────────────────────────────────────────────────── */
+.sidebar-column {
+    background: #0f172a !important;
+    gap: 16px !important;
 }
 
 /* ── Cards ────────────────────────────────────────────────────────────── */
 .card {
+    --block-background-fill: #1e293b !important;
+    --background-fill-primary: #1e293b !important;
+    --background-fill-secondary: #1e293b !important;
     background: #1e293b !important; /* Solid background */
+    background-color: #1e293b !important;
     border: 1px solid #334155 !important;
     border-radius: 14px !important;
     padding: 18px !important;
     transition: border-color 0.2s ease-out !important;
+}
+.card > .gr-block, .card > .gr-box, .card .gr-form, .card .gr-group,
+.card .gr-padded, .card .gr-block, .card .gr-box, .card .gr-row, .card .gr-col {
+    background: #1e293b !important;
+    background-color: #1e293b !important;
+    border: none !important;
 }
 .card:hover { border-color: #475569 !important; }
 
@@ -135,46 +150,28 @@ html, body, gradio-app {
 }
 
 .btn-send {
-    background: #f1f5f9 !important;
-    color: #0f172a !important;
-    border-radius: 50% !important;
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
+    background: #0ea5e9 !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
     padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    font-size: 1.2rem !important;
+    font-size: 1.1rem !important;
     border: none !important;
     cursor: pointer !important;
-    transition: transform 0.1s ease !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3) !important;
 }
 .btn-send:hover {
-    transform: scale(1.05) !important;
-    background: #ffffff !important;
+    transform: translateY(-2px) !important;
+    background: #38bdf8 !important;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4) !important;
 }
 
-.btn-clear {
-    background: transparent !important;
-    color: #94a3b8 !important;
-    border-radius: 50% !important;
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    font-size: 1.2rem !important;
-    border: 1px solid #334155 !important;
-    cursor: pointer !important;
-    transition: background 0.1s ease !important;
-}
-.btn-clear:hover {
-    background: #334155 !important;
-    color: #f1f5f9 !important;
-}
 
 /* ── Section Titles ──────────────────────────────────────────────────── */
 .section-title {
@@ -192,15 +189,14 @@ html, body, gradio-app {
 
 /* ── KPI Tiles ───────────────────────────────────────────────────────── */
 .kpi-tile {
-    background: rgba(30, 41, 59, 0.6);
-    backdrop-filter: blur(8px);
-    border: 1px solid #334155;
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
     border-radius: 10px;
     padding: 14px;
     text-align: center;
     transition: border-color 0.2s ease-out;
 }
-.kpi-tile:hover { border-color: #0ea5e9; }
+.kpi-tile:hover { border-color: #0ea5e9 !important; }
 .kpi-label {
     font-size: 0.68rem; font-weight: 500; color: #64748b;
     text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
@@ -242,7 +238,7 @@ button.secondary:hover, button[variant="secondary"]:hover {
 /* The select element itself */
 select, .gr-dropdown select,
 [data-testid="dropdown"] select,
-.single-select, .multiselect {
+.single-select, .multiselect, .gr-dropdown {
     background: #1e293b !important;
     background-color: #1e293b !important;
     color: #e2e8f0 !important;

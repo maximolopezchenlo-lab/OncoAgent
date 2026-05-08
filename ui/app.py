@@ -187,7 +187,7 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
 
     with gr.Row():
         # ── LEFT SIDEBAR ────────────────────────────────────────────
-        with gr.Column(scale=1, min_width=280):
+        with gr.Column(scale=1, min_width=280, elem_classes="sidebar-column"):
             # Session Controls
             with gr.Column(elem_classes="card"):
                 gr.HTML("<div class='section-title'>Session</div>")
@@ -203,6 +203,7 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
                     value="auto",
                     info="Auto-routes based on case complexity",
                 )
+                new_session_btn = gr.Button("↻ New Session", variant="secondary", size="sm")
 
             # KPI Row
             with gr.Row():
@@ -250,6 +251,7 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
                     show_label=False,
                     elem_classes="gr-chatbot",
                     height=620,
+                    type="tuples",
                 )
                 with gr.Row(elem_classes="chat-input-row"):
                     case_input = gr.Textbox(
@@ -258,11 +260,8 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
                         container=False,
                         scale=8,
                     )
-                    clear_btn = gr.Button(
-                        "↻", variant="secondary", elem_classes="btn-clear", min_width=40, scale=0
-                    )
                     triage_btn = gr.Button(
-                        "↑", variant="primary", elem_classes="btn-send", min_width=40, scale=0
+                        "↑", variant="primary", elem_classes="btn-send", min_width=44, scale=1
                     )
 
     # ── Interaction Logic (Streaming) ─────────────────────────────────
@@ -343,12 +342,12 @@ with gr.Blocks(title="OncoAgent — Clinical Triage") as demo:
     triage_btn.click(fn=process_and_stream, inputs=inputs, outputs=outputs)
     case_input.submit(fn=process_and_stream, inputs=inputs, outputs=outputs)
 
-    clear_btn.click(
-        lambda: [
+    new_session_btn.click(
+        lambda: (
             [], "", generate_patient_id(), "auto", "—", "—",
             "", "", "",
             "<div class='status-bar'>System ready.</div>",
-        ],
+        ),
         outputs=[
             chatbot, case_input, patient_id_input, tier_override_input,
             confidence_val, sources_val,

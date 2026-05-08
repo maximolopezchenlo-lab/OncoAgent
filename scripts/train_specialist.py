@@ -174,7 +174,7 @@ def tokenize_dataset(
             examples["text"],
             truncation=True,
             max_length=max_length,
-            padding=False,
+            padding="max_length",
         )
         # DataCollatorForLanguageModeling automatically handles creating labels
         # padded with -100, so we don't need to manually copy input_ids here.
