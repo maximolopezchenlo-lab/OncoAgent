@@ -1,6 +1,20 @@
 🚀# OncoAgent - Registro de Build-in-Public
 ---
-## [08-05-2026] ¡Multi-tasking como un profesional en AMD MI300X! 🚀
+## [08-05-2026] ¡Actualización SOTA: Qwen 3.5 9B ya está aquí! 🧠🚀
+
+¡Gran noticia para #OncoAgent! Hemos transicionado oficialmente nuestro backend de inferencia a **Qwen 3.5 9B**.
+
+Mientras nuestra AMD MI300X continúa su entrenamiento masivo de 60 horas para el modelo especialista personalizado, ya estamos usando lo último de Qwen 3.5 9B para las validaciones E2E.
+
+✅ Razonamiento médico más agudo.
+✅ Rendimiento de tokens optimizado en Featherless.ai.
+✅ ¡El puente de evidencia genómica (CIViC API) ya está corregido y funcionando!
+
+El sistema de triaje se siente increíblemente rápido e inteligente. ¡Estamos listos para la demo! 💻🏥
+
+#OncoAgent #AMDHackathon #ROCm #Qwen35 #HealthTech #BuildInPublic
+
+---
 
 Mientras nuestra instancia MI300X está dándolo todo con el entrenamiento SFT para el OncoAgent (eta ~60h de aprendizaje profundo), ¡no queríamos dejar de probar!
 

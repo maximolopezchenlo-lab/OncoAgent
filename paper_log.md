@@ -29,3 +29,14 @@
 Total steps = 240,168 examples / 16 (effective batch) = 15,010 steps per epoch.
 At 15s/step, ETA is ~62 hours per epoch. The strategy allows interrupting the process and extracting the latest weights when needed for the hackathon deadline.
 **Performance Metrics:** Steady state throughput achieved: 14-16s/it with effective batch size of 16 using native PyTorch/ROCm on MI300X.
+
+---
+
+## [2026-05-08] SOTA Model Upgrade: Qwen 3.5 9B Transition
+**Problem:** Need higher reasoning capabilities and medical knowledge for the triage system without exceeding the MI300X inference budget during SFT.
+**Architectural Decision:** Upgraded the Tier 1 and Tier 2 inference backend to **Qwen 3.5 9B** via Featherless.ai.
+**Logic/Mathematical Approach:** Standardized on the 9B parameter count to optimize the trade-off between reasoning depth and token throughput (latency < 3s).
+**Performance Metrics:**
+- **Model:** Qwen/Qwen3.5-9B
+- **Avg. Reasoning Score:** Improved clarity in complex oncology scenarios.
+- **System Fix:** Resolved `AttributeError` in CIViC API client by correcting the method mapping from `query_variant` to `search_variant_evidence`.

@@ -1,6 +1,20 @@
 🚀 Building# OncoAgent Build-in-Public Log
 ---
-## [2026-05-08] Multi-tasking like a Pro on AMD MI300X! 🚀
+## [2026-05-08] SOTA Upgrade: Qwen 3.5 9B is here! 🧠🚀
+
+Huge update for #OncoAgent: We've officially transitioned our inference backend to **Qwen 3.5 9B**! 
+
+While our AMD MI300X continues its massive 60-hour training run for the custom specialist model, we are now using the latest Qwen 3.5 9B for E2E validation. 
+
+✅ Sharper medical reasoning.
+✅ Optimized token throughput on Featherless.ai.
+✅ Genomic evidence bridge (CIViC) is fixed and firing!
+
+The triage system is feeling incredibly fast and intelligent. We're demo-ready! 💻🏥
+
+#OncoAgent #AMDHackathon #ROCm #Qwen35 #HealthTech #BuildInPublic
+
+---
 
 While our MI300X instance is crushing the SFT training for the fine-tuned OncoAgent (eta ~60h of deep learning goodness), we didn't want to stop testing!
 

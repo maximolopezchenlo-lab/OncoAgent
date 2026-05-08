@@ -29,3 +29,14 @@
 Pasos totales = 240.168 ejemplos / 16 (batch efectivo) = 15.010 pasos por época.
 A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrumpir el proceso y usar los últimos pesos guardados para la demo del hackathon.
 **Métricas de Rendimiento:** Throughput estable alcanzado: 14-16s/iteración con batch size efectivo de 16 usando PyTorch nativo en ROCm sobre la GPU MI300X.
+
+---
+
+## [08-05-2026] Actualización a Modelo SOTA: Transición a Qwen 3.5 9B
+**Problema:** Necesidad de mayores capacidades de razonamiento y conocimiento médico para el sistema de triaje sin exceder el presupuesto de inferencia de la MI300X durante el SFT.
+**Decisión Arquitectónica:** Se actualizó el backend de inferencia Tier 1 y Tier 2 a **Qwen 3.5 9B** a través de Featherless.ai.
+**Enfoque Lógico/Matemático:** Estandarización en el conteo de parámetros de 9B para optimizar el equilibrio entre profundidad de razonamiento y rendimiento de tokens (latencia < 3s).
+**Métricas de Rendimiento:**
+- **Modelo:** Qwen/Qwen3.5-9B
+- **Puntuación de Razonamiento Promedio:** Claridad mejorada en escenarios oncológicos complejos.
+- **Corrección del Sistema:** Se resolvió el error `AttributeError` en el cliente de la API de CIViC corrigiendo el mapeo del método de `query_variant` a `search_variant_evidence`.

@@ -157,7 +157,7 @@ def _fetch_api_evidence(entities: Dict[str, Any]) -> Dict[str, List[str]]:
             client = CivicAPIClient()
             evidence = []
             for mutation in mutations:
-                civic_results = client.query_variant(mutation, cancer)
+                civic_results = client.search_variant_evidence(mutation, cancer)
                 for r in civic_results:
                     evidence.append(
                         f"[CIViC] {mutation}: {r.get('summary', 'No summary available')}"
