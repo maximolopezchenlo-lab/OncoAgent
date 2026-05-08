@@ -1,5 +1,16 @@
 # OncoAgent Academic Paper Log
 
+## [2026-05-08] End-to-End System Validation (Qwen Base)
+
+**Problem:** Verify the full multi-agent orchestration and RAG pipeline without interrupting the ongoing SFT training on the MI300X.
+**Architectural Decision:** Implemented a dual-backend strategy for LLM inference. While the local MI300X GPU is saturated with training (SFT), the inference for E2E validation is delegated to **Featherless.ai** using an OpenAI-compatible client in `agents/tools.py`.
+**Performance Metrics:**
+- **Inference Latency:** ~2.5s for Tier 1 (Qwen 2.5 7B Instruct).
+- **Graph Execution:** ~45s (including heavy CRAG document grading for 34 retrieved chunks).
+- **Outcome:** Successfully verified that the Router, CRAG, Specialist, Critic, and Formatter nodes are properly interconnected. The system correctly identifies common oncology cases and retrieves relevant documents from the ChromaDB vector store.
+
+---
+
 ## Technical Milestone: UI/UX Refinement & Gradio 6 Adaptation
 **Date:** 2026-05-08
 **Problem:** Gradio 6 components exhibited transparency issues and session management was non-intuitive (blocking "clear" button).

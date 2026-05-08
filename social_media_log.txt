@@ -1,3 +1,19 @@
+🚀 Building# OncoAgent Build-in-Public Log
+---
+## [2026-05-08] Multi-tasking like a Pro on AMD MI300X! 🚀
+
+While our MI300X instance is crushing the SFT training for the fine-tuned OncoAgent (eta ~60h of deep learning goodness), we didn't want to stop testing!
+
+💡 **The Hack:** We implemented a dual-backend strategy. While the local GPU handles the heavy training, we've successfully validated the entire LangGraph orchestration using an external inference backend.
+✅ Full system E2E validation complete!
+✅ Router, RAG (Corrective RAG!), and Multi-Agent Reflexion are all green.
+✅ UI is live and responsive.
+
+This means we can polish the interface and demo while the "brain" gets its specialized training.
+
+#AMDHackathon #HealthTech #ROCm #OpenSourceAI #Oncology
+---
+
 🚀 Building OncoAgent in Public: UI & Performance Upgrades! 🚀
 
 Huge progress today on two critical fronts for the #AMDHackathon:

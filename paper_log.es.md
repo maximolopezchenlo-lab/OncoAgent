@@ -1,5 +1,16 @@
 # Registro del Artículo Académico OncoAgent
 
+## [08-05-2026] Validación de Sistema de Extremo a Extremo (Qwen Base)
+
+**Problema:** Verificar la orquestación multi-agente completa y el pipeline RAG sin interrumpir el entrenamiento SFT en curso en la MI300X.
+**Decisión Arquitectónica:** Implementación de una estrategia de backend dual para inferencia de LLM. Mientras la GPU MI300X local está saturada con el entrenamiento (SFT), la inferencia para la validación E2E se delega a **Featherless.ai** mediante un cliente compatible con OpenAI en `agents/tools.py`.
+**Métricas de Rendimiento:**
+- **Latencia de Inferencia:** ~2.5s para Tier 1 (Qwen 2.5 7B Instruct).
+- **Ejecución del Grafo:** ~45s (incluyendo la calificación intensiva de documentos CRAG para 34 fragmentos recuperados).
+- **Resultado:** Se verificó con éxito que los nodos Router, CRAG, Specialist, Critic y Formatter están correctamente interconectados. El sistema identifica correctamente casos oncológicos comunes y recupera documentos relevantes del almacén de vectores ChromaDB.
+
+---
+
 ## Hito Técnico: Refinamiento de UI/UX y Adaptación a Gradio 6
 **Fecha:** 2026-05-08
 **Problema:** Los componentes de Gradio 6 presentaban problemas de transparencia y la gestión de sesiones no era intuitiva (botón "clear" bloqueante).
