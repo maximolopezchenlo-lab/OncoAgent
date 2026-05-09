@@ -201,7 +201,7 @@ def _fetch_api_evidence(entities: Dict[str, Any]) -> Dict[str, List[str]]:
 # ---------------------------------------------------------------------------
 
 # Minimum relevant documents required to proceed
-_MIN_RELEVANT_DOCS = 1
+_MIN_RELEVANT_DOCS = 2
 # Maximum query rewrite attempts
 _MAX_REWRITES = 1
 

@@ -49,8 +49,8 @@ def _route_after_router(state: AgentState) -> str:
     if decision == "insufficient":
         logger.info("Router → Fallback (insufficient input)")
         return "fallback"
-    # Both "simple" and "complex" proceed to corrective_rag
-    return "corrective_rag"
+    # Both "simple" and "complex" proceed to ingestion
+    return "ingestion"
 
 
 def _route_after_crag(state: AgentState) -> str:
@@ -197,21 +197,21 @@ def build_oncoagent_graph() -> StateGraph:
     workflow.add_node("fallback", fallback_node)
 
     # --- Define Edges ---
-    # Entry point: Ingestion first to have entities for the router
-    workflow.set_entry_point("ingestion")
+    # Entry point
+    workflow.set_entry_point("router")
 
-    # Ingestion → Router (always)
-    workflow.add_edge("ingestion", "router")
-
-    # Router → Corrective RAG or Fallback (conditional)
+    # Router → Ingestion or Fallback (conditional)
     workflow.add_conditional_edges(
         "router",
         _route_after_router,
         {
-            "corrective_rag": "corrective_rag",
+            "ingestion": "ingestion",
             "fallback": "fallback",
         },
     )
+
+    # Ingestion → Corrective RAG (always)
+    workflow.add_edge("ingestion", "corrective_rag")
 
     # Corrective RAG → Specialist or Fallback (conditional)
     workflow.add_conditional_edges(

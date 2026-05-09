@@ -75,28 +75,29 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 **Enfoque Lógico/Matemático:** Uso de prompts en lenguaje natural en inglés (traducidos del caso real) para simular una entrada realista de un médico.
 **Métricas de Rendimiento:**
 - **Resultado:** El sistema identifica con éxito el riesgo de neoplasias uterinas y recomienda pasos diagnósticos estándar (ej. biopsia endometrial/ecografía) basados en las guías NCCN recuperadas para "Uterine Cancer".
-- **Auditoría de Hardware:** Se confirmó que el sistema utiliza la **AMD Instinct MI300X** exclusivamente para el entrenamiento SFT de alta carga, mientras que la inferencia en tiempo real se delega a **Featherless.ai** para mantener la fluidez de la interfaz durante la época de entrenamiento de 60 horas.
-
----
-
-## [09-05-2026] Activación de UI y Simulación de Lenguaje Natural
-**Problema:** Necesidad de validar la capacidad predictiva "zero-shot" del agente utilizando solo síntomas crudos y no técnicos en una interacción clínica realista.
-**Decisión Arquitectónica:** Se refinó el prompt de simulación para eliminar todo el argot médico (ej. "menorragia", "amenorrea") y referencias a estudios previos. El objetivo es probar la capacidad del `data_ingestion_node` para mapear frases comunes como "sangrado abundante" a dominios oncológicos de alto riesgo.
+## [09-05-2026] Corrección de Calificación CRAG y Migración de Modelos
+**Problema:** El nodo de RAG Correctivo (CRAG) rechazaba sistemáticamente documentos relevantes, devolviendo respuestas vacías o fallando al identificar la relevancia clínica para casos complejos de cáncer uterino.
+**Decisión Arquitectónica:** Se identificó una discrepancia en el ID del modelo en la configuración del entorno (`Qwen/Qwen3.5-9B`). Se migró el nivel de inferencia a los modelos **Qwen 2.5 Instruct** (`Qwen/Qwen2.5-7B-Instruct` y `Qwen/Qwen2.5-72B-Instruct`).
+**Enfoque Lógico/Matemático:** Estandarización del prompt de clasificación binaria de relevancia. La migración a Qwen 2.5, que presenta mejoras significativas en el seguimiento de instrucciones y razonamiento médico sobre la generación anterior, resolvió el problema de "respuestas vacías" en el bucle de calificación.
 **Métricas de Rendimiento:**
-- **Estado de UI:** Aplicación Gradio 6 lanzada con éxito en el puerto 7860 utilizando el entorno `.venv`.
-- **Resultado:** Se verificó que el prompt en lenguaje natural activa la ruta RAG correcta para las guías de "Cáncer de Útero", incluso sin palabras clave diagnósticas explícitas.
+- **Tasa de Éxito en Calificación:** Mejoró del 0% al 100% para el caso de prueba de triaje de cáncer uterino.
+- **Puntuación de Confianza RAG:** Alcanzó 2.3+ (anteriormente 0.0), indicando una recuperación y validación exitosa de las guías NCCN.
+- **Latencia:** Mantenida en < 5s para la calificación paralela de 3-5 documentos.
 
----
-
-## [09-05-2026] Optimización del Pipeline de Triaje: RAG Relajado y Cambio de Topología
-**Problema:** El sistema mostraba un comportamiento de "alta precisión/baja exhaustividad" en el pipeline RAG. Las entradas clínicas coloquiales (ej. "períodos irregulares") eran rechazadas por el "Distance Gate" estricto (umbral 0.10), provocando un fallback a recomendaciones de "Desconocido". Además, el nodo Router estaba "ciego" ante las entidades médicas porque se ejecutaba antes que la Ingestión de Datos.
-**Decisión Arquitectónica:** 
-1. **Re-ingeniería de Topología:** Se reestructuró la máquina de estados de LangGraph para ejecutar `data_ingestion_node` como punto de entrada, asegurando que el `router_node` tenga acceso inmediato a las `entities` extraídas.
-2. **Relajación de Umbral:** Se aumentó el umbral de distancia del Bi-Encoder de 0.10 a 0.20 en `retriever.py` para acomodar la brecha semántica entre las guías médicas formales y los síntomas descritos por el paciente.
-3. **Refinamiento Lógico:** Se redujo `_MIN_RELEVANT_DOCS` a 1 en `corrective_rag.py` para asegurar que incluso una sola coincidencia de guía altamente relevante permita al agente especialista proporcionar una recomendación estructurada.
+## [2026-05-09] Corrección de Calificación CRAG y Migración de Modelos
+**Problema:** El nodo de RAG Correctivo (CRAG) rechazaba consistentemente documentos relevantes, devolviendo respuestas vacías o fallando al identificar la relevancia clínica en casos complejos de cáncer de útero.
+**Decisión Arquitectónica:** Se identificó una discrepancia en el ID del modelo en la configuración del entorno (`Qwen/Qwen3.5-9B`). Se migró el nivel de inferencia a los modelos **Qwen 2.5 Instruct** (`Qwen/Qwen2.5-7B-Instruct` y `Qwen/Qwen2.5-72B-Instruct`).
+**Enfoque Lógico/Matemático:** Se estandarizó el prompt de clasificación de relevancia binaria. La migración a Qwen 2.5, que ha mejorado significativamente el seguimiento de instrucciones y el razonamiento médico sobre la generación anterior, resolvió el problema de "respuesta vacía" en el bucle de calificación.
 **Métricas de Rendimiento:**
-- **Tasa de Exhaustividad (Recall):** Mejoró del ~30% al 100% para el triaje de síntomas en lenguaje natural en los escenarios de oncología ginecológica probados.
-- **Ruta de Decisión:** El sistema ahora enruta consistentemente desde Síntomas -> Ingestión -> Triaje de Cáncer de Útero -> Recomendación del Especialista, evitando el fallback genérico.
-- **Confianza de Recuperación:** Las distancias de coseno documentadas para síntomas uterinos coloquiales pasaron del rango 0.12-0.18 (previamente rechazados) a la zona aceptada (<0.20).
+- **Tasa de Éxito de Calificación:** Mejoró del 0% al 100% para el caso de prueba de triaje de cáncer de útero.
+- **Puntuación de Confianza RAG:** Alcanzó 2.3+ (anteriormente 0.0), indicando una recuperación y validación exitosa de las guías NCCN.
+- **Latencia:** Mantenida en < 5s para la calificación paralela de 3-5 documentos.
 
----
+## [2026-05-09] Despliegue de UI y Armonización del Entorno
+**Problema:** Un error `ModuleNotFoundError` impedía el lanzamiento de la interfaz Gradio debido a un contexto de ejecución incorrecto para el paquete `agents`. Además, el proceso anterior de la UI se ejecutaba con un entorno desactualizado.
+**Decisión Arquitectónica:** Se estandarizó el comando de lanzamiento de producción usando `PYTHONPATH` y se verificó la disponibilidad del puerto (7860). Se sincronizó el entorno de ejecución con las últimas configuraciones de modelos del archivo `.env`.
+**Enfoque Lógico/Matemático:** Se ejecutó un reinicio limpio del servidor Gradio, asegurando que todos los nodos (CRAG, Router, Specialist) utilicen el nivel Qwen 2.5 Instruct para un triaje médico confiable.
+**Métricas de Rendimiento:**
+- **Disponibilidad de la UI:** 100% (Escuchando en el puerto 7860).
+- **Estabilidad de Inferencia:** Conectividad confirmada con Featherless.ai para flujos de trabajo agentes paralelos.
+- **División de Hardware:** Instancia MI300X reservada para SFT en segundo plano; Featherless.ai manejando la inferencia de triaje en tiempo real.

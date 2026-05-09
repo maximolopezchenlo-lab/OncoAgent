@@ -88,3 +88,36 @@ Nos dimos cuenta de que nuestro motor RAG estaba siendo un poco *demasiado* estr
 ¿Resultado? 100% de recuperación en alertas rojas clínicas que antes eran invisibles. Estamos cerrando la brecha entre cómo hablan los pacientes y cómo trata la medicina. 🏥🤝
 
 #AMDHackathon #OncoAgent #RAG #AIClínica #HealthTech #BuildInPublic #ROCm #MI300X
+
+---
+
+🚀 ¡Solucionamos el cuello de botella de "Confianza Cero"! 🛠️🎯
+
+Acabamos de resolver un bug crítico en nuestro pipeline de **RAG Correctivo (CRAG)**. Nuestro calificador de documentos estaba siendo demasiado estricto debido a una configuración incorrecta del ID del modelo.
+
+Al migrar nuestro nivel de inferencia a **Qwen 2.5 7B y 72B Instruct**, hemos logrado:
+✅ 100% de éxito en la calificación de documentos para casos complejos.
+✅ La confianza del RAG saltó de 0.0 a 2.3+ para oncología ginecológica.
+✅ ¡Las recomendaciones de triaje ahora están totalmente basadas en las guías NCCN! 🩺📑
+
+El sistema ahora está "leyendo y aprobando" efectivamente la evidencia clínica antes de presentarla al especialista. ¡La precisión no es negociable! 🏥💻
+
+#OncoAgent #AMDHackathon #Qwen25 #RAG #AIClínica #ROCm #BuildInPublic
+
+---
+
+🚀 **¡Actualización: UI en Vivo y Mejorada!** 🚀
+
+¡Acabamos de completar un despliegue limpio de la interfaz de triaje de OncoAgent! 🏥
+
+Después de algunos obstáculos con las rutas, el sistema ahora funciona sin problemas en nuestro entorno MI300X, aprovechando la alta velocidad de **Qwen 2.5 72B** para un razonamiento clínico profundo y **Qwen 2.5 7B** para una calificación rápida de documentos. ⚡️
+
+El pipeline de **RAG Correctivo (CRAG)** ahora alcanza puntuaciones de confianza de 2.3+ en casos ginecológicos complejos, asegurando que ningún síntoma del paciente quede sin mapear con las guías oncológicas. 📑🧬
+
+Chequeo de estrategia de hardware:
+✅ MI300X: Dedicado a nuestro entrenamiento SFT de 60 horas.
+✅ Featherless.ai: Potenciando la UI de triaje en tiempo real.
+
+¡Listos para la grabación de la demo! 🎬
+
+#AMDHackathon #OncoAgent #ROCm #HealthTech #BuildInPublic

@@ -59,12 +59,20 @@ def data_ingestion_node(state: AgentState) -> Dict[str, Any]:
     """
     text: str = state.get("clinical_text", "")
 
-    # --- Zero-PHI check ---
+    # --- Zero-PHI check and redaction ---
     phi_found = False
+    cleaned_text = text
     for pattern in _PHI_PATTERNS:
         if pattern.search(text):
             phi_found = True
-            break
+            # Redact detected PHI
+            cleaned_text = pattern.sub("[REDACTED]", cleaned_text)
+    
+    if phi_found:
+        logger.warning("PHI detected and redacted from clinical input.")
+
+    # Use cleaned text for downstream processing
+    text = cleaned_text
 
     # --- Rule-based entity extraction ---
     extracted: Dict[str, Any] = {
