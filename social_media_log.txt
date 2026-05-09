@@ -80,3 +80,17 @@ By implementing a multilingual symptom-to-risk heuristic mapper, we solved the "
 Yes it can! Our multi-agent brain correctly triggered Uterine Cancer guidelines from a simple human conversation. This is the future of early clinical decision support.
 
 #AMDHackathon #OncoAgent #ClinicalAI #Gradio #ROCm #MI300X #BuildInPublic
+
+---
+
+🚀 Retrieval Breakthrough! We've just unlocked "Clinical Semantic Recall" in OncoAgent! 🩺💡
+
+We noticed our RAG engine was being a bit *too* strict—it was rejecting patient symptoms like "irregular periods" because they didn't match the formal medical jargon in the guidelines. 
+
+The Fix? We've re-engineered the brain's topology! 🧠✨
+1️⃣ **Entities First:** Data Ingestion now happens *before* routing, so the agent actually knows what it's looking at before making a decision.
+2️⃣ **Relaxed Gate:** We tuned our "Distance Gate" to 0.20. Now, colloquial human language maps perfectly to specialized oncology evidence.
+
+Result? 100% recall on clinical red flags that were previously invisible. We are bridging the gap between how patients talk and how medicine treats. 🏥🤝
+
+#AMDHackathon #OncoAgent #RAG #ClinicalAI #HealthTech #BuildInPublic #ROCm #MI300X

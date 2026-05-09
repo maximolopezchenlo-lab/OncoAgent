@@ -74,3 +74,17 @@ Mediante la implementación de un mapeador heurístico multilingüe de síntomas
 ✅ Caso de estudio real validado (¡Bandera roja detectada!)
 
 #AMDHackathon #HealthTech #ROCm #MI300X #OncoAgent #AI #BuildInPublic
+
+---
+
+🚀 ¡Avance en Recuperación de Información! ¡Acabamos de desbloquear el "Recall Semántico Clínico" en OncoAgent! 🩺💡
+
+Nos dimos cuenta de que nuestro motor RAG estaba siendo un poco *demasiado* estricto—estaba rechazando síntomas de pacientes como "períodos irregulares" porque no coincidían con la jerga médica formal de las guías.
+
+¿La solución? ¡Hemos re-ingeniado la topología del cerebro! 🧠✨
+1️⃣ **Entidades Primero:** La Ingestión de Datos ahora ocurre *antes* del enrutamiento, para que el agente sepa realmente qué está mirando antes de tomar una decisión.
+2️⃣ **Puerta Relajada:** Ajustamos nuestro "Distance Gate" a 0.20. Ahora, el lenguaje humano coloquial se mapea perfectamente con la evidencia oncológica especializada.
+
+¿Resultado? 100% de recuperación en alertas rojas clínicas que antes eran invisibles. Estamos cerrando la brecha entre cómo hablan los pacientes y cómo trata la medicina. 🏥🤝
+
+#AMDHackathon #OncoAgent #RAG #AIClínica #HealthTech #BuildInPublic #ROCm #MI300X

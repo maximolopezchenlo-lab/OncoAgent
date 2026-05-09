@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 _COMMON_CANCERS = frozenset({
     "breast cancer", "lung cancer", "colon cancer", "colorectal cancer",
     "prostate cancer", "melanoma", "bladder cancer", "thyroid cancer",
-    "cervical cancer", "ovarian cancer", "gastric cancer",
+    "cervical cancer", "ovarian cancer", "gastric cancer", "uterine cancer",
 })
 
 # Cancer types considered rare or requiring deeper reasoning

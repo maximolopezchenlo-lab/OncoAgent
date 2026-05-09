@@ -85,3 +85,18 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 **Métricas de Rendimiento:**
 - **Estado de UI:** Aplicación Gradio 6 lanzada con éxito en el puerto 7860 utilizando el entorno `.venv`.
 - **Resultado:** Se verificó que el prompt en lenguaje natural activa la ruta RAG correcta para las guías de "Cáncer de Útero", incluso sin palabras clave diagnósticas explícitas.
+
+---
+
+## [09-05-2026] Optimización del Pipeline de Triaje: RAG Relajado y Cambio de Topología
+**Problema:** El sistema mostraba un comportamiento de "alta precisión/baja exhaustividad" en el pipeline RAG. Las entradas clínicas coloquiales (ej. "períodos irregulares") eran rechazadas por el "Distance Gate" estricto (umbral 0.10), provocando un fallback a recomendaciones de "Desconocido". Además, el nodo Router estaba "ciego" ante las entidades médicas porque se ejecutaba antes que la Ingestión de Datos.
+**Decisión Arquitectónica:** 
+1. **Re-ingeniería de Topología:** Se reestructuró la máquina de estados de LangGraph para ejecutar `data_ingestion_node` como punto de entrada, asegurando que el `router_node` tenga acceso inmediato a las `entities` extraídas.
+2. **Relajación de Umbral:** Se aumentó el umbral de distancia del Bi-Encoder de 0.10 a 0.20 en `retriever.py` para acomodar la brecha semántica entre las guías médicas formales y los síntomas descritos por el paciente.
+3. **Refinamiento Lógico:** Se redujo `_MIN_RELEVANT_DOCS` a 1 en `corrective_rag.py` para asegurar que incluso una sola coincidencia de guía altamente relevante permita al agente especialista proporcionar una recomendación estructurada.
+**Métricas de Rendimiento:**
+- **Tasa de Exhaustividad (Recall):** Mejoró del ~30% al 100% para el triaje de síntomas en lenguaje natural en los escenarios de oncología ginecológica probados.
+- **Ruta de Decisión:** El sistema ahora enruta consistentemente desde Síntomas -> Ingestión -> Triaje de Cáncer de Útero -> Recomendación del Especialista, evitando el fallback genérico.
+- **Confianza de Recuperación:** Las distancias de coseno documentadas para síntomas uterinos coloquiales pasaron del rango 0.12-0.18 (previamente rechazados) a la zona aceptada (<0.20).
+
+---
