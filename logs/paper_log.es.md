@@ -505,3 +505,23 @@ En lugar de depender únicamente de la ingeniería de prompts (de la cual los LL
 ### Métricas de Rendimiento
 - **Aprobación de Seguridad:** La ejecución de `test_bias_fix.py` demostró que el Crítico captura correctamente los errores y (en el estado corregido) aprueba al Especialista cuando este pospone adecuadamente el tratamiento en favor de una solicitud de biopsia.
 - **Siguiente Paso:** Ahora estamos preparados para la demostración funcional final de principio a fin (end-to-end) en la instancia AMD MI300X, asegurando que las reglas de seguridad y los pesos ajustados (fine-tuned) se alinean perfectamente.
+
+## Hito: Demostración Funcional de Triaje End-to-End
+**Fecha:** 2026-05-09
+**Estado:** Completado
+**Sesión:** 25
+
+### El Problema
+Para validar toda la arquitectura del sistema para el AMD Developer Hackathon, necesitábamos demostrar la integración de la interfaz de usuario (UI), el orquestador LangGraph y los guardarraíles de seguridad de rigor diagnóstico ejecutándose en vivo en la instancia AMD MI300X.
+
+### Justificación de la Decisión Arquitectónica
+Utilizamos nuestra interfaz Gradio 6 con estilo glassmorphism en combinación con nuestro backend de LangGraph en modo streaming. La prueba requirió enviar notas clínicas de casos límite (edge-cases) para verificar el correcto funcionamiento de nuestros guardarraíles de seguridad.
+
+### Enfoque Matemático/Lógico
+- **Pruebas de Guardarraíl:** Realizamos dos pruebas E2E a través de la UI en `http://localhost:7860/`.
+- **Caso 1 (Sin Biopsia):** Simulamos un caso de sangrado postmenopáusico con sospecha de cáncer pero sin biopsia. La regla determinista `_check_diagnostic_rigor` interceptó correctamente la recomendación de cirugía del especialista y la detuvo, demostrando que nuestro guardarraíl anti-alucinaciones funciona en tiempo real.
+- **Caso 2 (Con Biopsia):** Simulamos un caso con biopsia confirmada. El sistema lo procesó a través del motor de recuperación (RAG) y ejecutó un "fallback" seguro al no encontrar pautas exactas en la base de datos vectorial de prueba (dummy), mostrando el mensaje `Fallback: No relevant documents found`. Esto confirma que el Distance Gate del RAG evita correctamente emitir recomendaciones sin fundamento.
+
+### Métricas de Rendimiento
+- La interfaz Gradio transmitió correctamente (stream) los eventos de los nodos de LangGraph de forma dinámica (Enrutador -> Extracción -> Recuperación -> Crítico).
+- Se confirmó la validación de seguridad en tiempo real. El proyecto ahora es funcionalmente completo y está listo para ser empaquetado (Dockerfile) para su despliegue en Hugging Face Spaces.

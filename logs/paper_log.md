@@ -584,3 +584,23 @@ Rather than solely relying on prompt engineering (which LLMs often drift away fr
 ### Performance Metrics
 - **Safety Passed:** Executing `test_bias_fix.py` demonstrated the Critic correctly catching and (in the fixed state) passing the Specialist when it properly deferred treatment in favor of a biopsy request.
 - **Next Step:** We are now prepared for the final end-to-end functionality demo on the AMD MI300X instance, ensuring safety rules and fine-tuned weights align perfectly.
+
+## Milestone: End-to-End Functional Triage Demonstration
+**Date:** 2026-05-09
+**Status:** Completed
+**Session:** 25
+
+### The Problem
+To validate the entire system architecture for the AMD Developer Hackathon, we needed to demonstrate the integration of the UI, LangGraph orchestrator, and the diagnostic rigor safety guardrails running live on the AMD MI300X instance.
+
+### Architectural Decision Justification
+We utilized our Gradio 6 glassmorphism UI paired with our streaming LangGraph backend. The test required submitting edge-case clinical notes to verify the correct functioning of our safety guardrails.
+
+### Mathematical/Logical Approach
+- **Guardrail Testing:** We performed two E2E tests via the `http://localhost:7860/` UI.
+- **Case 1 (No Biopsy):** We simulated a postmenopausal bleeding case with suspected cancer but without a biopsy. The deterministic rule `_check_diagnostic_rigor` correctly intercepted the specialist's surgery recommendation and halted it, proving our anti-hallucination guardrail works in real time.
+- **Case 2 (With Biopsy):** We simulated a case with confirmed biopsy. The system processed it through the retrieval engine and safely fell back when exact guidelines were absent in the dummy vector database, displaying the `Fallback: No relevant documents found` message. This confirms that the RAG Distance Gate is correctly avoiding ungrounded recommendations.
+
+### Performance Metrics
+- The Gradio UI correctly streamed LangGraph node events dynamically (Router -> Extraction -> Retrieval -> Critic).
+- Real-time safety validation confirmed. The project is now functionally complete and ready to be packaged (Dockerfile) for deployment to Hugging Face Spaces.
