@@ -7,19 +7,24 @@ OncoAgent is proudly 100% open-source. We believe that life-saving clinical inte
 - **Guarantee Patient Privacy:** Run locally on AMD MI300X hardware or private clouds, ensuring zero patient data leaves the hospital.
 - **Foster Global Contribution:** Allow medical communities worldwide to easily audit, modify, and contribute to the RAG knowledge base.
 
-OncoAgent is a multi-agent clinical triage system designed to combat **unstructured data blindness** in primary care oncology. It leverages a fine-tuned Llama 3.1 8B model orchestrated via LangGraph to provide evidence-based oncological reasoning grounded in NCCN/ESMO clinical guidelines.
+OncoAgent is a state-of-the-art multi-agent clinical triage system designed to combat **unstructured data blindness** in primary care oncology. It leverages a tier-adaptive architecture featuring **Qwen 3.5-9B** (Speed Triage) and **Qwen 3.6-27B** (Deep Reasoning) models. Orchestrated via a sophisticated LangGraph state machine, it provides evidence-based oncological reasoning strictly grounded in NCCN/ESMO clinical guidelines, with built-in human-in-the-loop (HITL) safety gates and a Reflexion-based critic loop.
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│   Router     │───▶│   RAG Engine │───▶│  Specialist  │───▶│  Validator   │
-│  (PHI Clean) │    │ (ChromaDB +  │    │ (Llama 3.1)  │    │(Safety Check)│
-└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
-        │                                                           │
-        └───────────── LangGraph StateGraph ────────────────────────┘
+┌────────┐   ┌─────────┐   ┌─────────┐   ┌────────────┐      ┌────────────┐   ┌─────────┐
+│ Router │──▶│Ingestion│──▶│Corrective│──▶│ Specialist │◀────│ Critic     │   │ Formatter│
+│(Triage)│   │ (PHI)   │   │  RAG    │   │ (Qwen 9B/  │     │(Reflexion  │   │(Output)  │
+└────────┘   └─────────┘   └─────────┘   │    27B)    │────▶│ Validation)│   └─────────┘
+    │           │             │          └────────────┘      └────────────┘        ▲
+    │           │             │                 │                   │              │
+    ▼           ▼             ▼                 ▼                   ▼              │
+  ┌───────────────────────────────────────────────────────────────────┐      ┌────────────┐
+  │                           Fallback Node                           │      │ HITL Gate  │
+  └───────────────────────────────────────────────────────────────────┘      │(Acuity Chk)│
+                                                                             └────────────┘
 ```
 
 **Key Components:**
@@ -28,7 +33,7 @@ OncoAgent is a multi-agent clinical triage system designed to combat **unstructu
 |--------|-------------|
 | `data_prep/` | Dataset builder: PMC-Patients/OncoCoT → JSONL (Llama 3 template) |
 | `rag_engine/` | Semantic chunking of NCCN/ESMO PDFs + ChromaDB vectorization |
-| `agents/` | LangGraph multi-agent orchestration (Router → RAG → Specialist → Validator) |
+| `agents/` | LangGraph multi-agent orchestration (Router → Ingestion → Corrective RAG → Specialist ↔ Critic → HITL Gate → Formatter) |
 | `ui/` | Gradio interface for clinical note input, source citations, and reasoning output |
 
 ---
@@ -37,7 +42,7 @@ OncoAgent is a multi-agent clinical triage system designed to combat **unstructu
 
 - **GPU:** AMD Instinct™ MI300X (192GB HBM3)
 - **Software Stack:** ROCm 7.2.x, PyTorch (HIP), vLLM with PagedAttention
-- **Model:** `meta-llama/Meta-Llama-3.1-8B-Instruct` (QLoRA 4-bit fine-tuned)
+- **Models:** `Qwen/Qwen3.5-9B` (Speed Triage) & `Qwen/Qwen3.6-27B-Instruct` (Deep Reasoning) (QLoRA 4-bit via bitsandbytes)
 
 ---
 
@@ -54,9 +59,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # 3. Start Inference Server (vLLM on Docker)
-# This spins up Llama 3.1 8B optimized for AMD MI300X via ROCm
+# This spins up the Qwen models optimized for AMD MI300X via ROCm PagedAttention
 docker run --device /dev/kfd --device /dev/dri -p 8000:8000 rocm/vllm:latest \
-    --model meta-llama/Meta-Llama-3.1-8B-Instruct --tensor-parallel-size 1
+    --model Qwen/Qwen3.6-27B-Instruct --tensor-parallel-size 1
 
 # 4. Configure environment & Run UI
 cp .env.example .env
@@ -89,7 +94,9 @@ python -m ui.app
 
 ## 🩺 Safety Guarantees
 
-- **Anti-Hallucination Validator:** A dedicated safety node audits the Specialist's output against the RAG context. Rejects ungrounded claims.
+- **Reflexion-based Critic Loop:** A dedicated safety node audits the Specialist's output against the RAG context (entailment verification). It forces the Specialist to regenerate its output if it detects ungrounded claims or invented dosages.
+- **Human-In-The-Loop (HITL) Gate:** An acuity-based checkpoint that stops the pipeline for human clinician approval on high-risk cases (e.g., Stage IV + complex mutations).
+- **Corrective RAG:** The system grades retrieved context relevance. If insufficient evidence is found, it safely falls back instead of guessing.
 - **Zero-PHI:** Regex-based PII redaction before any processing
 - **Reproducibility:** Fixed seeds (`torch.manual_seed(42)`) across all ML scripts
 

@@ -486,3 +486,22 @@ Implementamos un script de evaluación cuantitativa dedicado (`evaluate_speciali
 **Razón Arquitectónica:** La combinación de los kernels de `unsloth` en el AMD Instinct MI300X y el "sequence packing" (`packing=True` en SFTTrainer) permitió concatenar múltiples casos médicos cortos en secuencias únicas de 2048 tokens. Esto minimizó la sobrecarga de tokens de relleno (padding) y redujo drásticamente la cantidad de pasos de entrenamiento sin perder puntos de datos.
 **Impacto:** Ahora podemos iterar sobre entrenamientos con el dataset completo múltiples veces al día, o incrementar la cantidad de épocas a 3+ manteniéndonos dentro de los límites de tiempo del hackathon.
 
+## Hito: Corrección del "Sesgo de Confirmación" Clínico y Validación del Checkpoint del Nivel 1
+**Fecha:** 2026-05-09
+**Estado:** Completado
+**Sesión:** 25
+
+### El Problema
+Durante las pruebas manuales del pipeline Especialista-Crítico dentro de LangGraph, detectamos un fallo grave de seguridad: el "Sesgo de Confirmación". El sistema asumía que debido a que estaba evaluando un caso de oncología, el cáncer ya estaba confirmado. Procedía a recomendar tratamientos agresivos (cirugía, radioterapia) sin esperar o solicitar una confirmación histológica explícita (como un informe de biopsia).
+
+### Justificación de la Decisión Arquitectónica
+En lugar de depender únicamente de la ingeniería de prompts (de la cual los LLM a menudo se desvían), implementamos una verificación determinista basada en reglas en el **Nodo Crítico** (`agents/critic.py`). Esto impone estrictamente un rigor diagnóstico antes de que se realicen las verificaciones de implicación clínica (entailment).
+
+### Enfoque Matemático/Lógico
+- **Coincidencia de Palabras Clave Determinista:** Añadimos `_check_diagnostic_rigor()`, que escanea el `clinical_text` en busca de palabras clave de patología/biopsia.
+- **Guardarraíl de Tratamiento:** Si no se confirma patología, el Crítico cruza la recomendación del Especialista contra una lista de palabras clave de tratamientos agresivos (`cirugía`, `quimioterapia`, etc.). Si hay una coincidencia, el Crítico desencadena instantáneamente un veredicto de `FAIL` (Fallo) con feedback explícito para solicitar el procedimiento diagnóstico primero.
+- **Validación de Checkpoint:** Simultáneamente, pausamos con éxito nuestro entrenamiento QLoRA acelerado por `Unsloth` en el droplet de AMD y validamos la generación de nuestro primer checkpoint de entrenamiento (`checkpoint-1000`) para el modelo del Nivel 1 (Tier 1), confirmando que el estado está almacenado de manera segura para su despliegue o continuación futura.
+
+### Métricas de Rendimiento
+- **Aprobación de Seguridad:** La ejecución de `test_bias_fix.py` demostró que el Crítico captura correctamente los errores y (en el estado corregido) aprueba al Especialista cuando este pospone adecuadamente el tratamiento en favor de una solicitud de biopsia.
+- **Siguiente Paso:** Ahora estamos preparados para la demostración funcional final de principio a fin (end-to-end) en la instancia AMD MI300X, asegurando que las reglas de seguridad y los pesos ajustados (fine-tuned) se alinean perfectamente.

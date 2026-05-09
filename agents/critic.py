@@ -31,9 +31,9 @@ MAX_CRITIC_ATTEMPTS = 2
 # Required sections in a well-formed recommendation
 _REQUIRED_SECTIONS = [
     "hallazgos",
-    "estadificación",
-    "tratamiento",
-    "recomendación",
+    "validación diagnóstica",
+    "manejo",
+    "recomendación final",
 ]
 
 
@@ -61,8 +61,8 @@ def _check_formatting(recommendation: str) -> tuple[bool, str]:
     if missing:
         feedback = (
             f"FORMATTING: Missing required sections: {', '.join(missing)}. "
-            "Please include all sections: Hallazgos Clínicos, Análisis de Estadificación, "
-            "Opciones de Tratamiento, Recomendación."
+            "Please include all sections: Hallazgos Clínicos, Validación Diagnóstica, "
+            "Análisis de Estadificación, Opciones de Manejo, Recomendación Final."
         )
         return False, feedback
 
@@ -91,6 +91,30 @@ def _check_safety_phrases(recommendation: str) -> tuple[bool, str]:
             "Either cite the guideline source for each dosage or remove the specific numbers."
         )
 
+    return True, ""
+
+
+def _check_diagnostic_rigor(recommendation: str, clinical_text: str) -> tuple[bool, str]:
+    """Ensure no premature treatment is recommended without a confirmed diagnosis."""
+    text_lower = clinical_text.lower()
+    rec_lower = recommendation.lower()
+    
+    # Simple heuristic to detect if a biopsy/pathology was mentioned in the clinical text
+    has_pathology = any(word in text_lower for word in ["biopsia", "patología", "pathology", "biopsy", "histolog", "legrado", "malign"])
+    
+    # Treatment keywords
+    treatment_keywords = ["cirugía", "radioterapia", "quimioterapia", "surgery", "radiation", "chemotherapy", "histerectomía", "hysterectomy"]
+    
+    if not has_pathology:
+        found_treatments = [kw for kw in treatment_keywords if kw in rec_lower]
+        if found_treatments:
+            feedback = (
+                f"DIAGNOSTIC RIGOR: Recommended treatments ({', '.join(found_treatments)}) "
+                "but no pathology/biopsy confirmation was found in the clinical text. "
+                "You MUST request a diagnostic procedure (e.g., biopsy) first."
+            )
+            return False, feedback
+            
     return True, ""
 
 
@@ -207,17 +231,21 @@ def critic_node(state: AgentState) -> Dict[str, Any]:
     # --- Layer 2: Safety check ---
     safety_pass, safety_feedback = _check_safety_phrases(recommendation)
 
-    # --- Layer 3: Entailment check (only if layers 1-2 pass) ---
+    # --- Layer 3: Diagnostic Rigor check ---
+    clinical_text = state.get("clinical_text", "")
+    rigor_pass, rigor_feedback = _check_diagnostic_rigor(recommendation, clinical_text)
+
+    # --- Layer 4: Entailment check (only if layers 1-3 pass) ---
     entailment_pass = True
     entailment_feedback = ""
-    if fmt_pass and safety_pass and context:
+    if fmt_pass and safety_pass and rigor_pass and context:
         entailment_pass, entailment_feedback = _check_entailment(
             recommendation, context
         )
 
     # --- Aggregate verdict ---
-    all_passed = fmt_pass and safety_pass and entailment_pass
-    feedbacks = [f for f in [fmt_feedback, safety_feedback, entailment_feedback] if f]
+    all_passed = fmt_pass and safety_pass and rigor_pass and entailment_pass
+    feedbacks = [f for f in [fmt_feedback, safety_feedback, rigor_feedback, entailment_feedback] if f]
 
     verdict = "PASS" if all_passed else "FAIL"
     combined_feedback = "\n".join(feedbacks)

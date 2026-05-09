@@ -57,5 +57,6 @@ Objetivo: Desplegar en Hugging Face Spaces con Docker (rocm/vllm). UI en Gradio 
 - Logging Estricto: Mantener paper_log.md y social_media_log.txt (y versiones .es) al día.
 - Seguridad PHI: Cero exposición de datos privados.
 - Anti-Alucinación: Basar respuestas estrictamente en el RAG.
+- Rigor Diagnóstico: Prohibido recomendar tratamientos oncológicos (cirugía, quimio, radio) si no existe confirmación histológica/biopsia en el input. Priorizar siempre la obtención del diagnóstico definitivo.
 
 Antigravity, analiza este documento y confírmame que has integrado esta directiva en tu memoria operativa. Procederemos con la Fase 0.

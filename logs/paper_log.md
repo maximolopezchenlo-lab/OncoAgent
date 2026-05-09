@@ -565,3 +565,22 @@ We implemented a dedicated quantitative evaluation script (`evaluate_specialist.
 **Architectural Reason:** The combination of `unsloth` kernels on the AMD Instinct MI300X and sequence packing (`packing=True` in SFTTrainer) allowed multiple short medical cases to be concatenated into single 2048-token sequences. This effectively minimized the padding token overhead and drastically reduced the total number of training steps without losing data points.
 **Impact:** We can now iterate on full-dataset fine-tuning runs multiple times a day or increase the number of epochs to 3+ while staying within the hackathon time constraints.
 
+## Milestone: Fixing Clinical "Confirmation Bias" and Tier 1 Checkpoint Validation
+**Date:** 2026-05-09
+**Status:** Completed
+**Session:** 25
+
+### The Problem
+During manual testing of the Specialist-Critic pipeline within LangGraph, we detected a severe safety flaw: "Confirmation Bias". The system assumed that because it was evaluating an oncology case, cancer was already confirmed. It proceeded to recommend aggressive treatments (surgery, radiotherapy) without waiting for or requesting explicit histological confirmation (like a biopsy report).
+
+### Architectural Decision Justification
+Rather than solely relying on prompt engineering (which LLMs often drift away from), we implemented a deterministic rule-based check in the **Critic Node** (`agents/critic.py`). This strictly enforces diagnostic rigor before any clinical entailment checks are performed.
+
+### Mathematical/Logical Approach
+- **Deterministic Keyword Matching:** We added `_check_diagnostic_rigor()`, which scans the `clinical_text` for pathology/biopsy keywords.
+- **Treatment Guardrail:** If no pathology is confirmed, the Critic cross-references the Specialist's recommendation against a list of aggressive treatment keywords (`cirugía`, `quimioterapia`, etc.). If a match occurs, the Critic instantly triggers a `FAIL` verdict with explicit feedback to request the diagnostic procedure first.
+- **Checkpoint Validation:** Concurrently, we successfully paused our `Unsloth` accelerated QLoRA training on the AMD droplet and validated the generation of our first training checkpoint (`checkpoint-1000`) for the Tier 1 model, confirming that the state is safely stored for deployment or future continuation.
+
+### Performance Metrics
+- **Safety Passed:** Executing `test_bias_fix.py` demonstrated the Critic correctly catching and (in the fixed state) passing the Specialist when it properly deferred treatment in favor of a biopsy request.
+- **Next Step:** We are now prepared for the final end-to-end functionality demo on the AMD MI300X instance, ensuring safety rules and fine-tuned weights align perfectly.
