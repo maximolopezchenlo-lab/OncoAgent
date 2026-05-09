@@ -7,6 +7,12 @@ if not TOKEN:
 ORG = "lablab-ai-amd-developer-hackathon"
 api = HfApi(token=TOKEN)
 
+EXCLUDE_PATTERNS = [
+    ".git*", ".venv*", "__pycache__*", "models/*", "data/*", "scratch/*", "logs/*", 
+    "*.safetensors", "*.bin", "*.sqlite3", "scripts/append_logs*", "AMD Developer Hackathon*.pdf",
+    "paper_log*", "social_media_log*", "walkthrough*", "AGENTS.md", "CLAUDE.md", ".claude*", ".oncoagent*"
+]
+
 print("1. Creando y subiendo el Space Repo (OncoAgent)...")
 space_repo_id = f"{ORG}/OncoAgent"
 try:
@@ -15,10 +21,7 @@ try:
         folder_path=".",
         repo_id=space_repo_id,
         repo_type="space",
-        ignore_patterns=[
-            ".git*", ".venv*", "__pycache__", "models/*", "data/*", "scratch/*", "logs/*", 
-            "*.safetensors", "*.bin", "*.sqlite3", "scripts/append_logs*", "AMD Developer Hackathon*.pdf"
-        ]
+        ignore_patterns=EXCLUDE_PATTERNS
     )
     print("✅ Space subido correctamente.")
 except Exception as e:
@@ -45,10 +48,7 @@ try:
     api.sync_bucket(
         source=".",
         dest=f"hf://buckets/{bucket_id}",
-        exclude=[
-            ".git*", ".venv*", "__pycache__*", "models/*", "data/*", "scratch/*", "logs/*", 
-            "*.safetensors", "*.bin", "*.sqlite3", "scripts/append_logs*", "AMD Developer Hackathon*.pdf"
-        ]
+        exclude=EXCLUDE_PATTERNS
     )
     print("✅ Bucket sincronizado correctamente.")
 except Exception as e:
