@@ -22,3 +22,15 @@ We've just integrated the `LocalModelManager` to swap between external APIs and 
 The system is now fully configured to leverage HBM3 bandwidth on the AMD droplet for Tier 1 triage. 
 Everything is set for the final E2E functional test and the big demo! 🎥🚀
 #AMDHackathon #AMDInstinct #Unsloth #OncologyAgent
+
+🚀 Sesión Finalizada: ¡Inferencia BF16 estable en AMD MI300X!
+
+Hoy dimos un salto gigante en calidad clínica. Migramos nuestro pipeline de inferencia local de 4 bits a precisión BF16 nativa. 🧠💻
+
+¿Por qué? Porque con 192GB de VRAM en la MI300X, ¡no necesitamos sacrificar ni un bit de precisión! Adiós a las repeticiones y al colapso semántico. Ahora el especialista Tier 1 (Qwen 2.5 7B + LoRA) razona con una claridad asombrosa.
+
+✅ Implementación estable con Transformers + PEFT.
+✅ Aprovechamiento total del hardware AMD Instinct.
+✅ Listos para la demo final y el despliegue en Hugging Face.
+
+#AMDHackathon #HealthTech #ROCm #OncoAgent #AIOnAMD #BuildInPublic

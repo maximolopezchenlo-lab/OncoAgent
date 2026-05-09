@@ -20,7 +20,8 @@ from dotenv import load_dotenv
 
 # Conditional imports for local adapter inference
 try:
-    from unsloth import FastLanguageModel
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from peft import PeftModel
     import torch
     HAS_LOCAL_INFERENCE = True
 except ImportError:
@@ -55,17 +56,17 @@ TIER_SPECS: Dict[int, TierSpec] = {
     1: TierSpec(
         tier_id=1,
         name="Speed Triage",
-        model_id=os.getenv("TIER1_MODEL_ID", "Qwen/Qwen3-8B"),
-        description="Fast triage for well-documented cancers. Optimised for throughput.",
-        max_tokens=512,
-        temperature=0.0,
+        model_id=os.getenv("BASE_MODEL_ID", "Qwen/Qwen2.5-7B-Instruct"),
+        description="Fast local model for initial triage and low-complexity cases.",
+        max_tokens=2048,
+        temperature=0.1,
     ),
     2: TierSpec(
         tier_id=2,
         name="Deep Reasoning",
-        model_id=os.getenv("TIER2_MODEL_ID", "Qwen/Qwen3-32B"),
-        description="Deep reasoning for rare/complex/multi-mutation cases.",
-        max_tokens=1024,
+        model_id=os.getenv("TIER2_MODEL_ID", "Qwen/Qwen2.5-72B-Instruct"),
+        description="High-reasoning model for complex oncology cases and validation.",
+        max_tokens=4096,
         temperature=0.0,
     ),
 }
@@ -117,29 +118,35 @@ class LocalModelManager:
             return
 
         if not HAS_LOCAL_INFERENCE:
-            logger.warning("Unsloth/Torch not found. Local inference disabled.")
+            logger.warning("Transformers/Torch not found. Local inference disabled.")
             return
 
         adapter_path = os.getenv("LOCAL_ADAPTER_PATH")
-        base_model_id = os.getenv("BASE_MODEL_ID", "unsloth/Qwen2.5-7B-Instruct-bnb-4bit")
+        base_model_id = os.getenv("BASE_MODEL_ID", "Qwen/Qwen2.5-7B-Instruct")
 
         if not adapter_path or not os.path.exists(adapter_path):
             logger.error("Local adapter path not found: %s", adapter_path)
             return
 
-        logger.info("Loading local adapters from %s...", adapter_path)
+        logger.info("Loading local base model %s and adapters from %s...", base_model_id, adapter_path)
         try:
-            model, tokenizer = FastLanguageModel.from_pretrained(
-                model_name=adapter_path, # Unsloth supports loading directly from adapter path
-                max_seq_length=2048,
-                load_in_4bit=True,
+            # 1. Load Tokenizer
+            self.tokenizer = AutoTokenizer.from_pretrained(base_model_id, trust_remote_code=True)
+            
+            # 2. Load Base Model in BF16
+            base_model = AutoModelForCausalLM.from_pretrained(
+                base_model_id,
+                torch_dtype=torch.bfloat16,
                 device_map="auto",
+                trust_remote_code=True,
             )
-            FastLanguageModel.for_inference(model)
-            self.model = model
-            self.tokenizer = tokenizer
+            
+            # 3. Load LoRA Adapters
+            self.model = PeftModel.from_pretrained(base_model, adapter_path)
+            self.model.eval()
+            
             self.initialized = True
-            logger.info("Local model initialized successfully on %s", os.getenv("DEVICE", "cuda"))
+            logger.info("Local BF16 model initialized successfully on %s", os.getenv("DEVICE", "cuda"))
         except Exception as e:
             logger.error("Failed to load local model: %s", e)
 
@@ -156,21 +163,24 @@ class LocalModelManager:
             {"role": "user", "content": user_prompt},
         ]
         
-        inputs = self.tokenizer.apply_chat_template(
-            messages,
-            tokenize=True,
-            add_generation_prompt=True,
-            return_tensors="pt",
-        ).to("cuda")
+        prompt_str = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        logger.debug("Local prompt: %s", prompt_str)
 
-        outputs = self.model.generate(
-            input_ids=inputs,
-            max_new_tokens=max_tokens,
-            temperature=temperature,
-            use_cache=True,
-        )
+        inputs = self.tokenizer(text=prompt_str, return_tensors="pt").to("cuda")
+
+        with torch.no_grad():
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=max_tokens,
+                temperature=temperature,
+                do_sample=temperature > 0,
+                use_cache=True,
+                pad_token_id=self.tokenizer.pad_token_id,
+            )
         
-        response = self.tokenizer.batch_decode(outputs[:, inputs.shape[1]:], skip_special_tokens=True)[0]
+        # Extract only the generated part
+        generated_ids = outputs[:, inputs.input_ids.shape[1]:]
+        response = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
         return response.strip()
 
 

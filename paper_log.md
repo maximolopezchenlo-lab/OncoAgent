@@ -631,3 +631,16 @@ The AMD Instinct MI300X maintained consistent throughput (~11.3s/it) and thermal
 **Next Steps:**
 - Initiate full-system integration test on the AMD GPU droplet using `checkpoint-1000`.
 - Prepare final demo assets for Hugging Face Spaces deployment.
+
+### Milestone: Environment Synchronization & ROCm Recovery
+**Date:** 2026-05-09
+**Status:** In Progress
+**Problem:** The remote environment on the AMD GPU Droplet suffered from library path corruption (`libtorch_cuda.so` missing), preventing local Unsloth-based inference.
+**Justification:** Re-establishing environment parity by recreating the `.venv` on the host and installing ROCm-specific PyTorch and Unsloth binaries. This allows direct hardware access to the MI300X without the overhead of containerized debugging for the final demo.
+**Architectural Decision:** Re-synchronized the host-level environment to ensure that the `LocalModelManager` can correctly resolve HIP kernels and load the Tier 1 adapters into HBM3 memory.
+
+**Milestone: BF16 Inference Migration for MI300X**
+- **Problem:** Observed repetitive token generation and semantic collapse in 4-bit Unsloth/BnB inference on AMD MI300X hardware.
+- **Architectural Decision:** Migrated the `LocalModelManager` from Unsloth (4-bit) to native `transformers` + `PEFT` using **bfloat16** precision.
+- **Technical Justification:** Leveraging the massive 192GB VRAM of the MI300X allows for high-fidelity BF16 inference, bypassing the precision loss and kernel-specific artifacts sometimes encountered with 4-bit quantization on CDNA3 architectures.
+- **Implementation:** Updated `agents/tools.py` to use `AutoModelForCausalLM` with `torch_dtype=torch.bfloat16` and integrated `PeftModel` for loading LoRA adapters.
