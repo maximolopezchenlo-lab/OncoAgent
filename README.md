@@ -46,7 +46,7 @@ OncoAgent is a state-of-the-art multi-agent clinical triage system designed to c
 
 ## 🧠 Dual-Tier Model Strategy (Qwen)
 
-To maximize the compute capabilities of the **AMD MI300X**, OncoAgent implements a dynamic **Dual-Tier** routing strategy using the Qwen model family:
+To maximize the compute capabilities of the **AMD MI300X**, OncoAgent implements a dynamic **Dual-Tier** routing strategy using the Qwen model family. **Both tiers have been fine-tuned on +200,000 real-world oncological cases covering all major cancer types** (derived from PMC-Patients and OncoCoT datasets) to ensure hyper-specialized medical reasoning:
 
 - **Tier 1: Qwen 3.5-9B (Speed Triage):** A lightweight, extremely fast model used by the `Router` to assess initial complexity, perform simple triage, and handle low-risk queries.
 - **Tier 2: Qwen 3.6-27B (Deep Reasoning):** The heavy-lifter. Activated for high-complexity clinical cases (e.g., metastasis, multi-mutations). It performs deep reasoning and entailment checks, avoiding confirmation bias through rigorous Reflexion loops.
