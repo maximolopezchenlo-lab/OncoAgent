@@ -151,3 +151,9 @@ La AMD Instinct MI300X mantuvo un rendimiento constante (~11.3s/it) y estabilida
 - **Corrección:** Se identificó que los adaptadores de Tier 1 (`checkpoint-1000`) fueron entrenados específicamente sobre **Qwen 3.5-9B**, no Qwen 2.5.
 - **Acción:** Se migró `BASE_MODEL_ID` a `Qwen/Qwen3.5-9B` y `TIER2_MODEL_ID` a `Qwen/Qwen3.6-27B-Instruct` según las reglas del "Bloque 3" del hackathon.
 - **Impacto:** Asegura compatibilidad estructural completa entre los adaptadores LoRA y el modelo base, y aprovecha las últimas optimizaciones CDNA3 presentes en la serie Qwen 3.x.
+
+### Hito: Documentación Arquitectónica y Profesionalización del Repositorio
+**Fecha:** 2026-05-09
+**Problema:** La documentación pública (README.md) carecía de la especificación formal de nuestra topología multi-agente y estrategia Dual-Tier, vital para los jueces del hackathon.
+**Decisión Arquitectónica:** Ampliamos el README resaltando la lógica Dual-Tier (Tier 1: Qwen 3.5-9B para triaje rápido, Tier 2: Qwen 3.6-27B para razonamiento profundo). Esto transparenta nuestro bucle de seguridad Reflexion y el Adaptive Semantic Chunking.
+**Métrica:** Flujo bilingüe 100% sincronizado.

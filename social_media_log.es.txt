@@ -29,3 +29,8 @@ Hoy alineamos nuestro stack de inteligencia con las últimas arquitecturas de Qw
 ✅ Inferencia Nativa BF16: Sin artefactos de cuantización. ¡Con 192GB de VRAM en la MI300X, estamos haciendo inferencia de precisión completa en CDNA3!
 ✅ Stack Validado: ¡Listos para la demo final y Hugging Face Spaces!
 #AMDHackathon #Qwen3 #HealthTech #AMDInstinct #MI300X #ROCm #OncoAgent
+
+### Session: 2026-05-09
+- 🚀 **Achievement:** Documentation and architecture 100% professionalized! We transparently explained our Dual-Tier model and LangGraph engine in the repos.
+- 💡 **Lesson/Overcome Failure:** We realized the system's complexity wasn't well communicated to the judges. Adding the exact Reflexion loop flows in the README solves this and builds technical trust.
+#AMDHackathon #HealthTech #ROCm #OpenSource
