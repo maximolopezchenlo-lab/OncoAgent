@@ -604,3 +604,43 @@ We utilized our Gradio 6 glassmorphism UI paired with our streaming LangGraph ba
 ### Performance Metrics
 - The Gradio UI correctly streamed LangGraph node events dynamically (Router -> Extraction -> Retrieval -> Critic).
 - Real-time safety validation confirmed. The project is now functionally complete and ready to be packaged (Dockerfile) for deployment to Hugging Face Spaces.
+
+---
+
+## Milestone: Production Deployment & Repository Sanitization
+**Date:** 2026-05-09
+**Status:** Completed
+
+### The Problem
+The OncoAgent repository accumulated 425 tracked files during rapid development, including: regenerable intermediate data (162 JSON chunks), debug/scratch scripts, duplicate root-level log files, internal AI tooling configurations (CLAUDE.md, AGENTS.md), and runtime artifacts (*.log, *.pid). This violated production hygiene standards and risked exposing internal strategy documents (social media logs) and sensitive tooling to hackathon judges.
+
+Additionally, the inference pipeline had three critical issues:
+1. **Model ID mismatch**: `TIER_SPECS` used `BASE_MODEL_ID` instead of `TIER1_MODEL_ID`, causing Tier 1 to load the wrong model.
+2. **Qwen3 thinking-mode tokens**: The `<think>...</think>` blocks in Qwen3 responses were passed raw to the critic, causing formatting failures.
+3. **Featherless fallback gap**: `Qwen/Qwen3.6-27B` is not available on Featherless.ai, causing Tier 2 inference failures in development.
+
+### Architectural Decision Justification
+**Repository Cleanup (425 → 229 tracked files)**:
+- Applied a 12-category `.gitignore` covering: secrets, generated data, model weights, scratch scripts, root-level duplicates, internal tooling, social media strategy, runtime artifacts, and IDE files.
+- Used `git rm --cached` to un-track files without deleting them locally, preserving development workflow.
+
+**Inference Pipeline Hardening**:
+1. **Thinking-token stripping**: Added a regex-based `_strip_thinking_tokens()` function that removes `<think>...</think>` blocks from Qwen3 model outputs before passing to downstream nodes.
+2. **Featherless fallback resolution**: Added `_resolve_model_id()` that detects when running against Featherless.ai and automatically substitutes `Qwen/Qwen3.6-27B` → `Qwen/Qwen3.5-27B`.
+3. **Flexible critic validation**: Replaced rigid section-name matching with synonym-list concept matching, supporting both English and Spanish section headers.
+
+**Deployment Architecture**:
+- Created `deploy/start_vllm.sh` supporting three modes: `tier1`, `tier2`, `both` (dual-model with split GPU memory).
+- Updated Dockerfile to use `supervisor` for running vLLM + Gradio simultaneously.
+- Created `.env.production` with local vLLM configuration for AMD MI300X droplet.
+
+### Mathematical/Logical Approach
+- **File reduction**: 425 tracked → 229 tracked = 46% reduction in repository surface area.
+- **Thinking token regex**: `re.compile(r"<think>.*?</think>", re.DOTALL)` with non-greedy matching to handle multiple thinking blocks.
+- **Concept matching**: 4 required semantic concepts × N synonyms each = flexible validation that accepts both `"hallazgos"` and `"findings"` as equivalent.
+
+### Performance Metrics
+- Repository size reduced from ~3.2GB to clean codebase + clinical guides only.
+- All unit tests pass: graph compilation ✅, model resolution ✅, thinking-token stripping ✅, critic validation ✅.
+- GitHub push successful (passed GitHub Push Protection after removing HF tokens from .env.production).
+- HuggingFace Space created and uploaded: `MaximoLopezChenlo/OncoAgent` (Docker SDK).

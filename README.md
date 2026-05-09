@@ -1,3 +1,14 @@
+---
+title: OncoAgent
+emoji: 🧬
+colorFrom: red
+colorTo: blue
+sdk: docker
+pinned: false
+license: apache-2.0
+short_description: Multi-Agent Oncology Triage powered by AMD MI300X
+---
+
 # 🧬 OncoAgent — Multi-Agent Oncology Triage System
 
 ![ROCm](https://img.shields.io/badge/AMD-ROCm_7.2-ed1c24?logo=amd&logoColor=white)
