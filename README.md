@@ -1,5 +1,11 @@
 # 🧬 OncoAgent — Multi-Agent Oncology Triage System
 
+![ROCm](https://img.shields.io/badge/AMD-ROCm_7.2-ed1c24?logo=amd&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![vLLM](https://img.shields.io/badge/vLLM-PagedAttention-000000?logo=vllm&logoColor=white)
+![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-FF4F00?logo=langchain&logoColor=white)
+![Gradio](https://img.shields.io/badge/UI-Gradio_6-FF7C00?logo=gradio&logoColor=white)
+
 > **AMD Developer Hackathon 2026** · Powered by AMD Instinct™ MI300X · ROCm 7.2
 
 ## 🌍 100% Open-Source: Democratizing Oncology
@@ -31,10 +37,19 @@ OncoAgent is a state-of-the-art multi-agent clinical triage system designed to c
 
 | Module | Description |
 |--------|-------------|
-| `data_prep/` | Dataset builder: PMC-Patients/OncoCoT → JSONL (Llama 3 template) |
-| `rag_engine/` | Semantic chunking of NCCN/ESMO PDFs + ChromaDB vectorization |
-| `agents/` | LangGraph multi-agent orchestration (Router → Ingestion → Corrective RAG → Specialist ↔ Critic → HITL Gate → Formatter) |
-| `ui/` | Gradio interface for clinical note input, source citations, and reasoning output |
+| `data_prep/` | Dataset builder: PMC-Patients/OncoCoT → Strict JSONL (Llama 3 chat template) |
+| `rag_engine/` | The "Brain": PyMuPDF extraction, Adaptive Semantic Chunking of NCCN/ESMO PDFs, & ChromaDB + PubMedBERT vectorization. |
+| `agents/` | The "Reasoning": LangGraph multi-agent orchestration (Router → Corrective RAG → Specialist ↔ Critic → HITL Gate). |
+| `ui/` | The "Face": Gradio 6 UI with Glassmorphism for clinical note input, real-time source citations, and reasoning output. |
+
+---
+
+## 🧠 Dual-Tier Model Strategy (Qwen)
+
+To maximize the compute capabilities of the **AMD MI300X**, OncoAgent implements a dynamic **Dual-Tier** routing strategy using the Qwen model family:
+
+- **Tier 1: Qwen 3.5-9B (Speed Triage):** A lightweight, extremely fast model used by the `Router` to assess initial complexity, perform simple triage, and handle low-risk queries.
+- **Tier 2: Qwen 3.6-27B (Deep Reasoning):** The heavy-lifter. Activated for high-complexity clinical cases (e.g., metastasis, multi-mutations). It performs deep reasoning and entailment checks, avoiding confirmation bias through rigorous Reflexion loops.
 
 ---
 
@@ -42,7 +57,8 @@ OncoAgent is a state-of-the-art multi-agent clinical triage system designed to c
 
 - **GPU:** AMD Instinct™ MI300X (192GB HBM3)
 - **Software Stack:** ROCm 7.2.x, PyTorch (HIP), vLLM with PagedAttention
-- **Models:** `Qwen/Qwen3.5-9B` (Speed Triage) & `Qwen/Qwen3.6-27B-Instruct` (Deep Reasoning) (QLoRA 4-bit via bitsandbytes)
+- **Models:** `Qwen/Qwen3.5-9B` (Speed Triage) & `Qwen/Qwen3.6-27B-Instruct` (Deep Reasoning)
+- **Precision:** QLoRA 4-bit NormalFloat4 via `bitsandbytes` (ROCm compatible)
 
 ---
 

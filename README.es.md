@@ -1,5 +1,11 @@
 # 🧬 OncoAgent — Sistema Multi-Agente de Triaje Oncológico
 
+![ROCm](https://img.shields.io/badge/AMD-ROCm_7.2-ed1c24?logo=amd&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![vLLM](https://img.shields.io/badge/vLLM-PagedAttention-000000?logo=vllm&logoColor=white)
+![LangGraph](https://img.shields.io/badge/Orchestration-LangGraph-FF4F00?logo=langchain&logoColor=white)
+![Gradio](https://img.shields.io/badge/UI-Gradio_6-FF7C00?logo=gradio&logoColor=white)
+
 > **AMD Developer Hackathon 2026** · Potenciado por AMD Instinct™ MI300X · ROCm 7.2
 
 ## 🌍 100% Código Abierto: Democratizando la Oncología
@@ -31,10 +37,19 @@ OncoAgent es un sistema de triaje clínico multi-agente de última generación d
 
 | Módulo | Descripción |
 |--------|-------------|
-| `data_prep/` | Creador de datasets: PMC-Patients/OncoCoT → JSONL (Formato Llama 3) |
-| `rag_engine/` | División semántica de PDFs de NCCN/ESMO + vectorización en ChromaDB |
-| `agents/` | Orquestación multi-agente en LangGraph (Router → Ingestión → RAG Correctivo → Especialista ↔ Crítico → Puerta HITL → Formateo) |
-| `ui/` | Interfaz Gradio para ingreso de notas clínicas, citas de fuentes y salida de razonamiento |
+| `data_prep/` | Constructor del dataset: PMC-Patients/OncoCoT → Strict JSONL (Plantilla chat de Llama 3) |
+| `rag_engine/` | El "Cerebro": Extracción PyMuPDF, Semantic Chunking Adaptativo de PDFs NCCN/ESMO, & Vectorización ChromaDB + PubMedBERT. |
+| `agents/` | El "Razonamiento": Orquestación multi-agente LangGraph (Router → Corrective RAG → Specialist ↔ Critic → HITL Gate). |
+| `ui/` | La "Cara": Interfaz Gradio 6 con Glassmorphism para input clínico, citas en tiempo real y salida estructurada. |
+
+---
+
+## 🧠 Estrategia de Modelo Dual-Tier (Qwen)
+
+Para maximizar las capacidades de cómputo del **AMD MI300X**, OncoAgent implementa una estrategia de enrutamiento dinámica de **Doble Nivel (Dual-Tier)** utilizando la familia de modelos Qwen:
+
+- **Tier 1: Qwen 3.5-9B (Speed Triage):** Un modelo extremadamente rápido y ligero usado por el `Router` para evaluar la complejidad inicial, realizar triaje simple y procesar consultas de bajo riesgo.
+- **Tier 2: Qwen 3.6-27B (Deep Reasoning):** El modelo pesado. Se activa para casos clínicos de alta complejidad (ej. metástasis, mutaciones múltiples). Realiza un razonamiento profundo y verificaciones de entrelazamiento (entailment checks), evitando el sesgo de confirmación mediante rigurosos bucles de Reflexion.
 
 ---
 
@@ -42,7 +57,8 @@ OncoAgent es un sistema de triaje clínico multi-agente de última generación d
 
 - **GPU:** AMD Instinct™ MI300X (192GB HBM3)
 - **Pila de Software:** ROCm 7.2.x, PyTorch (HIP), vLLM con PagedAttention
-- **Modelos:** `Qwen/Qwen3.5-9B` (Triaje Rápido) y `Qwen/Qwen3.6-27B-Instruct` (Razonamiento Profundo) (QLoRA 4-bit vía bitsandbytes)
+- **Modelos:** `Qwen/Qwen3.5-9B` (Triaje Rápido) y `Qwen/Qwen3.6-27B-Instruct` (Razonamiento Profundo)
+- **Precisión:** QLoRA 4-bit NormalFloat4 vía `bitsandbytes` (Compatible con ROCm)
 
 ---
 
