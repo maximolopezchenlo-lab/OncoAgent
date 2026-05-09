@@ -10,7 +10,8 @@ api = HfApi(token=TOKEN)
 EXCLUDE_PATTERNS = [
     ".git*", ".venv*", "__pycache__*", "models/*", "data/*", "scratch/*", "logs/*", 
     "*.safetensors", "*.bin", "*.sqlite3", "scripts/append_logs*", "AMD Developer Hackathon*.pdf",
-    "paper_log*", "social_media_log*", "walkthrough*", "AGENTS.md", "CLAUDE.md", ".claude*", ".oncoagent*"
+    "paper_log*", "social_media_log*", "walkthrough*", "AGENTS.md", "CLAUDE.md", ".claude*", ".oncoagent*",
+    ".env*"
 ]
 
 print("1. Creando y subiendo el Space Repo (OncoAgent)...")
