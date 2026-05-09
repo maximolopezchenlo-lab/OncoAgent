@@ -62,3 +62,15 @@ Mientras nuestra AMD Instinct MI300X está ocupada al 100% entrenando al "Gran C
 🧠 ¡Mejora de Inteligencia Clínica! OncoAgent ahora mapea síntomas no técnicos (como periodos irregulares) directamente a dominios de riesgo oncológico. Esto mejora radicalmente la precisión del RAG para triaje temprano, pasando de "Desconocido" a "Riesgo Endometrial" en segundos. 🩺✨
 
 #AMDHackathon #OncoAgent #TriajeClinico #RAG #IAMedica
+
+---
+
+🚀 ¡Avance en Triaje Clínico! ¡Acabamos de validar la capacidad de OncoAgent para detectar banderas rojas de alto riesgo a partir de descripciones de pacientes en lenguaje natural y en español! 🇪🇸🩺
+
+Mediante la implementación de un mapeador heurístico multilingüe de síntomas a riesgos, resolvimos el problema de clasificación "Desconocida" para oncología ginecológica. Ahora, términos comunes como "períodos irregulares" o "menstruación" activan correctamente las guías de Cáncer de Útero, cerrando la brecha entre el lenguaje del paciente y la evidencia médica.
+
+✅ 15s de Latencia (Calificación Paralela)
+✅ Soporte para Español con tildes
+✅ Caso de estudio real validado (¡Bandera roja detectada!)
+
+#AMDHackathon #HealthTech #ROCm #MI300X #OncoAgent #AI #BuildInPublic

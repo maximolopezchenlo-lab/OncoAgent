@@ -66,3 +66,13 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 ## Nota Técnica: Orquestación de Hardware (MI300X vs. Featherless)
 **Estado:** La AMD Instinct MI300X se encuentra actualmente bajo una carga de cómputo del 100%, realizando el Fine-Tuning Completo (SFT) de 60 horas en los conjuntos de datos PMC-Patients y OncoCoT.
 **Estrategia Operativa:** Para permitir la validación clínica paralela (Demo), el backend de inferencia se traslada temporalmente a Featherless.ai. Esto asegura que el entrenamiento no se vea interrumpido por tareas de demostración de alta prioridad, manteniendo al mismo tiempo un rendimiento SOTA (Qwen 3.5 9B).
+
+---
+
+## [09-05-2026] Simulación Clínica: Triaje de Síntomas de Primer Contacto
+**Problema:** Validar si OncoAgent puede predecir rutas oncológicas a partir de síntomas crudos y no técnicos (anamnesis) antes de que se realicen estudios diagnósticos.
+**Decisión Arquitectónica:** Se realizó una simulación utilizando los síntomas de primer contacto de la paciente (períodos irregulares, menorragia) para probar la capacidad de los nodos `data_ingestion_node` y `corrective_rag` para activar guías de oncología ginecológica sin etiquetas explícitas de tipo de cáncer.
+**Enfoque Lógico/Matemático:** Uso de prompts en lenguaje natural en inglés (traducidos del caso real) para simular una entrada realista de un médico.
+**Métricas de Rendimiento:**
+- **Resultado:** El sistema identifica con éxito el riesgo de neoplasias uterinas y recomienda pasos diagnósticos estándar (ej. biopsia endometrial/ecografía) basados en las guías NCCN recuperadas para "Uterine Cancer".
+- **Auditoría de Hardware:** Se confirmó que el sistema utiliza la **AMD Instinct MI300X** exclusivamente para el entrenamiento SFT de alta carga, mientras que la inferencia en tiempo real se delega a **Featherless.ai** para mantener la fluidez de la interfaz durante la época de entrenamiento de 60 horas.
