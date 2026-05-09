@@ -655,3 +655,7 @@ The AMD Instinct MI300X maintained consistent throughput (~11.3s/it) and thermal
 **Problem:** The project's public-facing documentation (README.md) lacked the formal specification of our multi-agent topology and Dual-Tier Qwen model deployment strategy, which is critical for hackathon judges to understand the system's depth.
 **Architectural Decision:** We augmented the README to highlight the Dual-Tier logic (Tier 1: Qwen 3.5-9B for Speed Triage, Tier 2: Qwen 3.6-27B for Deep Reasoning) and the LangGraph structure. This builds trust by transparently explaining the Reflexion safety loop and the Adaptive Semantic Chunking within the Corrective RAG pipeline.
 **Performance Metric:** Increased documentation completeness; synchronized dual-language workflows (English/Spanish) for broader accessibility.
+
+### Update: Training Dataset Clarification
+**Date:** 2026-05-09
+**Description:** Added explicit context in public documentation regarding the knowledge embedded in the models. It clarifies that the Dual-Tier Qwen strategy was fine-tuned on over 200,000 real-world oncological cases (derived from PMC-Patients and OncoCoT), ensuring coverage across all major cancer types and preventing generic model bias.

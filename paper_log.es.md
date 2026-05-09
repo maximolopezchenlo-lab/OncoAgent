@@ -157,3 +157,7 @@ La AMD Instinct MI300X mantuvo un rendimiento constante (~11.3s/it) y estabilida
 **Problema:** La documentación pública (README.md) carecía de la especificación formal de nuestra topología multi-agente y estrategia Dual-Tier, vital para los jueces del hackathon.
 **Decisión Arquitectónica:** Ampliamos el README resaltando la lógica Dual-Tier (Tier 1: Qwen 3.5-9B para triaje rápido, Tier 2: Qwen 3.6-27B para razonamiento profundo). Esto transparenta nuestro bucle de seguridad Reflexion y el Adaptive Semantic Chunking.
 **Métrica:** Flujo bilingüe 100% sincronizado.
+
+### Update: Clarificación de Dataset de Entrenamiento
+**Fecha:** 2026-05-09
+**Descripción:** Se añadió contexto explícito en la documentación pública sobre el origen del conocimiento embebido en los modelos. Se aclara que la estrategia Dual-Tier Qwen fue afinada (fine-tuned) con más de 200,000 casos oncológicos del mundo real (derivados de PMC-Patients y OncoCoT), lo que garantiza cobertura sobre todos los tipos principales de cáncer y previene sesgos de modelos genéricos.
