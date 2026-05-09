@@ -88,3 +88,4 @@ At 15s/step, ETA is ~62 hours per epoch. The strategy allows interrupting the pr
 **Performance Metrics:**
 - **Outcome:** System successfully identifies the risk of uterine neoplasms and recommends standard-of-care diagnostic steps (e.g., endometrial biopsy/ultrasound) based on the NCCN guidelines retrieved for "Uterine Cancer".
 - **Hardware Audit:** Confirmed that the system is currently utilizing the **AMD Instinct MI300X** exclusively for high-load SFT training, while real-time inference is delegated to **Featherless.ai** to maintain UI responsiveness during the 60-hour training epoch.
+- **UI Deployment:** The Gradio application is active and reachable at `http://localhost:7860`.

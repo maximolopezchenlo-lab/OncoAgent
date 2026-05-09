@@ -76,3 +76,4 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 **Métricas de Rendimiento:**
 - **Resultado:** El sistema identifica con éxito el riesgo de neoplasias uterinas y recomienda pasos diagnósticos estándar (ej. biopsia endometrial/ecografía) basados en las guías NCCN recuperadas para "Uterine Cancer".
 - **Auditoría de Hardware:** Se confirmó que el sistema utiliza la **AMD Instinct MI300X** exclusivamente para el entrenamiento SFT de alta carga, mientras que la inferencia en tiempo real se delega a **Featherless.ai** para mantener la fluidez de la interfaz durante la época de entrenamiento de 60 horas.
+- **Despliegue de UI:** La aplicación Gradio está activa y disponible en `http://localhost:7860`.
