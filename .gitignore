@@ -1,44 +1,95 @@
-# === Python ===
+# ============================================================
+# OncoAgent — .gitignore (Production Clean)
+# ============================================================
+
+# === Python Runtime ===
 .venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
+dist/
+build/
+*.egg
 
-# === Secrets ===
+# === Secrets & Environment ===
 .env
+.env.local
+.env.*.local
 
-# === Data (generated, not tracked) ===
-data/chroma_db/          # Vector DB persistence (regenerable)
-data/processed/          # Intermediate chunks (regenerable)
+# === Generated Data (regenerable via pipeline) ===
+data/processed/
+data/vector_db/
+data/chroma_db/
+data/synthetic/
+data/raw/
+data/final/
+data/samples/
 processed_data/
 raw_data/
+*.sqlite3
+
+# === Model Weights & Checkpoints (too large for Git) ===
+models/
 checkpoints/
-*.jsonl
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+*.pickle
+*.pkl
 
-# === Node/Tooling ===
-node_modules/
-.gitnexus/
+# === Scratch / Debug (internal development only) ===
+scratch/
+test_pipeline.py
+test_ui.py
+screenshot.py
 
-# === Internal AI & Tooling (No mostrar a los jueces) ===
+# === Runtime Logs & PID Files ===
+*.log
+*.pid
+ui_app.log
+ui_app.pid
+
+# === Duplicate Root-Level Files (canonical versions in logs/) ===
+/paper_log.md
+/paper_log.es.md
+/paper_log.md.bak
+/social_media_log.txt
+/social_media_log.es.txt
+/walkthrough.md
+/walkthrough.es.md
+
+# === Root-Level Duplicate Docs (canonical in docs/) ===
+/oncoagent_master_directive.md
+
+# === Internal AI & Tooling (not for judges) ===
 .oncoagent/
 .claude/
 AGENTS.md
+CLAUDE.md
 docs/antigravity_rules.md
 docs/oncoagent_master_directive.md
-AMD Developer Hackathon _ Lablab.ai.pdf
+
+# === Social Media Logs (internal strategy) ===
 logs/social_media_log*
 
-# === IDE ===
+# === IDE & Editor ===
 .vscode/
 .idea/
 *.swp
-# Ignore data binaries
-data/chroma_db/
-data/raw/
-data/synthetic/
-data/final/
-*.sqlite3
-*.bin
-*.pickle
-models/
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# === Node / Tooling ===
+node_modules/
+.gitnexus/
+package-lock.json
+
+# === External Docs (not part of codebase) ===
+*.pdf.bak
+AMD Developer Hackathon*.pdf

@@ -62,16 +62,29 @@ def _grade_document(document_text: str, query: str, tier: int = 1) -> bool:
     Returns:
         True if the document is RELEVANT, False otherwise.
     """
+    # Rule-based shortcut: if the query contains a core cancer type and the document mentions it,
+    # we favor relevance to avoid model hallucination/rejection.
+    query_lower = query.lower()
+    doc_lower = document_text.lower()
+    
+    # Simple semantic overlap check: ignore generic terms
+    ignore_terms = {"treatment", "recommendation", "guidelines", "triage", "management", "clinical", "oncology"}
+    core_terms = [t for t in query_lower.split() if len(t) > 4 and t not in ignore_terms]
+    term_match = any(term in doc_lower for term in core_terms)
+
     system_prompt = (
-        "You are a medical document relevance evaluator. "
-        "Given a clinical query and a retrieved document, determine if the document "
-        "is RELEVANT to answering the query. "
-        "Output ONLY the word 'RELEVANT' or 'IRRELEVANT', nothing else."
+        "You are an expert Oncology Clinical Analyst. "
+        "Your task is to evaluate if a retrieved medical document is RELEVANT to a patient's clinical query. "
+        "RELEVANCE CRITERIA:\n"
+        "1. The document discusses the specific cancer type or its precursors.\n"
+        "2. The document mentions treatment protocols, staging, or diagnostic criteria relevant to the case.\n"
+        "3. Synonyms are allowed (e.g., 'Uterine Cancer' is relevant to 'Endometrial Adenocarcinoma').\n\n"
+        "Output ONLY 'RELEVANT' or 'IRRELEVANT'. No explanation."
     )
     user_prompt = (
-        f"Clinical Query: {query}\n\n"
-        f"Retrieved Document:\n{document_text[:1500]}\n\n"
-        f"Is this document relevant to the clinical query? (RELEVANT/IRRELEVANT):"
+        f"Patient Query/Context: {query}\n\n"
+        f"Document Snippet:\n--- START ---\n{document_text[:2000]}\n--- END ---\n\n"
+        f"Is this document relevant? (RELEVANT/IRRELEVANT):"
     )
 
     try:
@@ -82,10 +95,20 @@ def _grade_document(document_text: str, query: str, tier: int = 1) -> bool:
             max_tokens=10,
             temperature=0.0,
         )
-        return "RELEVANT" in response.upper()
+        is_relevant = "RELEVANT" in response.upper()
+        logger.info("Doc Grade: %s (Term Match: %s) -> Query: %s...", "RELEVANT" if is_relevant else "IRRELEVANT", term_match, query[:30])
+        
+        # Boost: if model says IRRELEVANT but there is a strong term match, we might want to override.
+        # This ensures we don't drop guidelines that explicitly mention the cancer type.
+        if not is_relevant and term_match:
+            logger.debug("Model rejected doc but keyword match found. Overriding to RELEVANT for recall.")
+            return True
+            
+        return is_relevant
     except Exception as exc:
         logger.warning("Document grading failed: %s — defaulting to RELEVANT.", exc)
         return True  # Fail open: include document if grading fails
+
 
 
 def _rewrite_query(
