@@ -105,12 +105,18 @@ def data_ingestion_node(state: AgentState) -> Dict[str, Any]:
         "gastric": "Gastric Cancer",
         "cholangiocarcinoma": "Cholangiocarcinoma",
         "mesothelioma": "Mesothelioma",
-        # Symptom-based risk mapping (Triage mode)
-        "menstrual": "Endometrial Cancer",
-        "vaginal bleeding": "Uterine Cancer",
-        "abnormal bleeding": "Endometrial Cancer",
-        "irregular periods": "Endometrial Cancer",
-        "postmenopausal": "Endometrial Cancer",
+        "uterine": "Uterine Cancer",
+        "endometrial": "Uterine Cancer",
+        # Symptom-based risk mapping (Triage mode) - Multilingual support
+        "menstru": "Uterine Cancer",
+        "vaginal": "Uterine Cancer",
+        "bleeding": "Uterine Cancer",
+        "sangrado": "Uterine Cancer",
+        "periods": "Uterine Cancer",
+        "periodo": "Uterine Cancer",
+        "postmenopausal": "Uterine Cancer",
+        "postmenopau": "Uterine Cancer",
+        "hemorragia": "Uterine Cancer",
     }
     for keyword, label in cancer_keywords.items():
         if keyword in text_lower:
