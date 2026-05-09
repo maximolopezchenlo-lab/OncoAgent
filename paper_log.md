@@ -88,4 +88,12 @@ At 15s/step, ETA is ~62 hours per epoch. The strategy allows interrupting the pr
 **Performance Metrics:**
 - **Outcome:** System successfully identifies the risk of uterine neoplasms and recommends standard-of-care diagnostic steps (e.g., endometrial biopsy/ultrasound) based on the NCCN guidelines retrieved for "Uterine Cancer".
 - **Hardware Audit:** Confirmed that the system is currently utilizing the **AMD Instinct MI300X** exclusively for high-load SFT training, while real-time inference is delegated to **Featherless.ai** to maintain UI responsiveness during the 60-hour training epoch.
-- **UI Deployment:** The Gradio application is active and reachable at `http://localhost:7860`.
+
+---
+
+## [2026-05-09] UI Activation & Natural Language Simulation
+**Problem:** Need to validate the agent's "zero-shot" predictive capability using only raw, non-technical symptoms in a realistic clinical interaction.
+**Architectural Decision:** Refined the simulation prompt to remove all medical jargon (e.g., "menorrhagia", "amenorrhea") and prior study references. The goal is to test the `data_ingestion_node`'s ability to map common phrases like "heavy bleeding" to high-risk oncology domains.
+**Performance Metrics:**
+- **UI Status:** Successfully launched Gradio 6 app on port 7860 using the `.venv` environment.
+- **Outcome:** Verified that the natural language prompt triggers the correct RAG pathway for "Uterine Cancer" guidelines, even without explicit diagnostic keywords.

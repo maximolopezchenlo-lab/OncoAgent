@@ -76,4 +76,12 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 **Métricas de Rendimiento:**
 - **Resultado:** El sistema identifica con éxito el riesgo de neoplasias uterinas y recomienda pasos diagnósticos estándar (ej. biopsia endometrial/ecografía) basados en las guías NCCN recuperadas para "Uterine Cancer".
 - **Auditoría de Hardware:** Se confirmó que el sistema utiliza la **AMD Instinct MI300X** exclusivamente para el entrenamiento SFT de alta carga, mientras que la inferencia en tiempo real se delega a **Featherless.ai** para mantener la fluidez de la interfaz durante la época de entrenamiento de 60 horas.
-- **Despliegue de UI:** La aplicación Gradio está activa y disponible en `http://localhost:7860`.
+
+---
+
+## [09-05-2026] Activación de UI y Simulación de Lenguaje Natural
+**Problema:** Necesidad de validar la capacidad predictiva "zero-shot" del agente utilizando solo síntomas crudos y no técnicos en una interacción clínica realista.
+**Decisión Arquitectónica:** Se refinó el prompt de simulación para eliminar todo el argot médico (ej. "menorragia", "amenorrea") y referencias a estudios previos. El objetivo es probar la capacidad del `data_ingestion_node` para mapear frases comunes como "sangrado abundante" a dominios oncológicos de alto riesgo.
+**Métricas de Rendimiento:**
+- **Estado de UI:** Aplicación Gradio 6 lanzada con éxito en el puerto 7860 utilizando el entorno `.venv`.
+- **Resultado:** Se verificó que el prompt en lenguaje natural activa la ruta RAG correcta para las guías de "Cáncer de Útero", incluso sin palabras clave diagnósticas explícitas.

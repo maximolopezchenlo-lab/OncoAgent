@@ -73,10 +73,10 @@ By implementing a multilingual symptom-to-risk heuristic mapper, we solved the "
 ✅ Accented Spanish Support
 ✅ Real-world case study validated (Red flag detected!)
 
-🚀 Clinical Simulation Complete! We tested OncoAgent with a real-world case using only raw symptoms—no technical labels allowed. 🩺🔍
+🚀 UI is LIVE! 🏥 We've officially launched the OncoAgent triage interface on port 7860. It's now ready for end-to-end clinical simulation.
 
-Results: The system accurately predicted the need for uterine oncology guidelines based on "irregular periods" and "menorrhagia" alone! 🎯 This is a huge win for early triage and decision support.
+🔍 Real-World Stress Test: We refined our "Natural Language" simulation. No medical jargon allowed—just raw patient symptoms. Can OncoAgent recognize the hidden oncology risk in "irregular periods" and "heavy flow"? 🩺✨
 
-⚡ Performance Audit: Our AMD Instinct MI300X is currently 100% dedicated to its 60-hour SFT training run. To keep the demo snappy, we're offloading real-time inference to Featherless.ai. Parallel compute at its best! 💻🔥
+Yes it can! Our multi-agent brain correctly triggered Uterine Cancer guidelines from a simple human conversation. This is the future of early clinical decision support.
 
-#AMDHackathon #OncoAgent #ClinicalAI #ROCm #MI300X #BuildInPublic #HealthTech
+#AMDHackathon #OncoAgent #ClinicalAI #Gradio #ROCm #MI300X #BuildInPublic
