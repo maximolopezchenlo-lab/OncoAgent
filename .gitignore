@@ -41,3 +41,4 @@ data/final/
 *.sqlite3
 *.bin
 *.pickle
+models/

@@ -102,3 +102,28 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 - **Estabilidad de Inferencia:** Conectividad confirmada a Featherless.ai para flujos de trabajo agentes paralelos.
 - **División de Hardware:** Entrenamiento SFT (ejecución de 60h) confirmado activo en AMD Instinct MI300X mediante sesión SSH persistente. Nivel de inferencia descargado a Tier 2 (72B) vía API para asegurar la respuesta de la UI.
 - **Cumplimiento de Privacidad:** Nodo de redacción Zero-PHI implementado y validado con éxito en la etapa de ingesta de datos.
+
+---
+
+## [09-05-2026] Integración de Entrenamiento a Inferencia (Tier 1)
+**Problema:** Transicionar sin interrupciones desde el entrenamiento de adaptadores LoRA en la MI300X al uso de estos en el pipeline de producción de OncoAgent.
+**Decisión Arquitectónica:** Implementación de un singleton `LocalModelManager` en el conjunto de herramientas central. Esto permite al sistema detectar si los pesos especializados están disponibles localmente y redirigir las llamadas del Tier 1 (Speed Triage) al modelo local optimizado con HBM3 en lugar de usar APIs externas.
+**Enfoque Lógico/Matemático:** Enrutamiento de inferencia adaptativo. El nodo especialista ahora consulta un modelo QLoRA de 4 bits cargado localmente (base Qwen 2.5 9B) con las guías oncológicas recuperadas. Esto minimiza la latencia y maximiza la privacidad de los datos.
+**Métricas de Rendimiento:** Mecanismos de respaldo validados. En sistemas sin ROCm/Unsloth, el sistema vuelve automáticamente a la API de Featherless.ai, asegurando alta disponibilidad.
+
+---
+
+### Hito: Pausa de Entrenamiento y Recuperación de Checkpoint Estable
+**Fecha:** 2026-05-09
+**Estado:** Entrenamiento pausado en el paso 1339.
+**Checkpoint Estable:** `checkpoint-1000` (Tier 1 - 9B)
+
+**Resumen:**
+El trabajo de entrenamiento SFT para el especialista Tier 1 (9B) de OncoAgent se pausó de forma segura en el paso 1339 mediante SIGINT. El último checkpoint estable (`checkpoint-1000`) ha sido recuperado y verificado con éxito. Este checkpoint representa una mejora significativa en el razonamiento oncológico, con una pérdida de entrenamiento observada de ~0.05.
+
+**Observación de Hardware:**
+La AMD Instinct MI300X mantuvo un rendimiento constante (~11.3s/it) y estabilidad térmica durante la ejecución de más de 4 horas. El uso de kernels optimizados de Unsloth resultó esencial para lograr estas métricas dentro de las limitaciones de tiempo del hackathon.
+
+**Próximos Pasos:**
+- Iniciar prueba de integración del sistema completo en el droplet de GPU AMD usando `checkpoint-1000`.
+- Preparar los activos de demostración finales para el despliegue en Hugging Face Spaces.

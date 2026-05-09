@@ -18,6 +18,14 @@ from dataclasses import dataclass
 from openai import OpenAI
 from dotenv import load_dotenv
 
+# Conditional imports for local adapter inference
+try:
+    from unsloth import FastLanguageModel
+    import torch
+    HAS_LOCAL_INFERENCE = True
+except ImportError:
+    HAS_LOCAL_INFERENCE = False
+
 load_dotenv()
 
 logger = logging.getLogger(__name__)
@@ -88,6 +96,88 @@ def get_vllm_client() -> OpenAI:
 
 
 # ---------------------------------------------------------------------------
+# Local Adapter Manager (PEFT/Unsloth)
+# ---------------------------------------------------------------------------
+
+class LocalModelManager:
+    """Singleton to manage local LoRA model loading and inference."""
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(LocalModelManager, cls).__new__(cls)
+            cls._instance.model = None
+            cls._instance.tokenizer = None
+            cls._instance.initialized = False
+        return cls._instance
+
+    def initialize(self):
+        """Load the base model and LoRA adapters."""
+        if self.initialized:
+            return
+
+        if not HAS_LOCAL_INFERENCE:
+            logger.warning("Unsloth/Torch not found. Local inference disabled.")
+            return
+
+        adapter_path = os.getenv("LOCAL_ADAPTER_PATH")
+        base_model_id = os.getenv("BASE_MODEL_ID", "unsloth/Qwen2.5-7B-Instruct-bnb-4bit")
+
+        if not adapter_path or not os.path.exists(adapter_path):
+            logger.error("Local adapter path not found: %s", adapter_path)
+            return
+
+        logger.info("Loading local adapters from %s...", adapter_path)
+        try:
+            model, tokenizer = FastLanguageModel.from_pretrained(
+                model_name=adapter_path, # Unsloth supports loading directly from adapter path
+                max_seq_length=2048,
+                load_in_4bit=True,
+                device_map="auto",
+            )
+            FastLanguageModel.for_inference(model)
+            self.model = model
+            self.tokenizer = tokenizer
+            self.initialized = True
+            logger.info("Local model initialized successfully on %s", os.getenv("DEVICE", "cuda"))
+        except Exception as e:
+            logger.error("Failed to load local model: %s", e)
+
+    def generate(self, system_prompt: str, user_prompt: str, max_tokens: int, temperature: float) -> str:
+        """Run inference using the loaded local model."""
+        if not self.initialized:
+            self.initialize()
+        
+        if not self.initialized:
+            raise RuntimeError("Local model manager requested but not initialized.")
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+        
+        inputs = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=True,
+            add_generation_prompt=True,
+            return_tensors="pt",
+        ).to("cuda")
+
+        outputs = self.model.generate(
+            input_ids=inputs,
+            max_new_tokens=max_tokens,
+            temperature=temperature,
+            use_cache=True,
+        )
+        
+        response = self.tokenizer.batch_decode(outputs[:, inputs.shape[1]:], skip_special_tokens=True)[0]
+        return response.strip()
+
+
+_local_manager = LocalModelManager()
+
+
+# ---------------------------------------------------------------------------
 # Tier-Aware Model Calling
 # ---------------------------------------------------------------------------
 
@@ -130,6 +220,20 @@ def call_tier_model(
         "Calling %s (max_tokens=%d, temp=%.2f, json=%s)",
         spec, effective_max_tokens, effective_temperature, json_mode,
     )
+
+    # Check if we should use local adapters for Tier 1
+    use_local = os.getenv("USE_LOCAL_ADAPTERS", "false").lower() == "true"
+    if tier == 1 and use_local and HAS_LOCAL_INFERENCE:
+        try:
+            logger.info("Routing Tier 1 call to local LoRA adapters...")
+            return _local_manager.generate(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                max_tokens=effective_max_tokens,
+                temperature=effective_temperature
+            )
+        except Exception as local_exc:
+            logger.warning("Local inference failed, falling back to API: %s", local_exc)
 
     try:
         client = get_vllm_client()

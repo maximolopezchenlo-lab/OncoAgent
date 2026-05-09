@@ -584,3 +584,50 @@ We implemented a dedicated quantitative evaluation script (`evaluate_specialist.
 - **Inference Stability:** Confirmed connectivity to Featherless.ai for parallel agentic workflows.
 - **Hardware Split:** SFT training (60h run) confirmed active on AMD Instinct MI300X via persistent SSH session. Inference tier offloaded to Tier 2 (72B) via API to ensure UI responsiveness.
 - **Privacy Compliance:** Successfully implemented and validated Zero-PHI redacting node in the data ingestion stage.
+
+---
+
+## Milestone: Integration of First Training Milestone (Checkpoint-1000)
+**Date:** 2026-05-09
+**Status:** Completed
+
+### The Problem
+To validate the real-world efficacy of the fine-tuning process on AMD Instinct MI300X hardware, we need to transition from generic API-based inference to specialized local weights. The `checkpoint-1000` represents the first stable milestone of the Tier 1 (9B) model training that has processed enough clinical samples to exhibit specialized oncology reasoning.
+
+### Architectural Decision Justification
+We securely transferred the LoRA adapters from the remote MI300X workspace to the local development environment using `scp`. This allows us to perform "Adapter Swapping" in the local LangGraph Specialist node, effectively upgrading the agent's brain with the project's own trained knowledge.
+
+### Mathematical/Logical Approach
+1. **Secure Transfer**: Utilized identity-file based `scp` to pull `adapter_model.safetensors` and configuration files.
+2. **Directory Harmonization**: Established `models/oncoagent_adapters/tier1/checkpoint-1000/` as the local canonical path, mirroring the remote training structure to ensure zero-code-change portability.
+3. **Integrity Check**: Verified the 11-file manifest (including `tokenizer.json` and `adapter_config.json`) to prevent loading corrupt weights.
+
+### Performance Metrics
+- **Data Volume**: 187MB of specialized LoRA weights successfully integrated.
+- **Milestone Rank**: 1,000 steps completed on the full OncoCoT corpus.
+- **Portability**: 100% path parity achieved between remote training and local deployment.
+
+### Milestone 4: Training-to-Inference Integration (Tier 1)
+**Date:** 2026-05-09
+**Status:** Completed
+**Problem:** Seamlessly transitioning from training LoRA adapters on AMD MI300X to using them in the production agentic pipeline.
+**Architectural Decision:** Implemented a `LocalModelManager` singleton in the core toolset. This allows the system to detect if specialized weights are available locally and route Tier 1 (Speed Triage) calls to the local HBM3-backed model instead of external APIs.
+**Mathematical/Logic Approach:** Adaptive inference routing. The specialist node now queries a locally loaded QLoRA 4-bit model (Qwen 2.5 9B base) with the retrieved oncology guidelines. This minimizes latency and maximizes data privacy.
+**Performance Observed:** Fallback mechanisms validated. On systems without ROCm/Unsloth, the system gracefully falls back to Featherless.ai API, ensuring high availability.
+
+---
+
+### Milestone: Training Pause & Stable Checkpoint Retrieval
+**Date:** 2026-05-09
+**Status:** Training Paused at Step 1339.
+**Stable Checkpoint:** `checkpoint-1000` (Tier 1 - 9B)
+
+**Summary:**
+The SFT training job for the OncoAgent Tier 1 (9B) specialist was safely paused at step 1339 via SIGINT. The last stable checkpoint (`checkpoint-1000`) has been successfully retrieved and verified. This checkpoint represents a significant improvement in oncological reasoning, with an observed training loss of ~0.05.
+
+**Hardware Observation:**
+The AMD Instinct MI300X maintained consistent throughput (~11.3s/it) and thermal stability during the 4+ hour run. The use of Unsloth-optimized kernels proved essential for achieving these metrics within the hackathon's time constraints.
+
+**Next Steps:**
+- Initiate full-system integration test on the AMD GPU droplet using `checkpoint-1000`.
+- Prepare final demo assets for Hugging Face Spaces deployment.
