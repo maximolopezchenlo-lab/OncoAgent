@@ -45,3 +45,8 @@ Para asegurar que cualquiera pueda experimentar el poder de nuestro pipeline de 
 **Solución:** Construimos un mock de frontend de toda la lógica del pipeline que transmite salidas clínicas idénticas, ¡probando el concepto de UX limpiamente en el nivel gratuito! 🧠💻
 
 #AMDHackathon #HealthTech #ROCm #LangGraph #HuggingFace
+
+🚀 Actualización: ¡OncoAgent ha sido migrado completamente a su hogar oficial en @huggingface!
+Acabamos de sincronizar todo nuestro repositorio del proyecto en un Storage Bucket dedicado de Hugging Face. ¡Todo el código, registros y ADRs técnicos ahora están disponibles de forma centralizada para los jueces!
+¡El proyecto está estructuralmente completo y listo para la evaluación final! 🩺💻
+#AMDHackathon #HealthTech #ROCm #BuildInPublic #AI

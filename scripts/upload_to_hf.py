@@ -37,3 +37,19 @@ try:
     print("✅ Paper subido correctamente.")
 except Exception as e:
     print(f"❌ Error con el Paper: {e}")
+
+print("\n3. Creando y sincronizando el Storage Bucket (OncoAgent)...")
+bucket_id = f"{ORG}/OncoAgent"
+try:
+    api.create_bucket(bucket_id=bucket_id, exist_ok=True)
+    api.sync_bucket(
+        source=".",
+        dest=f"hf://buckets/{bucket_id}",
+        exclude=[
+            ".git*", ".venv*", "__pycache__*", "models/*", "data/*", "scratch/*", "logs/*", 
+            "*.safetensors", "*.bin", "*.sqlite3", "scripts/append_logs*", "AMD Developer Hackathon*.pdf"
+        ]
+    )
+    print("✅ Bucket sincronizado correctamente.")
+except Exception as e:
+    print(f"❌ Error con el Bucket: {e}")

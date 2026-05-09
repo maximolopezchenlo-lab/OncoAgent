@@ -175,3 +175,8 @@ Se implementó un generador de cadenas en fragmentos que imita el streaming toke
 **Métricas de Rendimiento:** 
 - Tiempo de carga de UI standalone: < 2 segundos.
 - Finalización de pipeline simulado: ~5 segundos (reflejando latencia real de MI300X).
+
+## [2026-05-09] Migración Final del Repositorio & Sincronización de Storage Bucket
+**Decisión Arquitectónica:** Se integraron los Storage Buckets de Hugging Face para centralizar los activos del proyecto OncoAgent.
+**Implementación:** Se actualizó `upload_to_hf.py` para utilizar `HfApi.create_bucket` y `HfApi.sync_bucket` logrando la sincronización fluida de todo el repositorio (excluyendo archivos sensibles y el historial de `.git`).
+**Rendimiento:** Se replicó eficientemente el entorno del proyecto en `https://huggingface.co/buckets/lablab-ai-amd-developer-hackathon/OncoAgent` permitiendo a los jueces acceder a todos los archivos fuente, ADRs y recursos nativamente a través de la infraestructura de HF.
