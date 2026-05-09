@@ -7,12 +7,21 @@ if not TOKEN:
 ORG = "lablab-ai-amd-developer-hackathon"
 api = HfApi(token=TOKEN)
 
-EXCLUDE_PATTERNS = [
-    ".git*", ".venv*", "__pycache__*", "models/*", "data/*", "scratch/*", "logs/*", 
-    "*.safetensors", "*.bin", "*.sqlite3", "scripts/append_logs*", "AMD Developer Hackathon*.pdf",
-    "paper_log*", "social_media_log*", "walkthrough*", "AGENTS.md", "CLAUDE.md", ".claude*", ".oncoagent*",
-    ".env*"
-]
+def get_gitignore_patterns():
+    patterns = [".git*"]
+    if os.path.exists(".gitignore"):
+        with open(".gitignore", "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    if line.startswith("/"):
+                        line = line[1:]
+                    if line.endswith("/"):
+                        line = line + "*"
+                    patterns.append(line)
+    return patterns
+
+EXCLUDE_PATTERNS = get_gitignore_patterns()
 
 print("1. Creando y subiendo el Space Repo (OncoAgent)...")
 space_repo_id = f"{ORG}/OncoAgent"
@@ -22,7 +31,8 @@ try:
         folder_path=".",
         repo_id=space_repo_id,
         repo_type="space",
-        ignore_patterns=EXCLUDE_PATTERNS
+        ignore_patterns=EXCLUDE_PATTERNS,
+        delete_patterns="*"
     )
     print("✅ Space subido correctamente.")
 except Exception as e:
@@ -49,7 +59,8 @@ try:
     api.sync_bucket(
         source=".",
         dest=f"hf://buckets/{bucket_id}",
-        exclude=EXCLUDE_PATTERNS
+        exclude=EXCLUDE_PATTERNS,
+        delete=True
     )
     print("✅ Bucket sincronizado correctamente.")
 except Exception as e:
