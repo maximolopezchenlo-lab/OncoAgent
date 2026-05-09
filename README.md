@@ -3,7 +3,9 @@ title: OncoAgent
 emoji: 🧬
 colorFrom: red
 colorTo: blue
-sdk: docker
+sdk: gradio
+sdk_version: 5.31.0
+app_file: ui/app.py
 pinned: false
 license: apache-2.0
 short_description: Multi-Agent Oncology Triage powered by AMD MI300X
