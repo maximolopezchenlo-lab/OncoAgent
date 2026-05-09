@@ -2,7 +2,7 @@
 Specialist Node — Tier-adaptive clinical reasoning with Chain-of-Thought.
 
 Design patterns:
-  - Model Tiering: routes to Qwen 3.5 9B (fast) or Qwen 3.6 27B (deep)
+  - Model Tiering: routes to Qwen3.5-9B (fast) or Qwen3.6-27B (deep)
   - Reflexion: accepts critic feedback for iterative refinement
   - Anti-Hallucination: system prompt strictly forbids inventing treatments
 
@@ -59,7 +59,8 @@ OUTPUT FORMAT (use this exact structure):
 ## Recomendación Final
 [The absolute next step for the clinician with confidence level]
 
-Provide your recommendation in Spanish, clearly citing the guidelines."""
+Provide your recommendation in Spanish, clearly citing the guidelines.
+IMPORTANT: Output your recommendation DIRECTLY. Do NOT wrap it in <think> tags."""
 
 
 _USER_PROMPT_TEMPLATE = """\

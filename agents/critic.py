@@ -7,10 +7,6 @@ Design pattern: Reflexion (Shinn et al. 2023)
   - If FAIL → specific feedback injected back to Specialist for retry
   - Max 2 iterations before safe fallback
 
-Inspired by:
-  - Claude Code: deterministic safety checks outside LLM control
-  - Hermes Agent: structured evaluation with JSON verdicts
-
 Layer 1: Rule-based checks (deterministic, no LLM needed)
 Layer 2: LLM-based entailment verification (Tier 1 for speed)
 """
@@ -28,12 +24,17 @@ logger = logging.getLogger(__name__)
 # Maximum critic attempts before triggering safe fallback
 MAX_CRITIC_ATTEMPTS = 2
 
-# Required sections in a well-formed recommendation
-_REQUIRED_SECTIONS = [
-    "hallazgos",
-    "validación diagnóstica",
-    "manejo",
-    "recomendación final",
+# Required semantic concepts in a well-formed recommendation.
+# Each entry is a list of synonyms — at least ONE must appear.
+_REQUIRED_CONCEPTS = [
+    # Clinical findings / presentation
+    ["hallazgos", "findings", "presentación", "presentation", "clinical findings"],
+    # Diagnostic validation
+    ["diagnóstic", "diagnostic", "validación", "biopsia", "biopsy", "patholog", "patolog"],
+    # Management / treatment options
+    ["manejo", "management", "tratamiento", "treatment", "opciones", "options", "histerectom", "hysterectom", "surgery", "cirugía"],
+    # Final recommendation
+    ["recomendación", "recommendation", "conclusi", "next step"],
 ]
 
 
@@ -44,6 +45,9 @@ _REQUIRED_SECTIONS = [
 def _check_formatting(recommendation: str) -> tuple[bool, str]:
     """Verify the recommendation contains required structural sections.
 
+    Uses flexible semantic matching instead of exact section headers,
+    so the model can use different header styles and still pass.
+
     Args:
         recommendation: The specialist's output text.
 
@@ -51,16 +55,15 @@ def _check_formatting(recommendation: str) -> tuple[bool, str]:
         Tuple of (passed, feedback_message).
     """
     text_lower = recommendation.lower()
-    missing = []
+    missing_concepts = []
 
-    for section in _REQUIRED_SECTIONS:
-        # Check for markdown headers or section markers
-        if section not in text_lower:
-            missing.append(section)
+    for synonyms in _REQUIRED_CONCEPTS:
+        if not any(syn in text_lower for syn in synonyms):
+            missing_concepts.append(synonyms[0])
 
-    if missing:
+    if missing_concepts:
         feedback = (
-            f"FORMATTING: Missing required sections: {', '.join(missing)}. "
+            f"FORMATTING: Missing required concepts: {', '.join(missing_concepts)}. "
             "Please include all sections: Hallazgos Clínicos, Validación Diagnóstica, "
             "Análisis de Estadificación, Opciones de Manejo, Recomendación Final."
         )
@@ -95,16 +98,33 @@ def _check_safety_phrases(recommendation: str) -> tuple[bool, str]:
 
 
 def _check_diagnostic_rigor(recommendation: str, clinical_text: str) -> tuple[bool, str]:
-    """Ensure no premature treatment is recommended without a confirmed diagnosis."""
+    """Ensure no premature treatment is recommended without a confirmed diagnosis.
+
+    Args:
+        recommendation: The specialist's output text.
+        clinical_text: The original clinical input.
+
+    Returns:
+        Tuple of (passed, feedback_message).
+    """
     text_lower = clinical_text.lower()
     rec_lower = recommendation.lower()
-    
-    # Simple heuristic to detect if a biopsy/pathology was mentioned in the clinical text
-    has_pathology = any(word in text_lower for word in ["biopsia", "patología", "pathology", "biopsy", "histolog", "legrado", "malign"])
-    
+
+    # Detect if a biopsy/pathology was mentioned in the clinical text
+    pathology_keywords = [
+        "biopsia", "patología", "pathology", "biopsy", "histolog",
+        "legrado", "malign", "adenocarcinoma", "carcinoma", "sarcoma",
+        "linfoma", "lymphoma", "melanoma", "confirms", "confirma",
+        "diagnosed", "diagnosticado",
+    ]
+    has_pathology = any(word in text_lower for word in pathology_keywords)
+
     # Treatment keywords
-    treatment_keywords = ["cirugía", "radioterapia", "quimioterapia", "surgery", "radiation", "chemotherapy", "histerectomía", "hysterectomy"]
-    
+    treatment_keywords = [
+        "cirugía", "radioterapia", "quimioterapia", "surgery",
+        "radiation", "chemotherapy", "histerectomía", "hysterectomy",
+    ]
+
     if not has_pathology:
         found_treatments = [kw for kw in treatment_keywords if kw in rec_lower]
         if found_treatments:
@@ -114,7 +134,7 @@ def _check_diagnostic_rigor(recommendation: str, clinical_text: str) -> tuple[bo
                 "You MUST request a diagnostic procedure (e.g., biopsy) first."
             )
             return False, feedback
-            
+
     return True, ""
 
 
@@ -167,10 +187,8 @@ def _check_entailment(
             temperature=0.0,
         )
 
-        # Parse the response
         response_upper = response.upper()
         if "FAIL" in response_upper:
-            # Extract issues if possible
             feedback = f"ENTAILMENT: {response}"
             return False, feedback
 
@@ -188,10 +206,11 @@ def _check_entailment(
 def critic_node(state: AgentState) -> Dict[str, Any]:
     """Validate the specialist's recommendation for safety and completeness.
 
-    Runs three layers of checks:
-      1. Formatting (deterministic)
-      2. Safety phrases (deterministic)
-      3. Entailment (LLM-based)
+    Runs four layers of checks:
+      1. Formatting (deterministic — flexible concept matching)
+      2. Safety phrases (deterministic — dosage citation check)
+      3. Diagnostic rigor (deterministic — no treatment without pathology)
+      4. Entailment (LLM-based — only if layers 1-3 pass)
 
     If any check fails, returns FAIL with specific feedback.
     The graph will loop back to the specialist if attempts < max.
@@ -209,7 +228,16 @@ def critic_node(state: AgentState) -> Dict[str, Any]:
     # Track this attempt
     new_attempts = current_attempts + 1
 
-    # Guard: if recommendation is already the safe fallback phrase
+    # Guard: empty recommendation
+    if not recommendation or not recommendation.strip():
+        logger.warning("Critic received empty recommendation — auto-FAIL.")
+        return {
+            "critic_verdict": "FAIL",
+            "critic_feedback": "SYSTEM: Specialist returned empty recommendation.",
+            "critic_attempts": new_attempts,
+        }
+
+    # Guard: recommendation is already the safe fallback phrase
     if "información no concluyente" in recommendation.lower():
         return {
             "critic_verdict": "PASS",

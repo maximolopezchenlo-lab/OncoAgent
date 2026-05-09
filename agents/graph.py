@@ -6,7 +6,7 @@ Architecture synthesised from:
   - Hermes Agent: structured tool calling + persistent state
   - Corrective RAG: graded retrieval with query rewriting
   - Reflexion: generator ↔ critic loop with max iterations
-  - Model Tiering: Qwen 3.5 9B (fast) ↔ Qwen 3.6 27B (deep reasoning)
+  - Model Tiering: Qwen3.5-9B (fast) ↔ Qwen3.6-27B (deep reasoning)
 
 Topology:
   Router → Ingestion → Corrective RAG → Specialist ↔ Critic → HITL Gate → Formatter
