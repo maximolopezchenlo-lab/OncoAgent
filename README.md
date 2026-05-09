@@ -5,7 +5,7 @@ colorFrom: red
 colorTo: blue
 sdk: gradio
 sdk_version: 5.31.0
-app_file: ui/app.py
+app_file: app.py
 pinned: false
 license: apache-2.0
 short_description: Multi-Agent Oncology Triage powered by AMD MI300X
