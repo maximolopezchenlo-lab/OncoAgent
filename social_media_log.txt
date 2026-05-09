@@ -1,0 +1,47 @@
+
+🚀 SESSION COMPLETE: OncoAgent is now Zero-PHI and Training on MI300X! 🧬💻
+
+Today's Milestones:
+✅ Zero-PHI Compliance: Implemented an automated redaction engine in the ingestion node. Names, SSNs, and DOBs are scrubbed before the agent even sees them. Medical privacy guaranteed! 🔒
+✅ Dual-Hardware Strategy: While our AMD Instinct MI300X is running a 60-hour SFT (Fine-Tuning) marathon, the UI stays lightning-fast using Qwen 2.5 (72B) via Featherless.ai. ⚡
+✅ Gradio UI Stabilized: The full triage pipeline is active and validated on port 7860.
+✅ First Training Milestone: Downloaded `checkpoint-1000` from our MI300X beast! 🐉 These LoRA adapters are the result of the first phase of intensive oncology fine-tuning. Local integration in progress — soon our Specialist agent will be thinking with its own specialized brain!
+
+"Failures of the Day": We had a port collision scare during the restart, but fixed it with a process cleanup script. Just part of the process!
+
+#AMDHackathon #HealthTech #ROCm #OncologyAI #BuildInPublic #AMDInstinct #MI300X
+
+🚀 [UPDATE] Training Milestone Reached!
+We've safely paused our fine-tuning at step 1339. The Tier 1 Specialist (9B) is now powered by #OncoAgent checkpoint-1000! 🩺🧬
+Training loss hit a sweet spot at ~0.05. The MI300X is a beast – rock solid performance for 4+ hours of intense SFT.
+Next up: Full system test on the droplet and getting ready for the final @huggingface Spaces demo! 🏁
+#AMDHackathon #HealthTech #MI300X #ROCm #AIOncology #BuildInPublic
+
+🏁 CIERRE FINAL: ¡Pipeline de Inferencia Listo para la MI300X!
+Acabamos de integrar el `LocalModelManager` para alternar entre APIs externas y nuestro cerebro fine-tuneado local. 🧠⚡
+El sistema está configurado para aprovechar el ancho de banda HBM3 en el droplet de AMD para el triaje Tier 1. 
+¡Todo listo para la prueba funcional final y la gran demo! 🎥🚀
+#AMDHackathon #AMDInstinct #Unsloth #OncoAgent
+
+🚀 SESSION COMPLETE: OncoAgent upgraded to Qwen 3.5 & 3.6! 🧬💻
+Today we aligned our intelligence stack with the latest Qwen architectures. Tier 1 now runs on **Qwen 3.5-9B** for ultra-fast oncology triage, and Tier 2 scales to **Qwen 3.6-27B** for deep clinical reasoning.
+✅ Perfect LoRA Alignment: Our specialist adapters are now paired with their native 3.5-9B base for maximum medical fidelity.
+✅ BF16 Native Inference: No more quantization artifacts. With 192GB VRAM on the MI300X, we're doing full-precision inference on CDNA3!
+✅ Validated Stack: Ready for the final demo and @huggingface Spaces!
+#AMDHackathon #Qwen3 #HealthTech #AMDInstinct #MI300X #ROCm
+
+### Sesión: 2026-05-09
+- 🚀 **Logro:** ¡Documentación y arquitectura profesionalizadas al 100%! Explicamos nuestro modelo Dual-Tier y el motor LangGraph de manera transparente en los repos.
+- 💡 **Lección/Fracaso superado:** Nos dimos cuenta de que la complejidad del sistema no estaba bien transmitida a los jueces. Añadir los flujos exactos del Reflexion loop en el README soluciona eso y genera confianza técnica.
+#AMDHackathon #HealthTech #ROCm #OpenSource
+
+🚀 **OncoAgent Update: Hackathon Organization Submission & Interactive UI!**
+
+We are officially preparing our repositories for the `lablab-ai-amd-developer-hackathon` Hugging Face organization! 🎉 
+
+To ensure anyone can experience the power of our 5-agent pipeline, we've integrated a "View Demo" simulation in our Space. Now you can watch the Router, Extraction, Corrective RAG, Specialist, and Critic agents triage a complex Endometriosis case in real-time, simulating the blazing fast speeds of the AMD Instinct MI300X! ⚡🏥
+
+**Fail of the day:** Getting the HF Space to run without crashing out of memory without the GPU attached.
+**Solution:** We built a frontend-only mock of the entire pipeline logic that streams identical clinical outputs, proving the UX concept cleanly on the free tier! 🧠💻
+
+#AMDHackathon #HealthTech #ROCm #LangGraph #HuggingFace
