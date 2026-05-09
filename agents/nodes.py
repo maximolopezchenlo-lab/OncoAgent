@@ -180,6 +180,7 @@ def data_ingestion_node(state: AgentState) -> Dict[str, Any]:
             break
 
     return {
+        "clinical_text": cleaned_text,
         "extracted_entities": extracted,
         "phi_detected": phi_found,
     }

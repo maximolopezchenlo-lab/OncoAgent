@@ -582,4 +582,5 @@ We implemented a dedicated quantitative evaluation script (`evaluate_specialist.
 **Performance Metrics:**
 - **UI Availability:** 100% (Listening on port 7860).
 - **Inference Stability:** Confirmed connectivity to Featherless.ai for parallel agentic workflows.
-- **Hardware Split:** MI300X instance reserved for background SFT; Featherless.ai handling real-time triage inference.
+- **Hardware Split:** SFT training (60h run) confirmed active on AMD Instinct MI300X via persistent SSH session. Inference tier offloaded to Tier 2 (72B) via API to ensure UI responsiveness.
+- **Privacy Compliance:** Successfully implemented and validated Zero-PHI redacting node in the data ingestion stage.

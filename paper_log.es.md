@@ -99,5 +99,6 @@ A 15s/paso, el ETA es de ~62 horas por época. Esta estrategia permite interrump
 **Enfoque Lógico/Matemático:** Se ejecutó un reinicio limpio del servidor Gradio, asegurando que todos los nodos (CRAG, Router, Specialist) utilicen el nivel Qwen 2.5 Instruct para un triaje médico confiable.
 **Métricas de Rendimiento:**
 - **Disponibilidad de la UI:** 100% (Escuchando en el puerto 7860).
-- **Estabilidad de Inferencia:** Conectividad confirmada con Featherless.ai para flujos de trabajo agentes paralelos.
-- **División de Hardware:** Instancia MI300X reservada para SFT en segundo plano; Featherless.ai manejando la inferencia de triaje en tiempo real.
+- **Estabilidad de Inferencia:** Conectividad confirmada a Featherless.ai para flujos de trabajo agentes paralelos.
+- **División de Hardware:** Entrenamiento SFT (ejecución de 60h) confirmado activo en AMD Instinct MI300X mediante sesión SSH persistente. Nivel de inferencia descargado a Tier 2 (72B) vía API para asegurar la respuesta de la UI.
+- **Cumplimiento de Privacidad:** Nodo de redacción Zero-PHI implementado y validado con éxito en la etapa de ingesta de datos.
