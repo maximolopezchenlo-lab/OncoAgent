@@ -17,20 +17,15 @@ Training loss hit a sweet spot at ~0.05. The MI300X is a beast – rock solid pe
 Next up: Full system test on the droplet and getting ready for the final @huggingface Spaces demo! 🏁
 #AMDHackathon #HealthTech #MI300X #ROCm #AIOncology #BuildInPublic
 
-🏁 FINAL WRAP: Inference Pipeline Ready for MI300X!
-We've just integrated the `LocalModelManager` to swap between external APIs and our local fine-tuned brain. 🧠⚡
-The system is now fully configured to leverage HBM3 bandwidth on the AMD droplet for Tier 1 triage. 
-Everything is set for the final E2E functional test and the big demo! 🎥🚀
-#AMDHackathon #AMDInstinct #Unsloth #OncologyAgent
+🏁 CIERRE FINAL: ¡Pipeline de Inferencia Listo para la MI300X!
+Acabamos de integrar el `LocalModelManager` para alternar entre APIs externas y nuestro cerebro fine-tuneado local. 🧠⚡
+El sistema está configurado para aprovechar el ancho de banda HBM3 en el droplet de AMD para el triaje Tier 1. 
+¡Todo listo para la prueba funcional final y la gran demo! 🎥🚀
+#AMDHackathon #AMDInstinct #Unsloth #OncoAgent
 
-🚀 Sesión Finalizada: ¡Inferencia BF16 estable en AMD MI300X!
-
-Hoy dimos un salto gigante en calidad clínica. Migramos nuestro pipeline de inferencia local de 4 bits a precisión BF16 nativa. 🧠💻
-
-¿Por qué? Porque con 192GB de VRAM en la MI300X, ¡no necesitamos sacrificar ni un bit de precisión! Adiós a las repeticiones y al colapso semántico. Ahora el especialista Tier 1 (Qwen 2.5 7B + LoRA) razona con una claridad asombrosa.
-
-✅ Implementación estable con Transformers + PEFT.
-✅ Aprovechamiento total del hardware AMD Instinct.
-✅ Listos para la demo final y el despliegue en Hugging Face.
-
-#AMDHackathon #HealthTech #ROCm #OncoAgent #AIOnAMD #BuildInPublic
+🚀 SESSION COMPLETE: OncoAgent upgraded to Qwen 3.5 & 3.6! 🧬💻
+Today we aligned our intelligence stack with the latest Qwen architectures. Tier 1 now runs on **Qwen 3.5-9B** for ultra-fast oncology triage, and Tier 2 scales to **Qwen 3.6-27B** for deep clinical reasoning.
+✅ Perfect LoRA Alignment: Our specialist adapters are now paired with their native 3.5-9B base for maximum medical fidelity.
+✅ BF16 Native Inference: No more quantization artifacts. With 192GB VRAM on the MI300X, we're doing full-precision inference on CDNA3!
+✅ Validated Stack: Ready for the final demo and @huggingface Spaces!
+#AMDHackathon #Qwen3 #HealthTech #AMDInstinct #MI300X #ROCm

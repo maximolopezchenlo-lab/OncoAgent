@@ -140,3 +140,14 @@ La AMD Instinct MI300X mantuvo un rendimiento constante (~11.3s/it) y estabilida
 - **Decisión Arquitectónica:** Se migró el `LocalModelManager` de Unsloth (4 bits) a `transformers` + `PEFT` nativo utilizando precisión **bfloat16**.
 - **Justificación Técnica:** Aprovechar los masivos 192GB de VRAM del MI300X permite una inferencia BF16 de alta fidelidad, evitando la pérdida de precisión y los artefactos específicos de kernel que a veces se encuentran con la cuantización de 4 bits en arquitecturas CDNA3.
 - **Implementación:** Se actualizó `agents/tools.py` para usar `AutoModelForCausalLM` con `torch_dtype=torch.bfloat16` e integrar `PeftModel` para cargar los adaptadores LoRA.
+
+**Hito: Migración de Inferencia a BF16 para MI300X**
+- **Problema:** Se observó generación repetitiva de tokens y colapso semántico en la inferencia de 4 bits con Unsloth/BnB en el hardware AMD MI300X.
+- **Decisión Arquitectónica:** Se migró el `LocalModelManager` de Unsloth (4 bits) a `transformers` nativo + `PEFT` utilizando precisión **bfloat16**.
+- **Justificación Técnica:** Aprovechar la masiva VRAM de 192 GB de la MI300X permite una inferencia BF16 de alta fidelidad, evitando la pérdida de precisión y los artefactos de kernel específicos que a veces se encuentran con la cuantización de 4 bits en arquitecturas CDNA3.
+- **Implementación:** Se actualizó `agents/tools.py` para usar `AutoModelForCausalLM` con `torch_dtype=torch.bfloat16` e integrar `PeftModel` para cargar adaptadores LoRA.
+
+**Hito: Alineación de Modelos (Migración a Qwen 3.5/3.6)**
+- **Corrección:** Se identificó que los adaptadores de Tier 1 (`checkpoint-1000`) fueron entrenados específicamente sobre **Qwen 3.5-9B**, no Qwen 2.5.
+- **Acción:** Se migró `BASE_MODEL_ID` a `Qwen/Qwen3.5-9B` y `TIER2_MODEL_ID` a `Qwen/Qwen3.6-27B-Instruct` según las reglas del "Bloque 3" del hackathon.
+- **Impacto:** Asegura compatibilidad estructural completa entre los adaptadores LoRA y el modelo base, y aprovecha las últimas optimizaciones CDNA3 presentes en la serie Qwen 3.x.

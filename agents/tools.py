@@ -56,7 +56,7 @@ TIER_SPECS: Dict[int, TierSpec] = {
     1: TierSpec(
         tier_id=1,
         name="Speed Triage",
-        model_id=os.getenv("BASE_MODEL_ID", "Qwen/Qwen2.5-7B-Instruct"),
+        model_id=os.getenv("BASE_MODEL_ID", "Qwen/Qwen3.5-9B"),
         description="Fast local model for initial triage and low-complexity cases.",
         max_tokens=2048,
         temperature=0.1,
@@ -64,7 +64,7 @@ TIER_SPECS: Dict[int, TierSpec] = {
     2: TierSpec(
         tier_id=2,
         name="Deep Reasoning",
-        model_id=os.getenv("TIER2_MODEL_ID", "Qwen/Qwen2.5-72B-Instruct"),
+        model_id=os.getenv("TIER2_MODEL_ID", "Qwen/Qwen3.6-27B-Instruct"),
         description="High-reasoning model for complex oncology cases and validation.",
         max_tokens=4096,
         temperature=0.0,
@@ -122,7 +122,7 @@ class LocalModelManager:
             return
 
         adapter_path = os.getenv("LOCAL_ADAPTER_PATH")
-        base_model_id = os.getenv("BASE_MODEL_ID", "Qwen/Qwen2.5-7B-Instruct")
+        base_model_id = os.getenv("BASE_MODEL_ID", "Qwen/Qwen3.5-9B")
 
         if not adapter_path or not os.path.exists(adapter_path):
             logger.error("Local adapter path not found: %s", adapter_path)

@@ -1,5 +1,5 @@
 
-🚀 SESIÓN COMPLETADA: OncoAgent es ahora Zero-PHI y está entrenando en el MI300X! 🧬💻
+🚀 SESIÓN COMPLETADA: ¡OncoAgent es ahora Zero-PHI y está entrenando en el MI300X! 🧬💻
 
 Hitos de hoy:
 ✅ Zero-PHI Compliance: Implementamos un motor de redacción automática en el nodo de ingesta. Nombres, SSNs y DOBs se eliminan antes de que el agente los vea. ¡Privacidad médica garantizada! 🔒
@@ -22,3 +22,10 @@ Acabamos de integrar el `LocalModelManager` para alternar entre APIs externas y 
 El sistema está configurado para aprovechar el ancho de banda HBM3 en el droplet de AMD para el triaje Tier 1. 
 ¡Todo listo para la prueba funcional final y la gran demo! 🎥🚀
 #AMDHackathon #AMDInstinct #Unsloth #OncoAgent
+
+🚀 SESIÓN COMPLETADA: ¡OncoAgent actualizado a Qwen 3.5 y 3.6! 🧬💻
+Hoy alineamos nuestro stack de inteligencia con las últimas arquitecturas de Qwen. El Tier 1 ahora corre sobre **Qwen 3.5-9B** para triaje oncológico ultra-rápido, y el Tier 2 escala a **Qwen 3.6-27B** para razonamiento clínico profundo.
+✅ Alineación LoRA Perfecta: Nuestros adaptadores especialistas ahora están emparejados con su base nativa 3.5-9B para máxima fidelidad médica.
+✅ Inferencia Nativa BF16: Sin artefactos de cuantización. ¡Con 192GB de VRAM en la MI300X, estamos haciendo inferencia de precisión completa en CDNA3!
+✅ Stack Validado: ¡Listos para la demo final y Hugging Face Spaces!
+#AMDHackathon #Qwen3 #HealthTech #AMDInstinct #MI300X #ROCm #OncoAgent
