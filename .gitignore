@@ -93,3 +93,9 @@ package-lock.json
 # === External Docs (not part of codebase) ===
 *.pdf.bak
 AMD Developer Hackathon*.pdf
+
+# Large Datasets
+data/filtered/*.jsonl
+data/finetuning/*.jsonl
+data/**/*.jsonl
+

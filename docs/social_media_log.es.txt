@@ -1,0 +1,13 @@
+
+## Actualización de Sesión: 2026-05-10 10:48:15
+¡Acabamos de subir de nivel la demo de OncoAgent con una Landing Page premium y elegante! 🚀🧬
+
+Antes de que los usuarios se sumerjan en la simulación de triaje clínico, ahora son recibidos con una impresionante pantalla de introducción construida de forma completamente nativa en Gradio 6.
+- Diseño Glassmorphism 🪟
+- Tarjetas de características interactivas 🧠
+- Transición fluida a la interfaz principal de chat ⚡
+
+Las primeras impresiones importan, especialmente en HealthTech.
+
+#AMDHackathon #HealthTech #ROCm #Gradio #BuildInPublic
+

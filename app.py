@@ -235,6 +235,74 @@ label, .gr-input-label { color: #94a3b8 !important; }
     padding: 12px; border-top: 1px solid #1e293b;
 }
 
+/* Landing Page */
+.landing-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    text-align: center;
+    background: radial-gradient(circle at center, rgba(14, 165, 233, 0.08) 0%, transparent 60%);
+    border-radius: 24px;
+    padding: 40px;
+}
+.hero-title {
+    font-family: 'Figtree', sans-serif;
+    font-size: 3.8rem;
+    font-weight: 800;
+    color: #f8fafc;
+    margin-bottom: 16px;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #e0f2fe 0%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #94a3b8;
+    max-width: 650px;
+    margin: 0 auto 32px auto;
+    line-height: 1.6;
+}
+.btn-launch {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+    border: none !important; color: #fff !important;
+    font-size: 1.15rem !important; font-weight: 600 !important;
+    padding: 16px 42px !important; border-radius: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-out !important;
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3) !important;
+}
+.btn-launch:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 32px rgba(14, 165, 233, 0.4) !important;
+}
+.features-grid {
+    display: flex;
+    gap: 24px;
+    margin-top: 56px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.feature-card {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 16px;
+    padding: 24px;
+    width: 280px;
+    text-align: left;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(14, 165, 233, 0.4);
+}
+.feature-icon { font-size: 2rem; margin-bottom: 14px; }
+.feature-title { color: #f1f5f9; font-weight: 600; margin-bottom: 8px; font-size: 1.1rem; }
+.feature-desc { color: #64748b; font-size: 0.88rem; line-height: 1.5; }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -562,45 +630,86 @@ with gr.Blocks(
     title="OncoAgent — Oncology Triage Demo",
     theme=gr.themes.Base(),
 ) as demo:
-    # Header
-    gr.HTML(HEADER_HTML)
-    gr.HTML(INFO_HTML)
+    # ── Landing Page ──────────────────────────────────────────────────
+    with gr.Column(elem_classes=["landing-page"], visible=True) as landing_page:
+        gr.HTML("""
+        <div class="hero-title">🧬 OncoAgent</div>
+        <div class="hero-subtitle">
+            An open-source, multi-agent AI system designed for clinical oncology triage. 
+            Powered by AMD Instinct™ MI300X, LangGraph, and specialized Qwen models.
+        </div>
+        """)
+        
+        launch_btn = gr.Button("🚀 Launch Demo", elem_classes=["btn-launch"], size="lg")
+        
+        gr.HTML("""
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <div class="feature-title">Corrective RAG</div>
+                <div class="feature-desc">Grounded in 170+ NCCN & ESMO guidelines with distance-gating to prevent hallucinations.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <div class="feature-title">Multi-Agent Reasoning</div>
+                <div class="feature-desc">Tiered architecture (Qwen3.5-9B Router + Qwen3.6-27B Specialist) for complex clinical analysis.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <div class="feature-title">Clinical Safety</div>
+                <div class="feature-desc">Reflexion loops validate outputs against strict medical criteria before clinician review.</div>
+            </div>
+        </div>
+        """)
 
-    # Chat
-    chatbot = gr.Chatbot(
-        type="messages",
-        label="Clinical Triage Chat",
-        height=520,
-        show_label=False,
-        show_copy_button=True,
-        render_markdown=True,
-        elem_classes=["card"],
-    )
+    # ── Main App ──────────────────────────────────────────────────────
+    with gr.Column(visible=False) as app_page:
+        # Header
+        gr.HTML(HEADER_HTML)
+        gr.HTML(INFO_HTML)
 
-    # Controls
-    with gr.Row():
-        with gr.Column(scale=3):
-            txt = gr.Textbox(
-                placeholder="Enter a clinical case or click '▶ View Demo'...",
-                show_label=False,
-                lines=2,
-                max_lines=5,
-            )
-        with gr.Column(scale=1, min_width=180):
-            demo_btn = gr.Button(
-                "▶ View Demo",
-                elem_classes=["btn-demo"],
-                size="lg",
-            )
+        # Chat
+        chatbot = gr.Chatbot(
+            type="messages",
+            label="Clinical Triage Chat",
+            height=520,
+            show_label=False,
+            show_copy_button=True,
+            render_markdown=True,
+            elem_classes=["card"],
+        )
 
-    with gr.Row():
-        send_btn = gr.Button("Send", elem_classes=["btn-primary"], size="sm")
-        clear_btn = gr.Button("🗑 Clear", variant="secondary", size="sm")
+        # Controls
+        with gr.Row():
+            with gr.Column(scale=3):
+                txt = gr.Textbox(
+                    placeholder="Enter a clinical case or click '▶ View Demo'...",
+                    show_label=False,
+                    lines=2,
+                    max_lines=5,
+                )
+            with gr.Column(scale=1, min_width=180):
+                demo_btn = gr.Button(
+                    "▶ View Demo",
+                    elem_classes=["btn-demo"],
+                    size="lg",
+                )
 
-    # Footer
-    gr.HTML(FOOTER_HTML)
+        with gr.Row():
+            send_btn = gr.Button("Send", elem_classes=["btn-primary"], size="sm")
+            clear_btn = gr.Button("🗑 Clear", variant="secondary", size="sm")
+
+        # Footer
+        gr.HTML(FOOTER_HTML)
 
     # ── Event Handlers ────────────────────────────────────────────────
+
+    # Landing page navigation
+    launch_btn.click(
+        fn=lambda: [gr.update(visible=False), gr.update(visible=True)],
+        inputs=None,
+        outputs=[landing_page, app_page],
+    )
 
     demo_btn.click(
         fn=run_demo,
